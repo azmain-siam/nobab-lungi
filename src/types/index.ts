@@ -1,0 +1,30 @@
+// Central export for all types
+// Import from here instead of individual type files
+
+export type {
+  UserRole,
+  OrderStatus,
+  PaymentStatus,
+  PaymentMethod,
+  ParentType,
+  CouponType,
+  ShippingAddressSnapshot,
+  Profile,
+  Address,
+  Category,
+  Collection,
+  Product,
+  ProductImage,
+  CollectionProduct,
+  Order,
+  OrderItem,
+  Coupon,
+  Review,
+  Wishlist,
+  Banner,
+  ContactMessage,
+  ProductWithImages,
+  ProductWithCategory,
+  ProductFull,
+  OrderWithItems,
+} from './database';
