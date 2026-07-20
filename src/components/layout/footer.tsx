@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 /**
  * Store Footer — Server Component.
  */
@@ -21,19 +23,19 @@ export function Footer() {
             <p className="text-sm font-semibold uppercase tracking-wide text-gray-400">Shop</p>
             <ul className="mt-3 space-y-2" role="list">
               <li>
-                <a href="/products" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link href="/products" className="text-sm text-gray-600 hover:text-gray-900">
                   All Products
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/collections" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link href="/collections" className="text-sm text-gray-600 hover:text-gray-900">
                   Collections
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/categories" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link href="/categories" className="text-sm text-gray-600 hover:text-gray-900">
                   Categories
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -43,19 +45,19 @@ export function Footer() {
             <p className="text-sm font-semibold uppercase tracking-wide text-gray-400">Account</p>
             <ul className="mt-3 space-y-2" role="list">
               <li>
-                <a href="/account" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link href="/account" className="text-sm text-gray-600 hover:text-gray-900">
                   My Profile
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/account/orders" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link href="/account/orders" className="text-sm text-gray-600 hover:text-gray-900">
                   My Orders
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/account/wishlist" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link href="/account/wishlist" className="text-sm text-gray-600 hover:text-gray-900">
                   Wishlist
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

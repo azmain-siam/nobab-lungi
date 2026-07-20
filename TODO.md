@@ -22,11 +22,11 @@
 
 # Phase 3 - Authentication
 
-- [ ] Register
-- [ ] Login
-- [ ] Forgot Password
-- [ ] User Profile
-- [ ] Role Management
+- [x] Register
+- [x] Login
+- [x] Forgot Password
+- [x] User Profile
+- [x] Role Management
 
 ---
 
@@ -34,13 +34,13 @@
 
 ## Homepage
 
-- [ ] Hero Banner
-- [ ] Featured Categories
-- [ ] New Arrivals
-- [ ] Best Sellers
-- [ ] Collections
-- [ ] Why Choose Us
-- [ ] Footer
+- [x] Hero Banner
+- [x] Featured Categories
+- [x] New Arrivals
+- [x] Best Sellers
+- [x] Collections
+- [x] Why Choose Us
+- [x] Footer
 
 ---
 

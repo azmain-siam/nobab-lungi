@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Dashboard',
@@ -30,7 +31,7 @@ export default function DashboardPage() {
       {/* Quick links grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {QUICK_LINKS.map((link) => (
-          <a
+          <Link
             key={link.href}
             href={link.href}
             className="flex items-start gap-4 rounded-lg border border-gray-200 bg-white p-5 transition hover:border-gray-400 hover:shadow-sm"
@@ -42,7 +43,7 @@ export default function DashboardPage() {
               <p className="text-sm font-semibold text-gray-900">{link.label}</p>
               <p className="mt-0.5 text-xs text-gray-500">{link.description}</p>
             </div>
-          </a>
+          </Link>
         ))}
       </div>
 

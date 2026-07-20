@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -49,9 +50,9 @@ export function ResetPasswordForm() {
         <p className="text-lg font-semibold text-green-800">Password updated!</p>
         <p className="mt-2 text-sm text-green-700">
           Your password has been changed.{' '}
-          <a href="/login" className="underline hover:text-green-900">
+          <Link href="/login" className="underline hover:text-green-900">
             Sign in
-          </a>{' '}
+          </Link>{' '}
           with your new password.
         </p>
       </div>

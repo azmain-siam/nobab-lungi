@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { logoutAction } from '@/features/auth/actions/auth-actions';
 
@@ -23,9 +24,9 @@ export function AdminSidebar() {
     <aside className="flex w-56 shrink-0 flex-col border-r border-gray-200 bg-white">
       {/* Brand */}
       <div className="border-b border-gray-200 px-5 py-4">
-        <a href="/" className="text-base font-bold text-gray-900">
+        <Link href="/" className="text-base font-bold text-gray-900">
           Nobab Lungi
-        </a>
+        </Link>
         <p className="mt-0.5 text-xs text-gray-400">Admin Dashboard</p>
       </div>
 
@@ -40,7 +41,7 @@ export function AdminSidebar() {
 
             return (
               <li key={item.href}>
-                <a
+                <Link
                   href={item.href}
                   aria-current={isActive ? 'page' : undefined}
                   className={`flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition ${
@@ -51,7 +52,7 @@ export function AdminSidebar() {
                 >
                   <span aria-hidden="true">{item.icon}</span>
                   {item.label}
-                </a>
+                </Link>
               </li>
             );
           })}

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { ForgotPasswordForm } from '@/features/auth/components/forgot-password-form';
 
 export const metadata: Metadata = {
@@ -24,9 +25,9 @@ export default function ForgotPasswordPage() {
 
         <p className="text-center text-sm text-gray-500">
           Remember your password?{' '}
-          <a href="/login" className="font-medium text-gray-900 underline underline-offset-4">
+          <Link href="/login" className="font-medium text-gray-900 underline underline-offset-4">
             Back to login
-          </a>
+          </Link>
         </p>
       </div>
     </div>

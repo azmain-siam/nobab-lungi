@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'My Orders',
@@ -24,7 +25,7 @@ export default function AccountOrdersPage() {
           { label: 'Wishlist', href: '/account/wishlist' },
           { label: 'Addresses', href: '/account/addresses' },
         ].map((item) => (
-          <a
+          <Link
             key={item.href}
             href={item.href}
             className={`-mb-px border-b-2 pb-3 text-sm font-medium transition ${
@@ -34,7 +35,7 @@ export default function AccountOrdersPage() {
             }`}
           >
             {item.label}
-          </a>
+          </Link>
         ))}
       </nav>
 
@@ -44,12 +45,12 @@ export default function AccountOrdersPage() {
         <p className="mt-1 text-sm text-gray-500">
           Your orders will appear here once you place one.
         </p>
-        <a
+        <Link
           href="/products"
           className="mt-4 inline-block rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-700"
         >
           Start shopping
-        </a>
+        </Link>
       </div>
     </div>
   );

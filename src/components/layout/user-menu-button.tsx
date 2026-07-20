@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
 import type { User } from '@supabase/supabase-js';
 import { logoutAction } from '@/features/auth/actions/auth-actions';
 
@@ -65,30 +66,30 @@ export function UserMenuButton({ user }: UserMenuButtonProps) {
           role="menu"
           className="absolute right-0 z-50 mt-1 w-48 origin-top-right rounded-md border border-gray-200 bg-white py-1 shadow-lg"
         >
-          <a
+          <Link
             href="/account"
             role="menuitem"
             onClick={() => setOpen(false)}
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
           >
             My Profile
-          </a>
-          <a
+          </Link>
+          <Link
             href="/account/orders"
             role="menuitem"
             onClick={() => setOpen(false)}
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
           >
             My Orders
-          </a>
-          <a
+          </Link>
+          <Link
             href="/account/wishlist"
             role="menuitem"
             onClick={() => setOpen(false)}
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
           >
             Wishlist
-          </a>
+          </Link>
           <div className="my-1 border-t border-gray-100" />
           <form action={logoutAction}>
             <button

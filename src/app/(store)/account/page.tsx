@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getUserProfile } from '@/services/user-service';
@@ -40,7 +41,7 @@ export default async function AccountPage() {
           { label: 'Wishlist', href: '/account/wishlist' },
           { label: 'Addresses', href: '/account/addresses' },
         ].map((item) => (
-          <a
+          <Link
             key={item.href}
             href={item.href}
             className={`-mb-px border-b-2 pb-3 text-sm font-medium transition ${
@@ -50,7 +51,7 @@ export default async function AccountPage() {
             }`}
           >
             {item.label}
-          </a>
+          </Link>
         ))}
       </nav>
 

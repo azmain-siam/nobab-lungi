@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { LoginForm } from '@/features/auth/components/login-form';
 
 export const metadata: Metadata = {
@@ -38,9 +39,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
         <p className="text-center text-sm text-gray-500">
           Don&apos;t have an account?{' '}
-          <a href="/register" className="font-medium text-gray-900 underline underline-offset-4">
+          <Link href="/register" className="font-medium text-gray-900 underline underline-offset-4">
             Register
-          </a>
+          </Link>
         </p>
       </div>
     </div>

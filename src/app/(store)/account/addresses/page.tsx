@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Saved Addresses',
@@ -24,7 +25,7 @@ export default function AccountAddressesPage() {
           { label: 'Wishlist', href: '/account/wishlist' },
           { label: 'Addresses', href: '/account/addresses' },
         ].map((item) => (
-          <a
+          <Link
             key={item.href}
             href={item.href}
             className={`-mb-px border-b-2 pb-3 text-sm font-medium transition ${
@@ -34,7 +35,7 @@ export default function AccountAddressesPage() {
             }`}
           >
             {item.label}
-          </a>
+          </Link>
         ))}
       </nav>
 
