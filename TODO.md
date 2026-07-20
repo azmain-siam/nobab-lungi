@@ -39,11 +39,12 @@
 - [ ] New Arrivals
 - [ ] Best Sellers
 - [ ] Collections
+- [ ] Why Choose Us
 - [ ] Footer
 
 ---
 
-## Product
+## Product Catalog
 
 - [ ] Product List
 - [ ] Product Details
@@ -51,14 +52,16 @@
 - [ ] Filter
 - [ ] Sorting
 - [ ] Pagination
+- [ ] Related Products
 
 ---
 
-## Cart
+## Shopping Cart
 
 - [ ] Add to Cart
 - [ ] Update Quantity
 - [ ] Remove Item
+- [ ] Cart Summary
 - [ ] Coupon System
 
 ---
@@ -68,6 +71,7 @@
 - [ ] Shipping Address
 - [ ] Delivery Charge
 - [ ] Payment Method
+- [ ] Order Review
 - [ ] Place Order
 - [ ] Order Success
 
@@ -102,6 +106,8 @@
 - [ ] Sitemap
 - [ ] Robots.txt
 - [ ] Structured Data
+- [ ] Image Optimization
+- [ ] Performance Audit
 
 ---
 
@@ -116,7 +122,7 @@
 
 ---
 
-# Future
+<!-- # Future
 
 - [ ] SSLCommerz
 - [ ] Courier Integration
@@ -124,4 +130,4 @@
 - [ ] Loyalty Program
 - [ ] Referral System
 - [ ] Multi Language
-- [ ] Mobile App
+- [ ] Mobile App -->
