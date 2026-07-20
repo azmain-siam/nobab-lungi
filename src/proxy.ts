@@ -1,6 +1,8 @@
 import { createServerClient } from '@supabase/ssr';
 import { type NextRequest, NextResponse } from 'next/server';
 
+// Next.js 16: middleware has been renamed to "proxy".
+// File must be src/proxy.ts; function export must be named "proxy".
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -26,17 +28,20 @@ export async function proxy(request: NextRequest) {
   );
 
   // Refresh session — required for Server Components to read auth state
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const pathname = request.nextUrl.pathname;
 
   // Protect /dashboard routes — admin only
   if (pathname.startsWith('/dashboard')) {
     if (!user) {
-      return NextResponse.redirect(new URL('/login', request.url));
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('next', pathname);
+      return NextResponse.redirect(loginUrl);
     }
 
-    // Check admin role
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
@@ -51,12 +56,15 @@ export async function proxy(request: NextRequest) {
   // Protect /account routes — must be logged in
   if (pathname.startsWith('/account')) {
     if (!user) {
-      return NextResponse.redirect(new URL('/login', request.url));
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('next', pathname);
+      return NextResponse.redirect(loginUrl);
     }
   }
 
   // Redirect logged-in users away from auth pages
-  if (user && (pathname === '/login' || pathname === '/register')) {
+  const authOnlyPaths = ['/login', '/register', '/forgot-password'];
+  if (user && authOnlyPaths.includes(pathname)) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
@@ -68,9 +76,9 @@ export const config = {
     /*
      * Match all request paths EXCEPT:
      * - _next/static (static files)
-     * - _next/image (image optimization)
+     * - _next/image (image optimization files)
      * - favicon.ico, sitemap.xml, robots.txt
-     * - public assets
+     * - public image assets
      */
     '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|images/).*)',
   ],
