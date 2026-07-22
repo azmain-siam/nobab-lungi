@@ -2,30 +2,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { Category } from '@/types';
 import { SectionHeader } from '@/components/shared/section-header';
+import { Badge } from '@/components/ui/badge';
 
 interface FeaturedCategoriesProps {
   categories: Category[];
 }
-
-// Curated colors per parent_type × index
-const LUNGI_COLORS = [
-  'bg-amber-50 border-amber-200 hover:bg-amber-100',
-  'bg-orange-50 border-orange-200 hover:bg-orange-100',
-  'bg-yellow-50 border-yellow-200 hover:bg-yellow-100',
-  'bg-lime-50 border-lime-200 hover:bg-lime-100',
-  'bg-amber-50 border-amber-200 hover:bg-amber-100',
-];
-
-const SAREE_COLORS = [
-  'bg-rose-50 border-rose-200 hover:bg-rose-100',
-  'bg-pink-50 border-pink-200 hover:bg-pink-100',
-  'bg-fuchsia-50 border-fuchsia-200 hover:bg-fuchsia-100',
-  'bg-purple-50 border-purple-200 hover:bg-purple-100',
-  'bg-rose-50 border-rose-200 hover:bg-rose-100',
-];
-
-const LUNGI_BADGE = 'bg-amber-100 text-amber-800';
-const SAREE_BADGE = 'bg-rose-100 text-rose-800';
 
 export function FeaturedCategories({ categories }: FeaturedCategoriesProps) {
   if (categories.length === 0) return null;
@@ -42,34 +23,24 @@ export function FeaturedCategories({ categories }: FeaturedCategoriesProps) {
 
       {/* Lungi row */}
       <div>
-        <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-amber-700">
+        <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-gray-500">
           Lungi
         </p>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {lungiCats.map((cat, idx) => (
-            <CategoryCard
-              key={cat.id}
-              category={cat}
-              colorClass={LUNGI_COLORS[idx % LUNGI_COLORS.length]}
-              badgeClass={LUNGI_BADGE}
-            />
+          {lungiCats.map((cat) => (
+            <CategoryCard key={cat.id} category={cat} type="lungi" />
           ))}
         </div>
       </div>
 
       {/* Saree row */}
       <div>
-        <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-rose-700">
+        <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-gray-500">
           Saree
         </p>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {sareeCats.map((cat, idx) => (
-            <CategoryCard
-              key={cat.id}
-              category={cat}
-              colorClass={SAREE_COLORS[idx % SAREE_COLORS.length]}
-              badgeClass={SAREE_BADGE}
-            />
+          {sareeCats.map((cat) => (
+            <CategoryCard key={cat.id} category={cat} type="saree" />
           ))}
         </div>
       </div>
@@ -79,20 +50,19 @@ export function FeaturedCategories({ categories }: FeaturedCategoriesProps) {
 
 interface CategoryCardProps {
   category: Category;
-  colorClass: string;
-  badgeClass: string;
+  type: 'lungi' | 'saree';
 }
 
-function CategoryCard({ category, colorClass, badgeClass }: CategoryCardProps) {
+function CategoryCard({ category, type }: CategoryCardProps) {
   return (
     <Link
       href={`/categories/${category.slug}`}
-      className={`group relative flex flex-col overflow-hidden rounded-xl border p-4 transition sm:p-5 ${colorClass}`}
+      className="group flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-card p-4 shadow-sm transition hover:border-gray-300 hover:shadow-md sm:p-5"
       aria-label={`Browse ${category.name}`}
     >
       {/* Image (if uploaded) */}
       {category.image_url && (
-        <div className="relative mb-3 aspect-square w-full overflow-hidden rounded-lg">
+        <div className="relative mb-3 aspect-square w-full overflow-hidden rounded-lg bg-gray-100">
           <Image
             src={category.image_url}
             alt={category.name}
@@ -103,11 +73,11 @@ function CategoryCard({ category, colorClass, badgeClass }: CategoryCardProps) {
         </div>
       )}
 
-      <span className={`self-start rounded-full px-2 py-0.5 text-xs font-semibold ${badgeClass}`}>
-        {category.parent_type === 'lungi' ? 'Lungi' : 'Saree'}
-      </span>
+      <Badge variant={type === 'lungi' ? 'primary' : 'secondary'} className="self-start">
+        {type === 'lungi' ? 'Lungi' : 'Saree'}
+      </Badge>
 
-      <p className="mt-2 text-sm font-semibold text-gray-900 transition group-hover:text-gray-700">
+      <p className="mt-2 text-sm font-semibold text-gray-900 transition group-hover:text-primary">
         {category.name}
       </p>
 
@@ -117,7 +87,7 @@ function CategoryCard({ category, colorClass, badgeClass }: CategoryCardProps) {
 
       <span
         aria-hidden="true"
-        className="mt-3 text-xs font-medium text-gray-500 transition group-hover:translate-x-0.5 group-hover:text-gray-700"
+        className="mt-3 text-xs font-medium text-gray-400 transition group-hover:translate-x-0.5 group-hover:text-primary"
       >
         Shop →
       </span>

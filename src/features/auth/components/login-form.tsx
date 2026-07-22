@@ -6,6 +6,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { loginAction } from '@/features/auth/actions/auth-actions';
+import { FormField, FormInput } from '@/components/forms/form-field';
+import { AlertMessage } from '@/components/shared/alert-message';
+import { Button } from '@/components/ui/button';
 
 const loginSchema = z.object({
   email: z
@@ -44,77 +47,46 @@ export function LoginForm({ next = '/' }: LoginFormProps) {
   }
 
   return (
-    <form
-      id="login-form"
-      onSubmit={handleSubmit(onSubmit)}
-      noValidate
-      className="space-y-5"
-    >
-      {/* Server-level error */}
-      {serverError && (
-        <div
-          role="alert"
-          className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700"
-        >
-          {serverError}
-        </div>
-      )}
+    <form id="login-form" onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
+      {serverError && <AlertMessage variant="error" message={serverError} />}
 
-      {/* Email */}
-      <div className="space-y-1">
-        <label htmlFor="login-email" className="block text-sm font-medium text-gray-700">
-          Email address
-        </label>
-        <input
+      <FormField id="login-email" label="Email address" error={errors.email?.message}>
+        <FormInput
           id="login-email"
           type="email"
           autoComplete="email"
-          {...register('email')}
-          className="block w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 disabled:opacity-50"
           placeholder="you@example.com"
           disabled={isSubmitting}
+          {...register('email')}
         />
-        {errors.email && (
-          <p className="text-xs text-red-600">{errors.email.message}</p>
-        )}
-      </div>
+      </FormField>
 
-      {/* Password */}
-      <div className="space-y-1">
-        <div className="flex items-center justify-between">
-          <label htmlFor="login-password" className="block text-sm font-medium text-gray-700">
-            Password
-          </label>
+      <FormField
+        id="login-password"
+        label="Password"
+        error={errors.password?.message}
+        labelRight={
           <Link
             href="/forgot-password"
-            className="text-xs text-gray-500 underline underline-offset-4 hover:text-gray-700"
+            className="text-xs text-gray-500 underline underline-offset-4 hover:text-primary"
           >
             Forgot password?
           </Link>
-        </div>
-        <input
+        }
+      >
+        <FormInput
           id="login-password"
           type="password"
           autoComplete="current-password"
-          {...register('password')}
-          className="block w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 disabled:opacity-50"
           placeholder="••••••••"
           disabled={isSubmitting}
+          {...register('password')}
         />
-        {errors.password && (
-          <p className="text-xs text-red-600">{errors.password.message}</p>
-        )}
-      </div>
+      </FormField>
 
-      {/* Submit */}
-      <button
-        id="login-submit"
-        type="submit"
-        disabled={isSubmitting}
-        className="flex w-full items-center justify-center rounded-md bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 disabled:opacity-60"
-      >
+      <Button type="submit" fullWidth isLoading={isSubmitting}>
         {isSubmitting ? 'Signing in…' : 'Sign in'}
-      </button>
+      </Button>
     </form>
   );
 }

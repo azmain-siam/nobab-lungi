@@ -5,6 +5,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { updateProfileAction } from '@/features/auth/actions/profile-actions';
+import { FormField, FormInput } from '@/components/forms/form-field';
+import { AlertMessage } from '@/components/shared/alert-message';
+import { Button } from '@/components/ui/button';
 
 const editProfileSchema = z.object({
   name: z
@@ -49,65 +52,45 @@ export function EditProfileForm({ initialName, initialPhone }: EditProfileFormPr
   }
 
   return (
-    <form
-      id="edit-profile-form"
-      onSubmit={handleSubmit(onSubmit)}
-      noValidate
-      className="space-y-5"
-    >
-      {serverError && (
-        <div role="alert" className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
-          {serverError}
-        </div>
-      )}
-      {success && (
-        <div role="status" className="rounded-md bg-green-50 px-4 py-3 text-sm text-green-700">
-          Profile updated successfully.
-        </div>
-      )}
+    <form id="edit-profile-form" onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
+      {serverError && <AlertMessage variant="error" message={serverError} />}
+      {success && <AlertMessage variant="success" message="Profile updated successfully." />}
 
-      {/* Name */}
-      <div className="space-y-1">
-        <label htmlFor="profile-name" className="block text-sm font-medium text-gray-700">
-          Full name
-        </label>
-        <input
+      <FormField id="profile-name" label="Full name" error={errors.name?.message}>
+        <FormInput
           id="profile-name"
           type="text"
           autoComplete="name"
-          {...register('name')}
-          className="block w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 disabled:opacity-50"
           disabled={isSubmitting}
+          {...register('name')}
         />
-        {errors.name && <p className="text-xs text-red-600">{errors.name.message}</p>}
-      </div>
+      </FormField>
 
-      {/* Phone */}
-      <div className="space-y-1">
-        <label htmlFor="profile-phone" className="block text-sm font-medium text-gray-700">
-          Phone number{' '}
-          <span className="font-normal text-gray-400">(optional)</span>
-        </label>
-        <input
+      <FormField
+        id="profile-phone"
+        label="Phone number"
+        error={errors.phone?.message}
+        hint="Optional — must be a valid Bangladeshi number"
+      >
+        <FormInput
           id="profile-phone"
           type="tel"
           autoComplete="tel"
-          {...register('phone')}
-          className="block w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 disabled:opacity-50"
           placeholder="01XXXXXXXXX"
           disabled={isSubmitting}
+          {...register('phone')}
         />
-        {errors.phone && <p className="text-xs text-red-600">{errors.phone.message}</p>}
-      </div>
+      </FormField>
 
-      <button
+      <Button
         id="edit-profile-submit"
         type="submit"
+        fullWidth
+        isLoading={isSubmitting}
         disabled={isSubmitting || !isDirty}
-        className="flex w-full items-center justify-center rounded-md bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 disabled:opacity-60"
       >
         {isSubmitting ? 'Saving…' : 'Save changes'}
-      </button>
+      </Button>
     </form>
   );
 }

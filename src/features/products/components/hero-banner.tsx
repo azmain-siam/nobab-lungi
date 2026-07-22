@@ -33,7 +33,7 @@ export function HeroBanner({ banners }: HeroBannerProps) {
               {banner.link && (
                 <Link
                   href={banner.link}
-                  className="mt-8 inline-block rounded-md bg-amber-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-amber-400"
+                  className="mt-8 inline-block rounded-md bg-secondary px-6 py-3 text-sm font-semibold text-white transition hover:bg-secondary-hover"
                 >
                   Shop Now
                 </Link>
@@ -48,33 +48,31 @@ export function HeroBanner({ banners }: HeroBannerProps) {
   // ── Static fallback hero ─────────────────────────────────────
   return (
     <section aria-label="Hero banner" className="relative overflow-hidden bg-stone-900">
-      {/* Subtle grid pattern */}
+      {/* Subtle diagonal texture — using Tailwind CSS, no inline styles */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 opacity-[0.04]"
-        style={{
-          backgroundImage:
-            'repeating-linear-gradient(45deg,#fff 0,#fff 1px,transparent 0,transparent 50%)',
-          backgroundSize: '20px 20px',
-        }}
+        className="absolute inset-0 bg-[repeating-linear-gradient(45deg,rgba(255,255,255,0.03)_0px,rgba(255,255,255,0.03)_1px,transparent_1px,transparent_20px)]"
       />
       {/* Decorative glow */}
       <div
         aria-hidden="true"
-        className="absolute right-0 top-0 h-[600px] w-[600px] -translate-y-1/4 translate-x-1/4 rounded-full bg-amber-500 opacity-10 blur-3xl"
+        className="absolute right-0 top-0 h-[600px] w-[600px] -translate-y-1/4 translate-x-1/4 rounded-full bg-secondary opacity-10 blur-3xl"
       />
 
       <div className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
         <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
+          <p
+            className="font-bangla text-xs font-semibold uppercase tracking-widest text-secondary"
+            lang="bn"
+          >
             বাংলাদেশের সেরা তাঁতবস্ত্র
           </p>
 
           <h1 className="mt-4 text-5xl font-bold leading-tight text-white sm:text-6xl">
             Premium{' '}
-            <span className="text-amber-400">Lungi</span>
+            <span className="text-secondary">Lungi</span>
             {' '}&amp;{' '}
-            <span className="text-amber-400">Saree</span>
+            <span className="text-secondary">Saree</span>
           </h1>
 
           <p className="mt-6 max-w-lg text-lg leading-8 text-stone-300">
@@ -85,13 +83,13 @@ export function HeroBanner({ banners }: HeroBannerProps) {
           <div className="mt-10 flex flex-wrap gap-4">
             <Link
               href="/products"
-              className="rounded-md bg-amber-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-stone-900"
+              className="rounded-md bg-secondary px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-secondary-hover focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-stone-900"
             >
               Shop Now
             </Link>
             <Link
               href="/collections"
-              className="rounded-md border border-stone-500 px-6 py-3 text-sm font-semibold text-stone-200 transition hover:border-stone-300 hover:text-white"
+              className="rounded-md border border-stone-400 px-6 py-3.5 text-sm font-semibold text-stone-200 transition hover:border-stone-200 hover:text-white"
             >
               View Collections
             </Link>
@@ -102,7 +100,7 @@ export function HeroBanner({ banners }: HeroBannerProps) {
             {[
               { icon: '🚚', label: 'Free delivery above ৳1,000' },
               { icon: '✅', label: '100% authentic products' },
-              { icon: '🔄', label: 'Easy returns' },
+              { icon: '🔄', label: 'Easy 7-day returns' },
             ].map((item) => (
               <div key={item.label} className="flex items-center gap-2 text-xs text-stone-400">
                 <span aria-hidden="true">{item.icon}</span>

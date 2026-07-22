@@ -5,6 +5,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { registerAction } from '@/features/auth/actions/auth-actions';
+import { FormField, FormInput } from '@/components/forms/form-field';
+import { AlertMessage } from '@/components/shared/alert-message';
+import { Button } from '@/components/ui/button';
 
 const registerSchema = z
   .object({
@@ -51,123 +54,70 @@ export function RegisterForm() {
     }
   }
 
-  // Success state — ask user to verify email
   if (success) {
     return (
-      <div
-        role="status"
-        className="rounded-md bg-green-50 px-6 py-8 text-center"
-      >
-        <p className="text-lg font-semibold text-green-800">Check your email!</p>
-        <p className="mt-2 text-sm text-green-700">
-          We&apos;ve sent a confirmation link. Please verify your email to activate your account.
-        </p>
-      </div>
+      <AlertMessage
+        variant="success"
+        message="We've sent a confirmation link to your email. Please verify your email to activate your account."
+      />
     );
   }
 
   return (
-    <form
-      id="register-form"
-      onSubmit={handleSubmit(onSubmit)}
-      noValidate
-      className="space-y-5"
-    >
-      {/* Server-level error */}
-      {serverError && (
-        <div
-          role="alert"
-          className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700"
-        >
-          {serverError}
-        </div>
-      )}
+    <form id="register-form" onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
+      {serverError && <AlertMessage variant="error" message={serverError} />}
 
-      {/* Name */}
-      <div className="space-y-1">
-        <label htmlFor="register-name" className="block text-sm font-medium text-gray-700">
-          Full name
-        </label>
-        <input
+      <FormField id="register-name" label="Full name" error={errors.name?.message}>
+        <FormInput
           id="register-name"
           type="text"
           autoComplete="name"
-          {...register('name')}
-          className="block w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 disabled:opacity-50"
           placeholder="Your full name"
           disabled={isSubmitting}
+          {...register('name')}
         />
-        {errors.name && (
-          <p className="text-xs text-red-600">{errors.name.message}</p>
-        )}
-      </div>
+      </FormField>
 
-      {/* Email */}
-      <div className="space-y-1">
-        <label htmlFor="register-email" className="block text-sm font-medium text-gray-700">
-          Email address
-        </label>
-        <input
+      <FormField id="register-email" label="Email address" error={errors.email?.message}>
+        <FormInput
           id="register-email"
           type="email"
           autoComplete="email"
-          {...register('email')}
-          className="block w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 disabled:opacity-50"
           placeholder="you@example.com"
           disabled={isSubmitting}
+          {...register('email')}
         />
-        {errors.email && (
-          <p className="text-xs text-red-600">{errors.email.message}</p>
-        )}
-      </div>
+      </FormField>
 
-      {/* Password */}
-      <div className="space-y-1">
-        <label htmlFor="register-password" className="block text-sm font-medium text-gray-700">
-          Password
-        </label>
-        <input
+      <FormField id="register-password" label="Password" error={errors.password?.message}>
+        <FormInput
           id="register-password"
           type="password"
           autoComplete="new-password"
-          {...register('password')}
-          className="block w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 disabled:opacity-50"
           placeholder="Min. 6 characters"
           disabled={isSubmitting}
+          {...register('password')}
         />
-        {errors.password && (
-          <p className="text-xs text-red-600">{errors.password.message}</p>
-        )}
-      </div>
+      </FormField>
 
-      {/* Confirm Password */}
-      <div className="space-y-1">
-        <label htmlFor="register-confirm-password" className="block text-sm font-medium text-gray-700">
-          Confirm password
-        </label>
-        <input
+      <FormField
+        id="register-confirm-password"
+        label="Confirm password"
+        error={errors.confirmPassword?.message}
+      >
+        <FormInput
           id="register-confirm-password"
           type="password"
-          autoComplete="new-password"
-          {...register('confirmPassword')}
-          className="block w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 disabled:opacity-50"
+          autoComplete="off"
           placeholder="Repeat your password"
           disabled={isSubmitting}
+          {...register('confirmPassword')}
         />
-        {errors.confirmPassword && (
-          <p className="text-xs text-red-600">{errors.confirmPassword.message}</p>
-        )}
-      </div>
+      </FormField>
 
-      {/* Submit */}
-      <button
-        id="register-submit"
-        type="submit"
-        disabled={isSubmitting}
-        className="flex w-full items-center justify-center rounded-md bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 disabled:opacity-60"
-      >
+      <Button type="submit" fullWidth isLoading={isSubmitting}>
         {isSubmitting ? 'Creating account…' : 'Create account'}
-      </button>
+      </Button>
     </form>
   );
 }

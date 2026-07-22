@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { ChevronDown } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 import { logoutAction } from '@/features/auth/actions/auth-actions';
 
@@ -45,32 +46,27 @@ export function UserMenuButton({ user }: UserMenuButtonProps) {
         {/* Avatar initial */}
         <span
           aria-hidden="true"
-          className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-900 text-xs font-semibold text-white"
+          className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white"
         >
           {displayName[0].toUpperCase()}
         </span>
         <span className="hidden sm:block">{displayName}</span>
-        <svg
+        <ChevronDown
           aria-hidden="true"
-          className={`h-4 w-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+          className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+        />
       </button>
 
       {open && (
         <div
           role="menu"
-          className="absolute right-0 z-50 mt-1 w-48 origin-top-right rounded-md border border-gray-200 bg-white py-1 shadow-lg"
+          className="absolute right-0 z-50 mt-1 w-48 origin-top-right rounded-lg border border-gray-200 bg-white py-1 shadow-lg"
         >
           <Link
             href="/account"
             role="menuitem"
             onClick={() => setOpen(false)}
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            className="block px-4 py-2 text-sm text-gray-700 transition hover:bg-primary-light hover:text-primary"
           >
             My Profile
           </Link>
@@ -78,7 +74,7 @@ export function UserMenuButton({ user }: UserMenuButtonProps) {
             href="/account/orders"
             role="menuitem"
             onClick={() => setOpen(false)}
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            className="block px-4 py-2 text-sm text-gray-700 transition hover:bg-primary-light hover:text-primary"
           >
             My Orders
           </Link>
@@ -86,7 +82,7 @@ export function UserMenuButton({ user }: UserMenuButtonProps) {
             href="/account/wishlist"
             role="menuitem"
             onClick={() => setOpen(false)}
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            className="block px-4 py-2 text-sm text-gray-700 transition hover:bg-primary-light hover:text-primary"
           >
             Wishlist
           </Link>
@@ -96,7 +92,7 @@ export function UserMenuButton({ user }: UserMenuButtonProps) {
               id="user-menu-logout"
               type="submit"
               role="menuitem"
-              className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+              className="block w-full px-4 py-2 text-left text-sm text-red-600 transition hover:bg-red-50"
             >
               Sign out
             </button>

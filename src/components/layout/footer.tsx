@@ -12,7 +12,9 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
           {/* Brand */}
           <div>
-            <p className="text-base font-bold text-gray-900">Nobab Lungi</p>
+            <Link href="/" className="text-base font-bold text-gray-900 transition hover:text-primary">
+              Nobab Lungi
+            </Link>
             <p className="mt-2 text-sm text-gray-500">
               Premium Bangladeshi Lungi &amp; Saree. Fast delivery across Bangladesh.
             </p>
@@ -23,17 +25,17 @@ export function Footer() {
             <p className="text-sm font-semibold uppercase tracking-wide text-gray-400">Shop</p>
             <ul className="mt-3 space-y-2" role="list">
               <li>
-                <Link href="/products" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link href="/products" className="text-sm text-gray-600 transition hover:text-primary">
                   All Products
                 </Link>
               </li>
               <li>
-                <Link href="/collections" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link href="/collections" className="text-sm text-gray-600 transition hover:text-primary">
                   Collections
                 </Link>
               </li>
               <li>
-                <Link href="/categories" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link href="/categories" className="text-sm text-gray-600 transition hover:text-primary">
                   Categories
                 </Link>
               </li>
@@ -45,17 +47,17 @@ export function Footer() {
             <p className="text-sm font-semibold uppercase tracking-wide text-gray-400">Account</p>
             <ul className="mt-3 space-y-2" role="list">
               <li>
-                <Link href="/account" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link href="/account" className="text-sm text-gray-600 transition hover:text-primary">
                   My Profile
                 </Link>
               </li>
               <li>
-                <Link href="/account/orders" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link href="/account/orders" className="text-sm text-gray-600 transition hover:text-primary">
                   My Orders
                 </Link>
               </li>
               <li>
-                <Link href="/account/wishlist" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link href="/account/wishlist" className="text-sm text-gray-600 transition hover:text-primary">
                   Wishlist
                 </Link>
               </li>
@@ -70,3 +72,4 @@ export function Footer() {
     </footer>
   );
 }
+

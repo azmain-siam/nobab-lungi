@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { AccountNav } from '@/features/auth/components/account-nav';
+import { EmptyState } from '@/components/shared/empty-state';
 
 export const metadata: Metadata = {
   title: 'My Orders',
@@ -7,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * Order history page — placeholder for Phase 4.
+ * Order history page — placeholder for Phase 5.
  */
 export default function AccountOrdersPage() {
   return (
@@ -17,41 +18,14 @@ export default function AccountOrdersPage() {
         <p className="mt-1 text-sm text-gray-500">Track and manage your orders.</p>
       </div>
 
-      {/* Account navigation */}
-      <nav aria-label="Account sections" className="mb-8 flex gap-4 border-b border-gray-200">
-        {[
-          { label: 'Profile', href: '/account' },
-          { label: 'Orders', href: '/account/orders' },
-          { label: 'Wishlist', href: '/account/wishlist' },
-          { label: 'Addresses', href: '/account/addresses' },
-        ].map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`-mb-px border-b-2 pb-3 text-sm font-medium transition ${
-              item.href === '/account/orders'
-                ? 'border-gray-900 text-gray-900'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            {item.label}
-          </Link>
-        ))}
-      </nav>
+      <AccountNav />
 
-      <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-6 py-16 text-center">
-        <p className="text-2xl">📋</p>
-        <p className="mt-3 text-sm font-medium text-gray-700">No orders yet</p>
-        <p className="mt-1 text-sm text-gray-500">
-          Your orders will appear here once you place one.
-        </p>
-        <Link
-          href="/products"
-          className="mt-4 inline-block rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-700"
-        >
-          Start shopping
-        </Link>
-      </div>
+      <EmptyState
+        icon="📋"
+        title="No orders yet"
+        description="Your orders will appear here once you place one."
+        action={{ label: 'Start shopping', href: '/products' }}
+      />
     </div>
   );
 }

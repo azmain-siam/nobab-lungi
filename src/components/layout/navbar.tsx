@@ -1,4 +1,10 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Menu, X, ShoppingBag } from 'lucide-react';
+import { cn } from '@/utils/cn';
 import type { User } from '@supabase/supabase-js';
 import { UserMenuButton } from './user-menu-button';
 
@@ -6,11 +12,24 @@ interface NavbarProps {
   user: User | null;
 }
 
+const NAV_LINKS = [
+  { label: 'Products', href: '/products' },
+  { label: 'Collections', href: '/collections' },
+  { label: 'Categories', href: '/categories' },
+] as const;
+
 /**
- * Store Navbar — Server Component.
+ * Store Navbar — Client Component for mobile menu state.
  * Receives user from the store layout (no extra DB fetch here).
  */
 export function Navbar({ user }: NavbarProps) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
+
+  function closeMobile() {
+    setMobileOpen(false);
+  }
+
   return (
     <header className="sticky top-0 z-40 border-b border-gray-200 bg-white">
       <nav
@@ -20,81 +39,146 @@ export function Navbar({ user }: NavbarProps) {
         {/* Brand */}
         <Link
           href="/"
-          className="text-xl font-bold tracking-tight text-gray-900 hover:text-gray-700"
+          className="text-xl font-bold tracking-tight text-gray-900 transition hover:text-primary"
         >
           Nobab Lungi
         </Link>
 
         {/* Desktop nav links */}
         <ul className="hidden items-center gap-6 md:flex" role="list">
-          <li>
-            <Link href="/products" className="text-sm font-medium text-gray-600 hover:text-gray-900">
-              Products
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/collections"
-              className="text-sm font-medium text-gray-600 hover:text-gray-900"
-            >
-              Collections
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/categories"
-              className="text-sm font-medium text-gray-600 hover:text-gray-900"
-            >
-              Categories
-            </Link>
-          </li>
+          {NAV_LINKS.map((link) => (
+            <li key={link.href}>
+              <Link
+                href={link.href}
+                className={cn(
+                  'text-sm font-medium transition',
+                  pathname.startsWith(link.href)
+                    ? 'text-primary'
+                    : 'text-gray-600 hover:text-gray-900',
+                )}
+              >
+                {link.label}
+              </Link>
+            </li>
+          ))}
         </ul>
 
         {/* Right actions */}
-        <div className="flex items-center gap-3">
-          {/* Cart icon (stub — Phase 4) */}
+        <div className="flex items-center gap-2">
+          {/* Cart */}
           <Link
             href="/cart"
             aria-label="Cart"
             className="rounded-md p-2 text-gray-600 transition hover:bg-gray-100 hover:text-gray-900"
           >
-            <svg
-              aria-hidden="true"
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
+            <ShoppingBag aria-hidden="true" className="h-5 w-5" />
           </Link>
 
-          {/* Auth section */}
-          {user ? (
-            <UserMenuButton user={user} />
-          ) : (
-            <div className="flex items-center gap-2">
-              <Link
-                href="/login"
-                className="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
-              >
-                Sign in
-              </Link>
-              <Link
-                href="/register"
-                className="rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-gray-700"
-              >
-                Register
-              </Link>
-            </div>
-          )}
+          {/* Auth section — desktop */}
+          <div className="hidden md:flex md:items-center md:gap-2">
+            {user ? (
+              <UserMenuButton user={user} />
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/register"
+                  className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white transition hover:bg-primary-hover"
+                >
+                  Register
+                </Link>
+              </>
+            )}
+          </div>
+
+          {/* Mobile hamburger */}
+          <button
+            id="mobile-menu-toggle"
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-menu"
+            onClick={() => setMobileOpen((v) => !v)}
+            className="rounded-md p-2 text-gray-600 transition hover:bg-gray-100 md:hidden"
+          >
+            {mobileOpen ? (
+              <X aria-hidden="true" className="h-5 w-5" />
+            ) : (
+              <Menu aria-hidden="true" className="h-5 w-5" />
+            )}
+          </button>
         </div>
       </nav>
+
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <div
+          id="mobile-menu"
+          role="dialog"
+          aria-label="Navigation menu"
+          className="border-t border-gray-200 bg-white md:hidden"
+        >
+          <ul className="space-y-1 px-4 py-3" role="list">
+            {NAV_LINKS.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  onClick={closeMobile}
+                  className={cn(
+                    'block rounded-md px-3 py-2.5 text-sm font-medium transition',
+                    pathname.startsWith(link.href)
+                      ? 'bg-primary-light text-primary'
+                      : 'text-gray-700 hover:bg-gray-100',
+                  )}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {/* Mobile auth */}
+          <div className="border-t border-gray-100 px-4 py-3">
+            {user ? (
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-700">
+                  {user.user_metadata?.full_name?.split(' ')[0] ??
+                    user.email?.split('@')[0] ??
+                    'Account'}
+                </p>
+                <Link
+                  href="/account"
+                  onClick={closeMobile}
+                  className="text-sm font-medium text-primary underline underline-offset-4"
+                >
+                  My Account
+                </Link>
+              </div>
+            ) : (
+              <div className="flex gap-3">
+                <Link
+                  href="/login"
+                  onClick={closeMobile}
+                  className="flex-1 rounded-md border border-gray-300 py-2.5 text-center text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/register"
+                  onClick={closeMobile}
+                  className="flex-1 rounded-md bg-primary py-2.5 text-center text-sm font-semibold text-white transition hover:bg-primary-hover"
+                >
+                  Register
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 }

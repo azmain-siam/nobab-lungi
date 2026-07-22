@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { AuthPageShell } from '@/features/auth/components/auth-page-shell';
 import { ForgotPasswordForm } from '@/features/auth/components/forgot-password-form';
 
 export const metadata: Metadata = {
@@ -9,27 +9,12 @@ export const metadata: Metadata = {
 
 export default function ForgotPasswordPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-8">
-        {/* Brand */}
-        <div className="text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-            Nobab Lungi
-          </h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Reset your password
-          </p>
-        </div>
-
-        <ForgotPasswordForm />
-
-        <p className="text-center text-sm text-gray-500">
-          Remember your password?{' '}
-          <Link href="/login" className="font-medium text-gray-900 underline underline-offset-4">
-            Back to login
-          </Link>
-        </p>
-      </div>
-    </div>
+    <AuthPageShell
+      title="Reset your password"
+      subtitle="We'll send you a reset link"
+      footer={{ text: 'Remember your password?', linkText: 'Back to login', linkHref: '/login' }}
+    >
+      <ForgotPasswordForm />
+    </AuthPageShell>
   );
 }

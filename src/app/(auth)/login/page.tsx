@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { AuthPageShell } from '@/features/auth/components/auth-page-shell';
 import { LoginForm } from '@/features/auth/components/login-form';
 
 export const metadata: Metadata = {
@@ -16,34 +16,17 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const next = params.next ?? '/';
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-8">
-        {/* Brand */}
-        <div className="text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-            Nobab Lungi
-          </h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Sign in to your account
-          </p>
+    <AuthPageShell
+      title="Sign in to your account"
+      subtitle="Welcome back"
+      footer={{ text: "Don't have an account?", linkText: 'Register', linkHref: '/register' }}
+    >
+      {params.error === 'auth_callback_failed' && (
+        <div className="mb-4 rounded-md bg-error-bg px-4 py-3 text-sm text-error">
+          Authentication failed. Please try again.
         </div>
-
-        {/* Error from callback */}
-        {params.error === 'auth_callback_failed' && (
-          <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">
-            Authentication failed. Please try again.
-          </div>
-        )}
-
-        <LoginForm next={next} />
-
-        <p className="text-center text-sm text-gray-500">
-          Don&apos;t have an account?{' '}
-          <Link href="/register" className="font-medium text-gray-900 underline underline-offset-4">
-            Register
-          </Link>
-        </p>
-      </div>
-    </div>
+      )}
+      <LoginForm next={next} />
+    </AuthPageShell>
   );
 }

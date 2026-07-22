@@ -6,6 +6,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { resetPasswordAction } from '@/features/auth/actions/auth-actions';
+import { FormField, FormInput } from '@/components/forms/form-field';
+import { AlertMessage } from '@/components/shared/alert-message';
+import { Button } from '@/components/ui/button';
 
 const resetPasswordSchema = z
   .object({
@@ -46,11 +49,11 @@ export function ResetPasswordForm() {
 
   if (success) {
     return (
-      <div role="status" className="rounded-md bg-green-50 px-6 py-8 text-center">
-        <p className="text-lg font-semibold text-green-800">Password updated!</p>
-        <p className="mt-2 text-sm text-green-700">
+      <div role="status" className="rounded-md bg-success-bg px-6 py-8 text-center">
+        <p className="text-lg font-semibold text-success">Password updated!</p>
+        <p className="mt-2 text-sm text-success/80">
           Your password has been changed.{' '}
-          <Link href="/login" className="underline hover:text-green-900">
+          <Link href="/login" className="underline hover:text-success">
             Sign in
           </Link>{' '}
           with your new password.
@@ -66,59 +69,37 @@ export function ResetPasswordForm() {
       noValidate
       className="space-y-5"
     >
-      {serverError && (
-        <div role="alert" className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
-          {serverError}
-        </div>
-      )}
+      {serverError && <AlertMessage variant="error" message={serverError} />}
 
-      <div className="space-y-1">
-        <label htmlFor="reset-password" className="block text-sm font-medium text-gray-700">
-          New password
-        </label>
-        <input
+      <FormField id="reset-password" label="New password" error={errors.password?.message}>
+        <FormInput
           id="reset-password"
           type="password"
           autoComplete="new-password"
-          {...register('password')}
-          className="block w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 disabled:opacity-50"
           placeholder="Min. 6 characters"
           disabled={isSubmitting}
+          {...register('password')}
         />
-        {errors.password && (
-          <p className="text-xs text-red-600">{errors.password.message}</p>
-        )}
-      </div>
+      </FormField>
 
-      <div className="space-y-1">
-        <label
-          htmlFor="reset-confirm-password"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Confirm new password
-        </label>
-        <input
+      <FormField
+        id="reset-confirm-password"
+        label="Confirm new password"
+        error={errors.confirmPassword?.message}
+      >
+        <FormInput
           id="reset-confirm-password"
           type="password"
-          autoComplete="new-password"
-          {...register('confirmPassword')}
-          className="block w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 disabled:opacity-50"
+          autoComplete="off"
           placeholder="Repeat new password"
           disabled={isSubmitting}
+          {...register('confirmPassword')}
         />
-        {errors.confirmPassword && (
-          <p className="text-xs text-red-600">{errors.confirmPassword.message}</p>
-        )}
-      </div>
+      </FormField>
 
-      <button
-        id="reset-password-submit"
-        type="submit"
-        disabled={isSubmitting}
-        className="flex w-full items-center justify-center rounded-md bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 disabled:opacity-60"
-      >
+      <Button id="reset-password-submit" type="submit" fullWidth isLoading={isSubmitting}>
         {isSubmitting ? 'Updating…' : 'Update password'}
-      </button>
+      </Button>
     </form>
   );
 }
