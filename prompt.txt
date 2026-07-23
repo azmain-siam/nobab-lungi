@@ -1,0 +1,44 @@
+Read the following project documents before making any changes:
+
+- AGENTS.md
+- PROJECT_SPEC.md
+- DATABASE_SCHEMA.md
+- ARCHITECTURE.md
+- DESIGN_SYSTEM.md
+- TODO.md
+
+Current Phase:
+<Phase Name>
+
+Objective:
+<What you want to build>
+
+Requirements:
+
+1. Follow AGENTS.md strictly.
+2. Follow the approved architecture.
+3. Follow DESIGN_SYSTEM.md for every UI decision.
+4. Reuse existing components whenever possible.
+5. Do not duplicate code.
+6. Do not modify unrelated features.
+7. Keep TypeScript strict.
+8. Use Server Components by default.
+9. Use Server Actions for mutations unless a Route Handler is required.
+10. Keep the implementation simple and maintainable.
+
+Before writing code:
+
+- Explain the implementation plan.
+- List the files that will be created or modified.
+- Mention any database changes (if any).
+
+After implementation:
+
+- Verify TypeScript builds successfully.
+- Verify npm run build passes.
+- Check for linting issues.
+- Update TODO.md.
+- If ARCHITECTURE.md or DATABASE_SCHEMA.md need changes, explain them before modifying.
+- Summarize all changes.
+- List modified files.
+- Stop and wait for my approval.

@@ -342,3 +342,23 @@ Never:
 - Use random colors.
 - Overuse animations.
 - Create cluttered layouts.
+
+---
+
+# Design Inspiration
+
+- Apple
+- Uniqlo
+- Aarong
+- COS
+- Muji
+
+Do NOT copy these websites.
+
+Instead, capture their:
+
+- whitespace
+- typography
+- spacing
+- product presentation
+- premium feeling
