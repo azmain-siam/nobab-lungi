@@ -1,88 +1,15 @@
 @import "tailwindcss";
 
-/* ─── Design System Tokens (Heritage Minimalist) ────────────────────────── */
-:root {
-  /* Backgrounds */
-  --background: #faf9f5;
-  --foreground: #181919;
-
-  /* Primary: Deep Charcoal / Heritage Forest */
-  --primary: #181919;
-  --primary-hover: #2d2d2d;
-  --primary-light: #efeeea;
-  --primary-foreground: #ffffff;
-
-  /* Secondary: Terracotta / Earth Accent */
-  --secondary: #9a4523;
-  --secondary-hover: #7b2f0e;
-  --secondary-light: #ffdbcf;
-  --secondary-foreground: #ffffff;
-
-  /* Neutrals */
-  --card: #ffffff;
-  --card-foreground: #181919;
-  --border: #e3e2df;
-  --input-border: #e3e2df;
-  --ring: #181919;
-
-  /* Status */
-  --success: #166534;
-  --success-bg: #f0fdf4;
-  --error: #ba1a1a;
-  --error-bg: #ffdad6;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-
-  /* Primary */
-  --color-primary: var(--primary);
-  --color-primary-hover: var(--primary-hover);
-  --color-primary-light: var(--primary-light);
-  --color-primary-foreground: var(--primary-foreground);
-
-  /* Secondary */
-  --color-secondary: var(--secondary);
-  --color-secondary-hover: var(--secondary-hover);
-  --color-secondary-light: var(--secondary-light);
-
-  /* Neutrals */
-  --color-card: var(--card);
-  --color-border: var(--border);
-  --color-ring: var(--ring);
-
-  /* Status */
-  --color-success: var(--success);
-  --color-success-bg: var(--success-bg);
-  --color-error: var(--error);
-  --color-error-bg: var(--error-bg);
-
-  /* Fonts */
   --font-sans: var(--font-inter);
-  --font-serif: var(--font-playfair);
   --font-bangla: var(--font-hind-siliguri);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-}
-
-/* Typography utilities */
-.font-serif {
-  font-family: var(--font-serif), Georgia, serif;
+  background-color: #ffffff;
+  color: #171717;
 }
 
 .font-bangla {
   font-family: var(--font-bangla), var(--font-sans), system-ui, sans-serif;
 }
-
-.label-caps {
-  font-family: var(--font-sans), sans-serif;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
