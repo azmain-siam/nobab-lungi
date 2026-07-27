@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, ShoppingBag } from 'lucide-react';
+import { Menu, X, ShoppingBag, Search, Heart } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import type { User } from '@supabase/supabase-js';
 import { UserMenuButton } from './user-menu-button';
@@ -13,14 +13,15 @@ interface NavbarProps {
 }
 
 const NAV_LINKS = [
-  { label: 'Products', href: '/products' },
+  { label: 'Lungis', href: '/products?category=lungi' },
+  { label: 'Sarees', href: '/products?category=saree' },
   { label: 'Collections', href: '/collections' },
-  { label: 'Categories', href: '/categories' },
+  { label: 'All Products', href: '/products' },
 ] as const;
 
 /**
- * Store Navbar — Client Component for mobile menu state.
- * Receives user from the store layout (no extra DB fetch here).
+ * Store Navbar — Glassmorphic Heritage Minimalist Header.
+ * Uses backdrop blur and Playfair Display typography.
  */
 export function Navbar({ user }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -31,30 +32,30 @@ export function Navbar({ user }: NavbarProps) {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-gray-200 bg-white">
+    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-md transition-colors">
       <nav
         aria-label="Main navigation"
-        className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8"
+        className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8"
       >
-        {/* Brand */}
+        {/* Brand Logo */}
         <Link
           href="/"
-          className="text-xl font-bold tracking-tight text-gray-900 transition hover:text-primary"
+          className="font-serif text-2xl font-bold tracking-wider text-foreground transition hover:opacity-85"
         >
-          Nobab Lungi
+          NOBAB
         </Link>
 
-        {/* Desktop nav links */}
-        <ul className="hidden items-center gap-6 md:flex" role="list">
+        {/* Desktop Navigation Links */}
+        <ul className="hidden items-center gap-8 md:flex" role="list">
           {NAV_LINKS.map((link) => (
             <li key={link.href}>
               <Link
                 href={link.href}
                 className={cn(
-                  'text-sm font-medium transition',
+                  'text-xs font-semibold uppercase tracking-widest transition-colors',
                   pathname.startsWith(link.href)
-                    ? 'text-primary'
-                    : 'text-gray-600 hover:text-gray-900',
+                    ? 'text-secondary font-bold'
+                    : 'text-foreground/80 hover:text-foreground',
                 )}
               >
                 {link.label}
@@ -63,18 +64,33 @@ export function Navbar({ user }: NavbarProps) {
           ))}
         </ul>
 
-        {/* Right actions */}
-        <div className="flex items-center gap-2">
-          {/* Cart */}
+        {/* Action Controls */}
+        <div className="flex items-center gap-3">
           <Link
-            href="/cart"
-            aria-label="Cart"
-            className="rounded-md p-2 text-gray-600 transition hover:bg-gray-100 hover:text-gray-900"
+            href="/products"
+            aria-label="Search"
+            className="rounded-full p-2 text-foreground/80 transition hover:bg-black/5 hover:text-foreground"
           >
-            <ShoppingBag aria-hidden="true" className="h-5 w-5" />
+            <Search aria-hidden="true" className="h-5 w-5 stroke-[1.5]" />
           </Link>
 
-          {/* Auth section — desktop */}
+          <Link
+            href="/account"
+            aria-label="Wishlist"
+            className="hidden rounded-full p-2 text-foreground/80 transition hover:bg-black/5 hover:text-foreground sm:block"
+          >
+            <Heart aria-hidden="true" className="h-5 w-5 stroke-[1.5]" />
+          </Link>
+
+          <Link
+            href="/cart"
+            aria-label="Shopping Cart"
+            className="relative rounded-full p-2 text-foreground/80 transition hover:bg-black/5 hover:text-foreground"
+          >
+            <ShoppingBag aria-hidden="true" className="h-5 w-5 stroke-[1.5]" />
+          </Link>
+
+          {/* User Account / Auth section — Desktop */}
           <div className="hidden md:flex md:items-center md:gap-2">
             {user ? (
               <UserMenuButton user={user} />
@@ -82,28 +98,28 @@ export function Navbar({ user }: NavbarProps) {
               <>
                 <Link
                   href="/login"
-                  className="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+                  className="rounded-md px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-foreground/80 transition hover:text-foreground"
                 >
                   Sign in
                 </Link>
                 <Link
                   href="/register"
-                  className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white transition hover:bg-primary-hover"
+                  className="rounded-md bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-primary-hover"
                 >
-                  Register
+                  Join
                 </Link>
               </>
             )}
           </div>
 
-          {/* Mobile hamburger */}
+          {/* Mobile Menu Toggle */}
           <button
             id="mobile-menu-toggle"
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileOpen}
             aria-controls="mobile-menu"
             onClick={() => setMobileOpen((v) => !v)}
-            className="rounded-md p-2 text-gray-600 transition hover:bg-gray-100 md:hidden"
+            className="rounded-md p-2 text-foreground/80 transition hover:bg-black/5 md:hidden"
           >
             {mobileOpen ? (
               <X aria-hidden="true" className="h-5 w-5" />
@@ -114,25 +130,25 @@ export function Navbar({ user }: NavbarProps) {
         </div>
       </nav>
 
-      {/* Mobile menu */}
+      {/* Mobile Menu Dropdown */}
       {mobileOpen && (
         <div
           id="mobile-menu"
           role="dialog"
           aria-label="Navigation menu"
-          className="border-t border-gray-200 bg-white md:hidden"
+          className="border-t border-border bg-background/95 backdrop-blur-lg md:hidden"
         >
-          <ul className="space-y-1 px-4 py-3" role="list">
+          <ul className="space-y-1 px-4 py-4" role="list">
             {NAV_LINKS.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
                   onClick={closeMobile}
                   className={cn(
-                    'block rounded-md px-3 py-2.5 text-sm font-medium transition',
+                    'block rounded-md px-3 py-2.5 text-xs font-semibold uppercase tracking-widest transition',
                     pathname.startsWith(link.href)
-                      ? 'bg-primary-light text-primary'
-                      : 'text-gray-700 hover:bg-gray-100',
+                      ? 'bg-secondary-light text-secondary'
+                      : 'text-foreground/90 hover:bg-black/5',
                   )}
                 >
                   {link.label}
@@ -141,11 +157,10 @@ export function Navbar({ user }: NavbarProps) {
             ))}
           </ul>
 
-          {/* Mobile auth */}
-          <div className="border-t border-gray-100 px-4 py-3">
+          <div className="border-t border-border px-4 py-4">
             {user ? (
               <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-700">
+                <p className="text-sm font-medium text-foreground">
                   {user.user_metadata?.full_name?.split(' ')[0] ??
                     user.email?.split('@')[0] ??
                     'Account'}
@@ -153,7 +168,7 @@ export function Navbar({ user }: NavbarProps) {
                 <Link
                   href="/account"
                   onClick={closeMobile}
-                  className="text-sm font-medium text-primary underline underline-offset-4"
+                  className="text-xs font-semibold uppercase tracking-wider text-secondary underline underline-offset-4"
                 >
                   My Account
                 </Link>
@@ -163,14 +178,14 @@ export function Navbar({ user }: NavbarProps) {
                 <Link
                   href="/login"
                   onClick={closeMobile}
-                  className="flex-1 rounded-md border border-gray-300 py-2.5 text-center text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                  className="flex-1 rounded-md border border-border py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-foreground transition hover:bg-black/5"
                 >
                   Sign in
                 </Link>
                 <Link
                   href="/register"
                   onClick={closeMobile}
-                  className="flex-1 rounded-md bg-primary py-2.5 text-center text-sm font-semibold text-white transition hover:bg-primary-hover"
+                  className="flex-1 rounded-md bg-primary py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-primary-hover"
                 >
                   Register
                 </Link>

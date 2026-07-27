@@ -7,6 +7,7 @@ import { HeroBanner } from '@/features/products/components/hero-banner';
 import { FeaturedCategories } from '@/features/products/components/featured-categories';
 import { ProductSection } from '@/features/products/components/product-section';
 import { FeaturedCollections } from '@/features/collections/components/featured-collections';
+import { HeritageStory } from '@/features/products/components/heritage-story';
 import { WhyChooseUs } from '@/features/products/components/why-choose-us';
 
 export const metadata: Metadata = {
@@ -35,22 +36,24 @@ export default async function HomePage() {
   ]);
 
   return (
-    <>
+    <div className="bg-background min-h-screen">
       <HeroBanner banners={banners} />
 
-      <div className="mx-auto max-w-7xl space-y-20 px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl space-y-20 px-4 py-16 sm:px-6 sm:py-24 sm:space-y-28 lg:px-8">
         <FeaturedCategories categories={categories} />
 
         <ProductSection
           title="New Arrivals"
-          subtitle="The latest additions to our collection"
+          subtitle="The latest additions to our handloom collection"
           products={newArrivals}
           viewAllHref="/products?filter=new-arrivals"
         />
 
+        <HeritageStory />
+
         <ProductSection
           title="Best Sellers"
-          subtitle="Our most loved products, chosen by customers like you"
+          subtitle="Our most loved traditional wear, chosen by customers"
           products={bestSellers}
           viewAllHref="/products?filter=best-sellers"
           emptyMessage="Our best sellers will appear here as products are added."
@@ -60,6 +63,6 @@ export default async function HomePage() {
 
         <WhyChooseUs />
       </div>
-    </>
+    </div>
   );
 }

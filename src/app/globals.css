@@ -1,34 +1,35 @@
 @import "tailwindcss";
 
-/* ─── Design System Tokens ──────────────────────────────────────────────── */
+/* ─── Design System Tokens (Heritage Minimalist) ────────────────────────── */
 :root {
   /* Backgrounds */
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf9f5;
+  --foreground: #181919;
 
-  /* Primary: Forest Green */
-  --primary: #1e5c3a;
-  --primary-hover: #174a2e;
-  --primary-light: #e8f4ee;
+  /* Primary: Deep Charcoal / Heritage Forest */
+  --primary: #181919;
+  --primary-hover: #2d2d2d;
+  --primary-light: #efeeea;
   --primary-foreground: #ffffff;
 
-  /* Secondary: Warm Gold */
-  --secondary: #c9962c;
-  --secondary-hover: #b5841f;
-  --secondary-light: #fdf4e0;
+  /* Secondary: Terracotta / Earth Accent */
+  --secondary: #9a4523;
+  --secondary-hover: #7b2f0e;
+  --secondary-light: #ffdbcf;
   --secondary-foreground: #ffffff;
 
   /* Neutrals */
-  --card: #f9f9f8;
-  --border: #e5e7eb;
-  --input-border: #d1d5db;
-  --ring: #1e5c3a;
+  --card: #ffffff;
+  --card-foreground: #181919;
+  --border: #e3e2df;
+  --input-border: #e3e2df;
+  --ring: #181919;
 
   /* Status */
   --success: #166534;
   --success-bg: #f0fdf4;
-  --error: #991b1b;
-  --error-bg: #fef2f2;
+  --error: #ba1a1a;
+  --error-bg: #ffdad6;
 }
 
 @theme inline {
@@ -59,6 +60,7 @@
 
   /* Fonts */
   --font-sans: var(--font-inter);
+  --font-serif: var(--font-playfair);
   --font-bangla: var(--font-hind-siliguri);
 }
 
@@ -67,7 +69,20 @@ body {
   color: var(--foreground);
 }
 
-/* Bangla text utility */
+/* Typography utilities */
+.font-serif {
+  font-family: var(--font-serif), Georgia, serif;
+}
+
 .font-bangla {
   font-family: var(--font-bangla), var(--font-sans), system-ui, sans-serif;
 }
+
+.label-caps {
+  font-family: var(--font-sans), sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
