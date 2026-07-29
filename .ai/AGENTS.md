@@ -151,15 +151,21 @@ All forms must have:
 
 Design should be:
 
-- Minimal
-- Elegant
-- Professional
-- Traditional but modern
+- Heritage Editorial Luxury (Minimalist, High-Fashion Editorial)
+- Minimal & Elegant with generous whitespace
+- Product-First gallery presentation
+- Bento Grid layout structure
+
+Typography:
+
+- Display & Headings: `Hanken Grotesk` (geometric, sharp editorial typography)
+- Body & Functional UI: `Inter` (utilitarian, high legibility)
+- Bangla Typography: `Hind Siliguri`
 
 Target users:
 
 - Bangladeshi customers
-- Mobile users
+- Mobile users (Android prioritized)
 - Non-technical users
 
 ---
@@ -168,13 +174,17 @@ Target users:
 
 Use:
 
-- TailwindCSS
-- shadcn/ui
+- TailwindCSS v4 with CSS variables defined in `.ai/DESIGN.md`
+- Paper surface background (`#FBF9F8`) with high-contrast monochrome foundation (`#000000`/`#FFFFFF`)
+- Sharp architectural 0px corners (`rounded-none`) for buttons & functional controls
+- Soft `rounded-2xl` (16px) for cards & image containers
+- Material Symbols Outlined (weight 300) or stroke-based icons
 
 Avoid:
 
 - Inline styles
-- Hardcoded spacing values
+- Saturated neon colors or flashy gradients
+- Heavy drop shadows (use soft ambient `0 10px 30px 4px rgba(0,0,0,0.04)`)
 - Unnecessary animations
 
 ---

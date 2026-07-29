@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Hind_Siliguri } from 'next/font/google';
+import { Inter, Hanken_Grotesk } from 'next/font/google';
 import './globals.css';
 
 const inter = Inter({
@@ -8,16 +8,17 @@ const inter = Inter({
   display: 'swap',
 });
 
-const hindSiliguri = Hind_Siliguri({
-  subsets: ['latin', 'bengali'],
+const hankenGrotesk = Hanken_Grotesk({
+  subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
-  variable: '--font-hind-siliguri',
+  variable: '--font-hanken',
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'Nobab Lungi — Traditional Bangladeshi Lungi & Saree Store',
-  description: 'Bangladesh\'s finest lungi and saree store.',
+  title: 'Nabab Lungi — Traditional Bangladeshi Lungi & Saree Store',
+  description:
+    'Wear Tradition with Pride. Premium handcrafted lungis made with exceptional fabrics, timeless craftsmanship, and modern comfort.',
 };
 
 export default function RootLayout({
@@ -26,8 +27,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${hindSiliguri.variable} h-full`}>
-      <body className="min-h-full font-sans antialiased">{children}</body>
+    <html
+      lang="en"
+      className={`${inter.variable} ${hankenGrotesk.variable} h-full scroll-smooth`}
+    >
+      <body className="min-h-full bg-[#fbf9f8] text-[#1b1c1c] font-sans antialiased">
+        {children}
+      </body>
     </html>
   );
 }

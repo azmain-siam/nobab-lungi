@@ -32,15 +32,16 @@
 
 # Phase 4 - Customer Features
 
-## Homepage
+## Homepage (Heritage Editorial Redesign)
 
-- [x] Hero Banner
-- [x] Featured Categories
-- [x] New Arrivals
-- [x] Best Sellers
-- [x] Collections
-- [x] Why Choose Us
-- [x] Footer
+- [ ] Align with Landing Page Design Reference
+- [ ] Configure `Hanken Grotesk` & `Inter` Fonts
+- [ ] Implement Paper Surface (`#FBF9F8`) & Monochrome Palette
+- [ ] Hero Banner Section
+- [ ] Bento Grid Featured Categories & Collections
+- [ ] Product Catalog Sections (New Arrivals & Best Sellers)
+- [ ] Brand Heritage Spotlight
+- [ ] Trust Badges & Footer Header Layouts
 
 ---
 
