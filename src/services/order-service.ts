@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import type { OrderWithItems, OrderItem } from '@/types';
+import type { OrderWithItems, OrderStatus, PaymentStatus } from '@/types';
 
 export interface CreateOrderParams {
   userId?: string;
@@ -25,8 +25,7 @@ export async function createOrder(params: CreateOrderParams): Promise<{ success:
   try {
     const supabase = await createClient();
 
-    // Generate mock/sequential order number
-    const mockOrderNumber = `NL-${Math.floor(100000 + Math.random() * 900000)}`;
+    const orderNumber = `NL-${Math.floor(100000 + Math.random() * 900000)}`;
 
     const shippingAddressJson = {
       fullName: params.fullName,
@@ -40,14 +39,14 @@ export async function createOrder(params: CreateOrderParams): Promise<{ success:
       .from('orders')
       .insert({
         user_id: params.userId ?? null,
-        order_number: mockOrderNumber,
+        order_number: orderNumber,
         status: 'pending',
         payment_method: params.paymentMethod,
         payment_status: params.paymentMethod === 'cod' ? 'unpaid' : 'pending_verification',
-        subtotal: params.subtotal * 100, // store in poisha
-        delivery_charge: params.deliveryCharge * 100,
+        subtotal: Math.round(params.subtotal * 100), // store in poisha
+        delivery_charge: Math.round(params.deliveryCharge * 100),
         discount_amount: 0,
-        total_amount: params.grandTotal * 100,
+        total_amount: Math.round(params.grandTotal * 100),
         shipping_address: shippingAddressJson,
         notes: params.transactionId ? `bKash TrxID: ${params.transactionId}` : null,
       })
@@ -55,8 +54,8 @@ export async function createOrder(params: CreateOrderParams): Promise<{ success:
       .single();
 
     if (orderError) {
-      // Fallback if database table is empty / unmigrated yet
-      return { success: true, orderId: mockOrderNumber, orderNumber: mockOrderNumber };
+      console.error('Order creation database error:', orderError);
+      return { success: false, error: orderError.message };
     }
 
     // Insert order items
@@ -66,23 +65,25 @@ export async function createOrder(params: CreateOrderParams): Promise<{ success:
         product_id: item.productId,
         product_name: item.productName,
         product_image: item.image,
-        unit_price: item.productPrice * 100,
+        unit_price: Math.round(item.productPrice * 100),
         quantity: item.quantity,
-        total_price: item.productPrice * item.quantity * 100,
+        total_price: Math.round(item.productPrice * item.quantity * 100),
       }));
 
-      await supabase.from('order_items').insert(orderItems);
+      const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
+      if (itemsError) {
+        console.error('Order items insertion error:', itemsError);
+      }
     }
 
     return {
       success: true,
-      orderId: order?.id ?? mockOrderNumber,
-      orderNumber: order?.order_number ?? mockOrderNumber,
+      orderId: order?.id ?? orderNumber,
+      orderNumber: order?.order_number ?? orderNumber,
     };
   } catch (error) {
-    console.error('Error creating order in Supabase:', error);
-    const mockOrderNumber = `NL-${Math.floor(100000 + Math.random() * 900000)}`;
-    return { success: true, orderId: mockOrderNumber, orderNumber: mockOrderNumber };
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred while placing order.';
+    return { success: false, error: message };
   }
 }
 
@@ -113,5 +114,37 @@ export async function getOrderById(orderId: string): Promise<OrderWithItems | nu
     return (data as OrderWithItems) ?? null;
   } catch {
     return null;
+  }
+}
+
+export async function updateOrderStatus(orderId: string, status: OrderStatus): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from('orders')
+      .update({ status, updated_at: new Date().toISOString() })
+      .or(`id.eq.${orderId},order_number.eq.${orderId}`);
+
+    if (error) return { success: false, error: error.message };
+    return { success: true };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to update order status.';
+    return { success: false, error: message };
+  }
+}
+
+export async function updatePaymentStatus(orderId: string, paymentStatus: PaymentStatus): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from('orders')
+      .update({ payment_status: paymentStatus, updated_at: new Date().toISOString() })
+      .or(`id.eq.${orderId},order_number.eq.${orderId}`);
+
+    if (error) return { success: false, error: error.message };
+    return { success: true };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to update payment status.';
+    return { success: false, error: message };
   }
 }

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Search, CreditCard } from 'lucide-react';
+import { updateOrderStatusAction } from '@/actions/order';
 
 interface OrderRecord {
   id: string;
@@ -69,10 +70,14 @@ export default function AdminOrdersPage() {
       o.phone.includes(searchTerm)
   );
 
-  const handleStatusChange = (orderId: string, newStatus: OrderRecord['status']) => {
+  const handleStatusChange = async (orderId: string, newStatus: OrderRecord['status']) => {
+    // Update state locally for instant UI feedback
     setOrders(
       orders.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
     );
+
+    const dbStatus = newStatus.toLowerCase() as 'pending' | 'processing' | 'shipped' | 'delivered';
+    await updateOrderStatusAction(orderId, dbStatus);
   };
 
   return (
