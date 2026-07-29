@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import type { ProductCardData } from '@/components/shared/product-card';
 
 export interface CartItem {
@@ -22,11 +22,39 @@ interface CartContextType {
   subtotal: number;
 }
 
+const CART_STORAGE_KEY = 'nobab_lungi_cart';
+
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Read cart from localStorage on initial client mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(CART_STORAGE_KEY);
+      if (saved) {
+        setItems(JSON.parse(saved));
+      }
+    } catch (e) {
+      console.error('Failed to load cart from localStorage:', e);
+    } finally {
+      setIsLoaded(true);
+    }
+  }, []);
+
+  // Save cart to localStorage whenever items state changes
+  useEffect(() => {
+    if (isLoaded) {
+      try {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+      } catch (e) {
+        console.error('Failed to save cart to localStorage:', e);
+      }
+    }
+  }, [items, isLoaded]);
 
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
@@ -75,7 +103,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const subtotal = useMemo(() => {
     return items.reduce((total, item) => {
-      // Parse numeric value from BDT string e.g. "৳2,450" -> 2450
       const rawPrice = parseInt(item.product.price.replace(/[^\d]/g, ''), 10) || 0;
       return total + rawPrice * item.quantity;
     }, 0);

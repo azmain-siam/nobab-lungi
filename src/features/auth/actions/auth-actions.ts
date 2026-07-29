@@ -1,114 +1,156 @@
 'use server';
 
-import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { revalidatePath } from 'next/cache';
 
-// ── Register ────────────────────────────────────────────────
-
-export interface RegisterResult {
+export interface AuthActionResult {
   error?: string;
   success?: boolean;
 }
 
-export async function registerAction(
-  name: string,
-  email: string,
-  password: string
-): Promise<RegisterResult> {
-  const supabase = await createClient();
+// ── Register ────────────────────────────────────────────────
 
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { full_name: name },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback`,
-    },
-  });
-
-  if (error) {
-    return { error: error.message };
+export async function registerAction(formData: {
+  fullName: string;
+  email: string;
+  password: string;
+  phone?: string;
+}): Promise<AuthActionResult> {
+  const { fullName, email, password, phone } = formData;
+  if (!email || !password || !fullName) {
+    return { error: 'Full name, email, and password are required.' };
   }
 
-  return { success: true };
+  try {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+          phone: phone ?? null,
+        },
+      },
+    });
+
+    if (error) {
+      return { error: error.message };
+    }
+
+    if (data.user) {
+      await supabase.from('profiles').upsert({
+        id: data.user.id,
+        name: fullName,
+        phone: phone ?? null,
+        role: 'customer',
+      });
+    }
+
+    revalidatePath('/', 'layout');
+    return { success: true };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred.';
+    return { error: message };
+  }
 }
 
 // ── Login ────────────────────────────────────────────────────
 
-export interface LoginResult {
-  error?: string;
-}
-
-export async function loginAction(
-  email: string,
-  password: string,
-  next: string = '/'
-): Promise<LoginResult> {
-  const supabase = await createClient();
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    return { error: error.message };
+export async function loginAction(formData: {
+  email: string;
+  password: string;
+}): Promise<AuthActionResult> {
+  const { email, password } = formData;
+  if (!email || !password) {
+    return { error: 'Email and password are required.' };
   }
 
-  // redirect() must be called OUTSIDE try/catch — it throws internally
-  redirect(next);
+  try {
+    const supabase = await createClient();
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      return { error: error.message };
+    }
+
+    revalidatePath('/', 'layout');
+    return { success: true };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred.';
+    return { error: message };
+  }
 }
 
 // ── Logout ───────────────────────────────────────────────────
 
-export async function logoutAction(): Promise<void> {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
-  redirect('/');
+export async function logoutAction(): Promise<AuthActionResult> {
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      return { error: error.message };
+    }
+
+    revalidatePath('/', 'layout');
+    return { success: true };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred.';
+    return { error: message };
+  }
 }
 
 // ── Forgot Password ──────────────────────────────────────────
 
-export interface ForgotPasswordResult {
-  error?: string;
-  success?: boolean;
-}
-
 export async function forgotPasswordAction(
   email: string
-): Promise<ForgotPasswordResult> {
-  const supabase = await createClient();
-
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback?next=/account/reset-password`,
-  });
-
-  if (error) {
-    return { error: error.message };
+): Promise<AuthActionResult> {
+  if (!email) {
+    return { error: 'Email address is required.' };
   }
 
-  // Always return success to avoid email enumeration attacks
-  return { success: true };
+  try {
+    const supabase = await createClient();
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? ''}/forgot-password?reset=true`,
+    });
+
+    if (error) {
+      return { error: error.message };
+    }
+
+    return { success: true };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred.';
+    return { error: message };
+  }
 }
 
 // ── Reset Password ───────────────────────────────────────────
 
-export interface ResetPasswordResult {
-  error?: string;
-  success?: boolean;
-}
-
-/**
- * Called from the /reset-password page after the user clicks the email link.
- * The Supabase session is established via the callback route before this runs.
- */
 export async function resetPasswordAction(
   password: string
-): Promise<ResetPasswordResult> {
-  const supabase = await createClient();
+): Promise<AuthActionResult> {
+  if (!password || password.length < 6) {
+    return { error: 'Password must be at least 6 characters.' };
+  }
 
-  const { error } = await supabase.auth.updateUser({ password });
+  try {
+    const supabase = await createClient();
 
-  if (error) return { error: error.message };
-  return { success: true };
+    const { error } = await supabase.auth.updateUser({ password });
+
+    if (error) return { error: error.message };
+    return { success: true };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred.';
+    return { error: message };
+  }
 }

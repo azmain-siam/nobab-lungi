@@ -1,7 +1,7 @@
 'use client';
 
 import { Container } from '@/components/ui/container';
-import { Heart, Search, ShoppingBag, User } from 'lucide-react';
+import { Heart, Search, ShoppingBag, User, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -11,10 +11,12 @@ interface HeaderProps {
   variant?: 'transparent' | 'light';
 }
 
-export function Header({ variant = 'light' }: HeaderProps) {
+export function Header({ variant }: HeaderProps) {
   const pathname = usePathname();
-  const isTransparentVariant = variant === 'transparent';
+  const activeVariant = variant ?? (pathname === '/' ? 'transparent' : 'light');
+  const isTransparentVariant = activeVariant === 'transparent';
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { openCart, cartCount } = useCart();
 
   useEffect(() => {
@@ -34,14 +36,14 @@ export function Header({ variant = 'light' }: HeaderProps) {
   const getHeaderStyles = () => {
     if (isTransparentVariant) {
       if (scrolled) {
-        return 'fixed top-0 left-0 right-0 z-50 w-full bg-[#1b1c1c]/75 backdrop-blur-md shadow-lg transition-all duration-300';
+        return 'fixed top-0 left-0 right-0 z-50 w-full bg-[#1b1c1c]/90 backdrop-blur-md shadow-lg transition-all duration-300';
       }
       return 'absolute top-0 left-0 right-0 z-50 w-full bg-transparent transition-all duration-300';
     }
     return 'sticky top-0 z-50 w-full border-b border-[#e3e2e2] bg-[#fbf9f8]/95 backdrop-blur-md transition-all duration-300';
   };
 
-  const isDarkText = !isTransparentVariant;
+  const isDarkText = !isTransparentVariant || (isTransparentVariant && scrolled);
 
   return (
     <header className={getHeaderStyles()}>
@@ -51,6 +53,17 @@ export function Header({ variant = 'light' }: HeaderProps) {
             scrolled ? 'py-4' : 'py-5'
           }`}
         >
+          {/* Mobile Menu Toggle (Left on mobile) */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className={`md:hidden p-1 focus:outline-none ${
+              isDarkText ? 'text-[#1b1c1c]' : 'text-white'
+            }`}
+            aria-label="Toggle mobile menu"
+          >
+            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+
           {/* Brand Logo */}
           <Link
             href="/"
@@ -61,7 +74,7 @@ export function Header({ variant = 'light' }: HeaderProps) {
             Nabab Lungi
           </Link>
 
-          {/* Center Navigation Links */}
+          {/* Center Navigation Links (Desktop) */}
           <div className="hidden items-center gap-8 md:flex">
             <Link
               href="/collections"
@@ -105,7 +118,7 @@ export function Header({ variant = 'light' }: HeaderProps) {
 
           {/* Action Icons */}
           <div
-            className={`flex items-center gap-5 ${
+            className={`flex items-center gap-4 sm:gap-5 ${
               isDarkText ? 'text-[#1b1c1c]' : 'text-white'
             }`}
           >
@@ -151,6 +164,42 @@ export function Header({ variant = 'light' }: HeaderProps) {
             </button>
           </div>
         </Container>
+
+        {/* Mobile Dropdown Drawer */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-b border-[#e3e2e2] bg-white p-6 space-y-4 shadow-xl">
+            <div className="flex flex-col space-y-4 text-sm font-semibold uppercase tracking-wider">
+              <Link
+                href="/collections"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-[#1b1c1c] hover:text-[#5e5e5b]"
+              >
+                Collections
+              </Link>
+              <Link
+                href="/products"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-[#1b1c1c] hover:text-[#5e5e5b]"
+              >
+                Shop
+              </Link>
+              <Link
+                href="/#about"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-[#1b1c1c] hover:text-[#5e5e5b]"
+              >
+                About
+              </Link>
+              <Link
+                href="/account"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-[#1b1c1c] hover:text-[#5e5e5b]"
+              >
+                My Account
+              </Link>
+            </div>
+          </div>
+        )}
       </nav>
     </header>
   );
