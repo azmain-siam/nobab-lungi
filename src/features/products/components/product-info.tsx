@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Star, Heart, Check, Minus, Plus, ShoppingBag } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useCart } from '@/context/cart-context';
 
 interface ProductInfoProps {
   product: {
@@ -19,10 +21,13 @@ interface ProductInfoProps {
     badge?: string | null;
     inStock: boolean;
     fabricDetails: string;
+    images?: string[];
   };
 }
 
 export function ProductInfo({ product }: ProductInfoProps) {
+  const router = useRouter();
+  const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
@@ -32,6 +37,28 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
   const incrementQuantity = () => {
     setQuantity(quantity + 1);
+  };
+
+  const productCardData = {
+    id: product.id,
+    name: product.name,
+    collectionTag: product.collectionTag,
+    description: product.description,
+    price: product.price,
+    originalPrice: product.originalPrice,
+    badge: product.badge,
+    image:
+      product.images?.[0] ??
+      'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?q=80&w=600&auto=format&fit=crop',
+  };
+
+  const handleAddToCart = () => {
+    addToCart(productCardData, quantity);
+  };
+
+  const handleBuyNow = () => {
+    addToCart(productCardData, quantity);
+    router.push('/checkout');
   };
 
   return (
@@ -135,6 +162,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
             variant="secondary"
             size="lg"
             className="flex-1 gap-2"
+            onClick={handleAddToCart}
           >
             <ShoppingBag className="h-4 w-4 stroke-[1.5]" />
             Add to Cart
@@ -143,6 +171,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
             variant="primary"
             size="lg"
             className="flex-1"
+            onClick={handleBuyNow}
           >
             Buy Now
           </Button>

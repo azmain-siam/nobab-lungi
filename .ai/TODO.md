@@ -34,26 +34,26 @@
 
 ## Homepage (Heritage Editorial Redesign)
 
-- [ ] Align with Landing Page Design Reference
-- [ ] Configure `Hanken Grotesk` & `Inter` Fonts
-- [ ] Implement Paper Surface (`#FBF9F8`) & Monochrome Palette
-- [ ] Hero Banner Section
-- [ ] Bento Grid Featured Categories & Collections
-- [ ] Product Catalog Sections (New Arrivals & Best Sellers)
-- [ ] Brand Heritage Spotlight
-- [ ] Trust Badges & Footer Header Layouts
+- [x] Align with Landing Page Design Reference
+- [x] Configure `Hanken Grotesk` & `Inter` Fonts
+- [x] Implement Paper Surface (`#FBF9F8`) & Monochrome Palette
+- [x] Hero Banner Section
+- [x] Bento Grid Featured Categories & Collections
+- [x] Product Catalog Sections (New Arrivals & Best Sellers)
+- [x] Brand Heritage Spotlight
+- [x] Trust Badges & Footer Header Layouts
 
 ---
 
 ## Product Catalog
 
-- [ ] Product List
-- [ ] Product Details
-- [ ] Search
-- [ ] Filter
-- [ ] Sorting
-- [ ] Pagination
-- [ ] Related Products
+- [x] Product List
+- [x] Product Details
+- [x] Search
+- [x] Filter
+- [x] Sorting
+- [x] Pagination
+- [x] Related Products
 
 ---
 

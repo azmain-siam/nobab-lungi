@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Heart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useCart } from '@/context/cart-context';
 
 export interface ProductCardData {
   id: string;
@@ -26,10 +27,17 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const { addToCart } = useCart();
   const collectionTag = product.collectionTag ?? 'Heritage';
   const description =
     product.description ?? 'Hand-woven fine cotton with traditional Bangladeshi techniques.';
   const productHref = `/products/${product.id}`;
+
+  const handleQuickAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart(product);
+  };
 
   return (
     <div className="group/card relative flex flex-col">
@@ -68,7 +76,12 @@ export function ProductCard({ product }: ProductCardProps) {
 
         {/* Animated Quick Add Button */}
         <div className="absolute bottom-0 inset-x-0 z-20 w-full transition-all duration-300 transform translate-y-full opacity-0 group-hover/card:translate-y-0 group-hover/card:opacity-100">
-          <Button variant="primary" size="md" className="w-full py-3">
+          <Button
+            variant="primary"
+            size="md"
+            className="w-full py-3"
+            onClick={handleQuickAdd}
+          >
             Quick Add
           </Button>
         </div>
