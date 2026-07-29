@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Heart } from 'lucide-react';
@@ -27,11 +29,16 @@ export function ProductCard({ product }: ProductCardProps) {
   const collectionTag = product.collectionTag ?? 'Heritage';
   const description =
     product.description ?? 'Hand-woven fine cotton with traditional Bangladeshi techniques.';
+  const productHref = `/products/${product.id}`;
 
   return (
     <div className="group/card relative flex flex-col">
       {/* Image Container */}
-      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-none bg-[#efeded]">
+      <Link
+        href={productHref}
+        aria-label={product.name}
+        className="relative aspect-[3/4] w-full overflow-hidden rounded-none bg-[#efeded]"
+      >
         <Image
           src={product.image}
           alt={product.name}
@@ -49,6 +56,10 @@ export function ProductCard({ product }: ProductCardProps) {
 
         {/* Top-Right Wishlist Heart */}
         <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
           aria-label="Wishlist"
           className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#1b1c1c] shadow-sm transition hover:bg-white focus:outline-none z-10"
         >
@@ -61,7 +72,7 @@ export function ProductCard({ product }: ProductCardProps) {
             Quick Add
           </Button>
         </div>
-      </div>
+      </Link>
 
       {/* Product Details below image */}
       <div className="mt-3.5 space-y-1">
@@ -71,9 +82,11 @@ export function ProductCard({ product }: ProductCardProps) {
         </span>
 
         {/* Title */}
-        <h3 className="font-display text-base font-semibold text-[#1b1c1c] transition group-hover/card:text-black">
-          {product.name}
-        </h3>
+        <Link href={productHref}>
+          <h3 className="font-display text-base font-semibold text-[#1b1c1c] transition group-hover/card:text-black">
+            {product.name}
+          </h3>
+        </Link>
 
         {/* Description snippet */}
         <p className="text-xs font-light text-[#5e5e5b] line-clamp-1">
