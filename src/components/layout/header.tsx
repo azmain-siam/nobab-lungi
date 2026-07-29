@@ -1,7 +1,7 @@
 'use client';
 
 import { Container } from '@/components/ui/container';
-import { Heart, Search, ShoppingBag } from 'lucide-react';
+import { Heart, Search, ShoppingBag, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -34,7 +34,7 @@ export function Header({ variant = 'light' }: HeaderProps) {
   const getHeaderStyles = () => {
     if (isTransparentVariant) {
       if (scrolled) {
-        return 'fixed top-0 left-0 right-0 z-50 w-full bg-[#1b1c1c]/60 backdrop-blur-md shadow-lg transition-all duration-300';
+        return 'fixed top-0 left-0 right-0 z-50 w-full bg-[#1b1c1c]/75 backdrop-blur-md shadow-lg transition-all duration-300';
       }
       return 'absolute top-0 left-0 right-0 z-50 w-full bg-transparent transition-all duration-300';
     }
@@ -64,9 +64,13 @@ export function Header({ variant = 'light' }: HeaderProps) {
           {/* Center Navigation Links */}
           <div className="hidden items-center gap-8 md:flex">
             <Link
-              href="/#collections"
-              className={`text-xs font-semibold uppercase tracking-[0.15em] transition ${
-                isDarkText
+              href="/collections"
+              className={`relative text-xs font-semibold uppercase tracking-[0.15em] transition ${
+                pathname.startsWith('/collections')
+                  ? isDarkText
+                    ? 'text-[#1b1c1c] after:absolute after:-bottom-1 after:left-0 after:h-[1.5px] after:w-full after:bg-[#1b1c1c]'
+                    : 'text-white after:absolute after:-bottom-1 after:left-0 after:h-[1px] after:w-full after:bg-white'
+                  : isDarkText
                   ? 'text-[#5e5e5b] hover:text-[#1b1c1c]'
                   : 'text-white/80 hover:text-white'
               }`}
@@ -105,18 +109,34 @@ export function Header({ variant = 'light' }: HeaderProps) {
               isDarkText ? 'text-[#1b1c1c]' : 'text-white'
             }`}
           >
-            <button
-              aria-label="Search"
+            {/* Search */}
+            <Link
+              href="/products"
+              aria-label="Search Catalog"
               className="transition hover:opacity-75 focus:outline-none cursor-pointer"
             >
               <Search className="h-5 w-5 stroke-[1.5]" />
-            </button>
-            <button
+            </Link>
+
+            {/* Wishlist */}
+            <Link
+              href="/account/wishlist"
               aria-label="Wishlist"
               className="transition hover:opacity-75 focus:outline-none cursor-pointer"
             >
               <Heart className="h-5 w-5 stroke-[1.5]" />
-            </button>
+            </Link>
+
+            {/* User Account */}
+            <Link
+              href="/account"
+              aria-label="Account Profile"
+              className="transition hover:opacity-75 focus:outline-none cursor-pointer"
+            >
+              <User className="h-5 w-5 stroke-[1.5]" />
+            </Link>
+
+            {/* Shopping Bag Drawer */}
             <button
               onClick={openCart}
               aria-label="Shopping Bag"

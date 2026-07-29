@@ -59,32 +59,32 @@
 
 ## Shopping Cart
 
-- [ ] Add to Cart
-- [ ] Update Quantity
-- [ ] Remove Item
-- [ ] Cart Summary
+- [x] Add to Cart
+- [x] Update Quantity
+- [x] Remove Item
+- [x] Cart Summary
 - [ ] Coupon System
 
 ---
 
 ## Checkout
 
-- [ ] Shipping Address
-- [ ] Delivery Charge
-- [ ] Payment Method
-- [ ] Order Review
-- [ ] Place Order
-- [ ] Order Success
+- [x] Shipping Address
+- [x] Delivery Charge
+- [x] Payment Method
+- [x] Order Review
+- [x] Place Order
+- [x] Order Success
 
 ---
 
 ## User Dashboard
 
-- [ ] Profile
-- [ ] Order History
-- [ ] Wishlist
-- [ ] Address Management
-- [ ] Order Tracking
+- [x] Profile
+- [x] Order History
+- [x] Wishlist
+- [x] Address Management
+- [x] Order Tracking
 
 ---
 
