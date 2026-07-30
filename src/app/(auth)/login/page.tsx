@@ -3,7 +3,7 @@
 import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { signIn, getSession } from 'next-auth/react';
 import { Container } from '@/components/ui/container';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/providers/toast-provider';
@@ -36,10 +36,15 @@ function LoginForm() {
         setErrorMsg('Invalid email or password.');
       } else {
         toast.success('Signed in successfully.');
+        const session = await getSession();
+        const role = (session?.user as { role?: string })?.role;
+
         router.refresh();
 
         if (nextParam) {
           router.push(nextParam);
+        } else if (role === 'admin') {
+          router.push('/dashboard');
         } else {
           router.push('/account');
         }
