@@ -1,78 +1,61 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import type { User } from '@supabase/supabase-js';
-import { createClient } from '@/lib/supabase/client';
-import { logoutAction } from '@/actions/auth';
+import { useSession, signOut as nextAuthSignOut } from 'next-auth/react';
 import type { Profile } from '@/types';
 
+interface CustomUser {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+  user_metadata?: { full_name?: string };
+}
+
+interface SessionUserShape {
+  id?: string;
+  name?: string | null;
+  email?: string | null;
+  role?: 'admin' | 'customer';
+  image?: string | null;
+}
+
 interface UseUserReturn {
-  user: User | null;
+  user: CustomUser | null;
   profile: Profile | null;
   loading: boolean;
   signOut: () => Promise<void>;
 }
 
-/**
- * Client-side hook to get the current authenticated user and profile.
- * Subscribes to auth state changes automatically.
- *
- * Use in Client Components only.
- * Server Components should use `supabase.auth.getUser()` directly.
- */
 export function useUser(): UseUserReturn {
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: session, status } = useSession();
 
-  useEffect(() => {
-    const supabase = createClient();
+  const loading = status === 'loading';
 
-    async function fetchProfile(uid: string) {
-      try {
-        const { data } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', uid)
-          .single();
-        setProfile((data as Profile) ?? null);
-      } catch {
-        setProfile(null);
+  const sessionUser = session?.user as SessionUserShape | undefined;
+
+  const user: CustomUser | null = sessionUser
+    ? {
+        id: sessionUser.id || sessionUser.email || 'user',
+        name: sessionUser.name,
+        email: sessionUser.email,
+        user_metadata: { full_name: sessionUser.name ?? undefined },
       }
-    }
+    : null;
 
-    // Initial fetch
-    supabase.auth.getUser().then(({ data: { user: currentUser } }) => {
-      setUser(currentUser);
-      if (currentUser) {
-        fetchProfile(currentUser.id);
-      } else {
-        setProfile(null);
+  const profile: Profile | null = sessionUser
+    ? {
+        id: sessionUser.id || sessionUser.email || 'user',
+        name: sessionUser.name ?? null,
+        email: sessionUser.email ?? null,
+        phone: null,
+        role: sessionUser.role || 'customer',
+        avatar_url: sessionUser.image ?? null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       }
-      setLoading(false);
-    });
-
-    // Subscribe to auth state changes (login, logout, token refresh)
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      const currentUser = session?.user ?? null;
-      setUser(currentUser);
-      if (currentUser) {
-        fetchProfile(currentUser.id);
-      } else {
-        setProfile(null);
-      }
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+    : null;
 
   const signOut = async () => {
-    await logoutAction();
-    setUser(null);
-    setProfile(null);
+    await nextAuthSignOut({ callbackUrl: '/login' });
   };
 
   return { user, profile, loading, signOut };

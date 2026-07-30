@@ -11,7 +11,8 @@ Tech Stack:
 - TypeScript
 - TailwindCSS
 - shadcn/ui
-- Supabase
+- MongoDB Atlas & Mongoose
+- NextAuth.js (Auth.js)
 - Cloudinary
 - Vercel
 
@@ -54,27 +55,18 @@ Use Route Handlers only when absolutely necessary.
 
 # Authentication
 
-Use Supabase Auth.
+Use NextAuth.js (Auth.js) with Credentials provider & bcrypt password hashing.
 
 Roles:
 
 - ADMIN
 - CUSTOMER
 
-Never implement custom JWT authentication.
-
 ---
 
 # Database
 
-Database: Supabase PostgreSQL.
-
-Never introduce:
-
-- Prisma
-- MongoDB
-- Separate backend
-- Redis
+Database: MongoDB Atlas with Mongoose ORM.
 
 ---
 

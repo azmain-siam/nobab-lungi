@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter, Hanken_Grotesk } from 'next/font/google';
 import { CartProvider } from '@/context/cart-context';
 import { ToastProvider } from '@/providers/toast-provider';
+import { SessionProvider } from '@/providers/session-provider';
 import { CartDrawer } from '@/components/shared/cart-drawer';
 import './globals.css';
 
@@ -35,12 +36,14 @@ export default function RootLayout({
       className={`${inter.variable} ${hankenGrotesk.variable} h-full scroll-smooth`}
     >
       <body className="min-h-full bg-[#fbf9f8] text-[#1b1c1c] font-sans antialiased">
-        <ToastProvider>
-          <CartProvider>
-            {children}
-            <CartDrawer />
-          </CartProvider>
-        </ToastProvider>
+        <SessionProvider>
+          <ToastProvider>
+            <CartProvider>
+              {children}
+              <CartDrawer />
+            </CartProvider>
+          </ToastProvider>
+        </SessionProvider>
       </body>
     </html>
   );

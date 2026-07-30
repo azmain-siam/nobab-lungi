@@ -1,9 +1,11 @@
 'use server';
 
+import { getServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
-import { createClient } from '@/lib/supabase/server';
-
-// ── Update Profile ───────────────────────────────────────────
+import bcrypt from 'bcryptjs';
+import { authOptions } from '@/lib/auth';
+import { connectToDatabase } from '@/lib/db';
+import { User } from '@/models/User';
 
 export interface ProfileActionResult {
   error?: string;
@@ -14,37 +16,54 @@ export async function updateProfileAction(
   name: string,
   phone: string
 ): Promise<ProfileActionResult> {
-  const supabase = await createClient();
+  const session = await getServerSession(authOptions);
 
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
+  if (!session || !session.user) {
     return { error: 'You must be signed in to update your profile.' };
   }
 
-  const { error } = await supabase
-    .from('profiles')
-    .update({ name: name.trim(), phone: phone.trim() || null })
-    .eq('id', user.id);
+  const userId = (session.user as { id: string }).id;
 
-  if (error) return { error: error.message };
+  try {
+    await connectToDatabase();
 
-  revalidatePath('/account');
-  return { success: true };
+    await User.findByIdAndUpdate(userId, {
+      $set: {
+        name: name.trim(),
+        phone: phone.trim() || null,
+      },
+    });
+
+    revalidatePath('/account');
+    return { success: true };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Failed to update profile.';
+    return { error: message };
+  }
 }
-
-// ── Update Password ──────────────────────────────────────────
 
 export async function updatePasswordAction(
   newPassword: string
 ): Promise<ProfileActionResult> {
-  const supabase = await createClient();
+  const session = await getServerSession(authOptions);
 
-  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (!session || !session.user) {
+    return { error: 'You must be signed in to update your password.' };
+  }
 
-  if (error) return { error: error.message };
-  return { success: true };
+  const userId = (session.user as { id: string }).id;
+
+  try {
+    await connectToDatabase();
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await User.findByIdAndUpdate(userId, {
+      $set: { password: hashedPassword },
+    });
+
+    return { success: true };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Failed to update password.';
+    return { error: message };
+  }
 }

@@ -1,187 +1,125 @@
-# Users
+# MongoDB Atlas Database Collections (Mongoose)
 
-users
-
-- id (uuid)
-- name
-- email
-- phone
-- role
-- avatar_url
-- created_at
-- updated_at
-
----
-
-# Addresses
-
-addresses
-
-- id (uuid)
-- user_id
-- name
-- phone
-- district
-- upazila
-- address
-- postal_code
-- is_default
-- created_at
+## 1. Users Collection (`User`)
+- `_id` (ObjectId)
+- `name` (String)
+- `email` (String, unique)
+- `password` (String, hashed with bcrypt)
+- `phone` (String)
+- `role` (String: `'admin'` | `'customer'`)
+- `avatar_url` (String)
+- `created_at` (Date)
+- `updated_at` (Date)
 
 ---
 
-# Categories
-
-categories
-
-- id
-- name
-- slug
-- description
-- image
-
----
-
-# Collections
-
-collections
-
-- id
-- name
-- slug
-- description
-- banner
-- is_featured
-
----
-
-# Products
-
-products
-
-- id
-- name
-- slug
-- sku
-- description
-- price
-- discount_price
-- stock
-- category_id
-- collection_id
-- is_featured
-- is_best_seller
-- is_new_arrival
-- seo_title
-- seo_description
-- created_at
-- updated_at
+## 2. Products Collection (`Product`)
+- `_id` (ObjectId)
+- `name` (String)
+- `slug` (String, unique)
+- `sku` (String)
+- `description` (String)
+- `price` (Number, stored in poisha / 100)
+- `discount_price` (Number)
+- `stock` (Number)
+- `category_id` (Number)
+- `is_featured` (Boolean)
+- `is_best_seller` (Boolean)
+- `is_new_arrival` (Boolean)
+- `is_active` (Boolean)
+- `seo_title` (String)
+- `seo_description` (String)
+- `product_images` Array:
+  - `_id` (ObjectId)
+  - `url` (String)
+  - `alt_text` (String)
+  - `sort_order` (Number)
+- `created_at` (Date)
+- `updated_at` (Date)
 
 ---
 
-# Product Images
-
-product_images
-
-- id
-- product_id
-- url
-- sort_order
-
----
-
-# Orders
-
-orders
-
-- id
-- user_id
-- order_number
-- status
-- subtotal
-- delivery_charge
-- discount
-- total
-- payment_method
-- payment_status
-- shipping_address_id
-- transaction_id
-- created_at
-- updated_at
+## 3. Categories Collection (`Category`)
+- `_id` (ObjectId)
+- `id` (Number)
+- `name` (String)
+- `slug` (String, unique)
+- `description` (String)
+- `image_url` (String)
+- `parent_type` (String: `'lungi'` | `'saree'`)
+- `sort_order` (Number)
+- `created_at` (Date)
 
 ---
 
-# Order Items
-
-order_items
-
-- id
-- order_id
-- product_id
-- price
-- quantity
-
----
-
-# Coupons
-
-coupons
-
-- id
-- code
-- type
-- value
-- minimum_amount
-- start_date
-- end_date
-- is_active
+## 4. Collections Collection (`Collection`)
+- `_id` (ObjectId)
+- `id` (Number)
+- `name` (String)
+- `slug` (String, unique)
+- `description` (String)
+- `banner_url` (String)
+- `is_featured` (Boolean)
+- `sort_order` (Number)
+- `created_at` (Date)
+- `updated_at` (Date)
 
 ---
 
-# Reviews
-
-reviews
-
-- id
-- user_id
-- product_id
-- rating
-- comment
-- created_at
-
----
-
-# Wishlist
-
-wishlist
-
-- id
-- user_id
-- product_id
-- created_at
-
----
-
-# Banners
-
-banners
-
-- id
-- title
-- image
-- link
-- sort_order
-- is_active
+## 5. Orders Collection (`Order`)
+- `_id` (ObjectId)
+- `user_id` (String)
+- `order_number` (String, unique)
+- `status` (String: `'pending'` | `'confirmed'` | `'processing'` | `'shipped'` | `'delivered'` | `'cancelled'` | `'refunded'`)
+- `subtotal` (Number)
+- `delivery_charge` (Number)
+- `discount_amount` (Number)
+- `total_amount` (Number)
+- `payment_method` (String: `'cod'` | `'bkash'` | `'nagad'`)
+- `payment_status` (String: `'unpaid'` | `'pending_verification'` | `'paid'` | `'refunded'`)
+- `shipping_address` Object:
+  - `fullName` (String)
+  - `phone` (String)
+  - `deliveryArea` (String: `'dhaka'` | `'outside'`)
+  - `fullAddress` (String)
+- `transaction_id` (String)
+- `notes` (String)
+- `order_items` Array:
+  - `_id` (ObjectId)
+  - `product_id` (String)
+  - `product_name` (String)
+  - `product_image` (String)
+  - `unit_price` (Number)
+  - `quantity` (Number)
+  - `total_price` (Number)
+- `created_at` (Date)
+- `updated_at` (Date)
 
 ---
 
-# Contact Messages
+## 6. Banners Collection (`Banner`)
+- `_id` (ObjectId)
+- `id` (Number)
+- `title` (String)
+- `subtitle` (String)
+- `image_url` (String)
+- `link` (String)
+- `sort_order` (Number)
+- `is_active` (Boolean)
+- `created_at` (Date)
+- `updated_at` (Date)
 
-contact_messages
+---
 
-- id
-- name
-- email
-- phone
-- message
-- created_at
+## 7. Coupons Collection (`Coupon`)
+- `_id` (ObjectId)
+- `id` (Number)
+- `code` (String, unique)
+- `type` (String: `'percentage'` | `'fixed'`)
+- `value` (Number)
+- `minimum_amount` (Number)
+- `max_discount_amount` (Number)
+- `usage_limit` (Number)
+- `used_count` (Number)
+- `is_active` (Boolean)
+- `created_at` (Date)

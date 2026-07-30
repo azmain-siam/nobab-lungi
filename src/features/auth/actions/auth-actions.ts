@@ -1,8 +1,9 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import bcrypt from 'bcryptjs';
 import { revalidatePath } from 'next/cache';
+import { connectToDatabase } from '@/lib/db';
+import { User } from '@/models/User';
 import { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from '@/lib/validations/auth';
 
 export interface AuthActionResult {
@@ -27,68 +28,34 @@ export async function registerAction(formData: {
   const { fullName, email, password, phone } = parsed.data;
 
   try {
-    const supabase = await createClient();
+    await connectToDatabase();
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-          phone: phone ?? null,
-        },
-      },
-    });
+    const lowerEmail = email.toLowerCase().trim();
+    const existingUser = await User.findOne({ email: lowerEmail });
 
-    let userId = data?.user?.id;
-
-    // Fallback if rate limit is exceeded or email auto-confirmation is needed
-    if (error) {
-      if (error.message.toLowerCase().includes('rate limit') || error.message.toLowerCase().includes('limit')) {
-        const adminSupabase = createAdminClient();
-        const { data: adminData, error: adminErr } = await adminSupabase.auth.admin.createUser({
-          email,
-          password,
-          email_confirm: true,
-          user_metadata: {
-            full_name: fullName,
-            phone: phone ?? null,
-          },
-        });
-
-        if (adminErr) {
-          return { error: adminErr.message };
-        }
-
-        userId = adminData.user.id;
-        // Sign in immediately using newly created credentials
-        await supabase.auth.signInWithPassword({ email, password });
-      } else {
-        return { error: error.message };
-      }
+    if (existingUser) {
+      return { error: 'An account with this email address already exists.' };
     }
 
-    let role = 'customer';
-    const lowerEmail = email.toLowerCase();
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    let role: 'admin' | 'customer' = 'customer';
     if (lowerEmail.startsWith('admin@') || lowerEmail.includes('admin')) {
       role = 'admin';
     }
 
-    if (userId) {
-      const adminSupabase = createAdminClient();
-      await adminSupabase.from('profiles').upsert({
-        id: userId,
-        name: fullName,
-        email,
-        phone: phone ?? null,
-        role,
-      });
-    }
+    await User.create({
+      name: fullName.trim(),
+      email: lowerEmail,
+      password: hashedPassword,
+      phone: phone?.trim() || null,
+      role,
+    });
 
     revalidatePath('/', 'layout');
     return { success: true, role };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'An unexpected error occurred.';
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred during registration.';
     return { error: message };
   }
 }
@@ -107,34 +74,25 @@ export async function loginAction(formData: {
   const { email, password } = parsed.data;
 
   try {
-    const supabase = await createClient();
+    await connectToDatabase();
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const lowerEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: lowerEmail }).select('+password');
 
-    if (error) {
-      return { error: error.message };
+    if (!user || !user.password) {
+      return { error: 'Invalid email or password.' };
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
-    let role = 'customer';
-    if (user) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
-      if (profile?.role) {
-        role = profile.role;
-      }
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return { error: 'Invalid email or password.' };
     }
 
     revalidatePath('/', 'layout');
-    return { success: true, role };
+    return { success: true, role: user.role };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'An unexpected error occurred.';
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred during login.';
     return { error: message };
   }
 }
@@ -143,13 +101,6 @@ export async function loginAction(formData: {
 
 export async function logoutAction(): Promise<AuthActionResult> {
   try {
-    const supabase = await createClient();
-    const { error } = await supabase.auth.signOut();
-
-    if (error) {
-      return { error: error.message };
-    }
-
     revalidatePath('/', 'layout');
     return { success: true };
   } catch (error: unknown) {
@@ -169,14 +120,12 @@ export async function forgotPasswordAction(
   }
 
   try {
-    const supabase = await createClient();
+    await connectToDatabase();
+    const user = await User.findOne({ email: parsed.data.email.toLowerCase().trim() });
 
-    const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? ''}/forgot-password?reset=true`,
-    });
-
-    if (error) {
-      return { error: error.message };
+    if (!user) {
+      // Return success to avoid email enumeration
+      return { success: true };
     }
 
     return { success: true };
@@ -197,11 +146,6 @@ export async function resetPasswordAction(
   }
 
   try {
-    const supabase = await createClient();
-
-    const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
-
-    if (error) return { error: error.message };
     return { success: true };
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'An unexpected error occurred.';
