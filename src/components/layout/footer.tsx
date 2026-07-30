@@ -1,70 +1,82 @@
-/**
- * Store Footer — Server Component.
- */
-export function Footer() {
-  const currentYear = new Date().getFullYear();
+import Link from 'next/link';
+import { Container } from '@/components/ui/container';
 
+export function Footer() {
   return (
-    <footer className="border-t border-gray-200 bg-white">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
-          {/* Brand */}
-          <div>
-            <p className="text-base font-bold text-gray-900">Nobab Lungi</p>
-            <p className="mt-2 text-sm text-gray-500">
-              Premium Bangladeshi Lungi &amp; Saree. Fast delivery across Bangladesh.
+    <footer id="about" className="border-t border-[#e3e2e2] bg-[#fbf9f8] pt-16 pb-12">
+      <Container>
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-12">
+          {/* Brand Info (Left) */}
+          <div className="md:col-span-6 space-y-3">
+            <h3 className="font-display text-base font-bold text-[#1b1c1c]">
+              Nabab Lungi
+            </h3>
+            <p className="max-w-xs text-xs font-light leading-relaxed text-[#5e5e5b]">
+              Wear Tradition with Pride. Handcrafted excellence since 1998.
             </p>
           </div>
 
-          {/* Shop */}
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-wide text-gray-400">Shop</p>
-            <ul className="mt-3 space-y-2" role="list">
+          {/* Shop Links (Middle) */}
+          <div className="md:col-span-3 space-y-3">
+            <h4 className="font-display text-xs font-semibold uppercase tracking-[0.1em] text-[#1b1c1c]">
+              Shop
+            </h4>
+            <ul className="space-y-2.5 text-xs text-[#5e5e5b]">
               <li>
-                <a href="/products" className="text-sm text-gray-600 hover:text-gray-900">
-                  All Products
-                </a>
-              </li>
-              <li>
-                <a href="/collections" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link href="/products" className="transition hover:text-[#1b1c1c]">
                   Collections
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/categories" className="text-sm text-gray-600 hover:text-gray-900">
-                  Categories
-                </a>
+                <Link href="/products" className="transition hover:text-[#1b1c1c]">
+                  New Arrivals
+                </Link>
+              </li>
+              <li>
+                <Link href="/products" className="transition hover:text-[#1b1c1c]">
+                  Best Sellers
+                </Link>
               </li>
             </ul>
           </div>
 
-          {/* Account */}
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-wide text-gray-400">Account</p>
-            <ul className="mt-3 space-y-2" role="list">
+          {/* Company Links (Right) */}
+          <div className="md:col-span-3 space-y-3">
+            <h4 className="font-display text-xs font-semibold uppercase tracking-[0.1em] text-[#1b1c1c]">
+              Company
+            </h4>
+            <ul className="space-y-2.5 text-xs text-[#5e5e5b]">
               <li>
-                <a href="/account" className="text-sm text-gray-600 hover:text-gray-900">
-                  My Profile
-                </a>
+                <Link href="/#about" className="transition hover:text-[#1b1c1c]">
+                  Our Story
+                </Link>
               </li>
               <li>
-                <a href="/account/orders" className="text-sm text-gray-600 hover:text-gray-900">
-                  My Orders
-                </a>
+                <Link href="/#about" className="transition hover:text-[#1b1c1c]">
+                  Shipping &amp; Returns
+                </Link>
               </li>
               <li>
-                <a href="/account/wishlist" className="text-sm text-gray-600 hover:text-gray-900">
-                  Wishlist
-                </a>
+                <Link href="/#about" className="transition hover:text-[#1b1c1c]">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/#about" className="transition hover:text-[#1b1c1c]">
+                  Sustainability
+                </Link>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-10 border-t border-gray-100 pt-6 text-center text-xs text-gray-400">
-          &copy; {currentYear} Nobab Lungi. All rights reserved.
+        {/* Bottom Copyright */}
+        <div className="mt-16 border-t border-[#e3e2e2]/60 pt-8 text-center">
+          <p className="text-[11px] text-[#5e5e5b]">
+            © 2026 Nabab Lungi. Handcrafted in Bangladesh.
+          </p>
         </div>
-      </div>
+      </Container>
     </footer>
   );
 }

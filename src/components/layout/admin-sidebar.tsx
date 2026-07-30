@@ -1,76 +1,200 @@
 'use client';
 
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { logoutAction } from '@/features/auth/actions/auth-actions';
+import {
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  Layers,
+  Users,
+  Ticket,
+  Settings,
+  Grid,
+  ExternalLink,
+  ShieldCheck,
+  ChevronLeft,
+  ChevronRight,
+  X,
+} from 'lucide-react';
 
-const NAV_ITEMS = [
-  { label: 'Dashboard', href: '/dashboard', icon: '⊞' },
-  { label: 'Products', href: '/dashboard/products', icon: '📦' },
-  { label: 'Categories', href: '/dashboard/categories', icon: '🏷️' },
-  { label: 'Collections', href: '/dashboard/collections', icon: '✨' },
-  { label: 'Orders', href: '/dashboard/orders', icon: '📋' },
-  { label: 'Banners', href: '/dashboard/banners', icon: '🖼️' },
-  { label: 'Coupons', href: '/dashboard/coupons', icon: '🎫' },
-] as const;
+const ADMIN_NAV = [
+  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
+  { href: '/dashboard/products', label: 'Products', icon: Package },
+  { href: '/dashboard/categories', label: 'Categories', icon: Grid },
+  { href: '/dashboard/collections', label: 'Collections & Banners', icon: Layers },
+  { href: '/dashboard/orders', label: 'Orders', icon: ShoppingCart },
+  { href: '/dashboard/customers', label: 'Customers', icon: Users },
+  { href: '/dashboard/coupons', label: 'Coupons', icon: Ticket },
+  { href: '/dashboard/settings', label: 'Settings', icon: Settings },
+];
 
-/**
- * Admin sidebar — Client Component for active link highlighting.
- */
-export function AdminSidebar() {
+interface AdminSidebarProps {
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
+  isMobileOpen?: boolean;
+  onMobileClose?: () => void;
+}
+
+export function AdminSidebar({
+  isCollapsed = false,
+  onToggleCollapse,
+  isMobileOpen = false,
+  onMobileClose,
+}: AdminSidebarProps) {
   const pathname = usePathname();
 
-  return (
-    <aside className="flex w-56 shrink-0 flex-col border-r border-gray-200 bg-white">
-      {/* Brand */}
-      <div className="border-b border-gray-200 px-5 py-4">
-        <a href="/" className="text-base font-bold text-gray-900">
-          Nobab Lungi
-        </a>
-        <p className="mt-0.5 text-xs text-gray-400">Admin Dashboard</p>
-      </div>
+  const sidebarContent = (
+    <div className={`flex flex-col justify-between h-full space-y-6 ${isCollapsed ? 'p-3' : 'p-4 lg:p-6'}`}>
+      <div className="space-y-6">
+        {/* Brand Header */}
+        <div className="border-b border-white/10 pb-5">
+          {isCollapsed ? (
+            <div className="flex flex-col items-center gap-2">
+              <Link
+                href="/dashboard"
+                className="font-display text-lg font-bold tracking-tight text-white flex items-center justify-center p-1"
+                title="Nabab Admin Dashboard"
+              >
+                <ShieldCheck className="h-6 w-6 text-emerald-400 stroke-[2]" />
+              </Link>
+              {onToggleCollapse && (
+                <button
+                  onClick={onToggleCollapse}
+                  className="hidden lg:flex p-1 text-white/60 hover:text-white hover:bg-white/10 transition"
+                  title="Expand sidebar"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              <Link
+                href="/dashboard"
+                onClick={onMobileClose}
+                className="font-display text-lg font-bold tracking-tight text-white flex items-center gap-2 overflow-hidden"
+              >
+                <ShieldCheck className="h-5 w-5 text-emerald-400 stroke-[2] shrink-0" />
+                <span className="truncate">Nabab Admin</span>
+              </Link>
 
-      {/* Nav */}
-      <nav aria-label="Admin navigation" className="flex-1 overflow-y-auto px-3 py-4">
-        <ul className="space-y-1" role="list">
-          {NAV_ITEMS.map((item) => {
+              {/* Desktop collapse toggle button */}
+              {onToggleCollapse && (
+                <button
+                  onClick={onToggleCollapse}
+                  className="hidden lg:flex p-1 text-white/60 hover:text-white hover:bg-white/10 transition"
+                  title="Collapse sidebar"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+              )}
+
+              {/* Mobile close button */}
+              {onMobileClose && (
+                <button
+                  onClick={onMobileClose}
+                  className="lg:hidden p-1 text-white/60 hover:text-white"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Navigation List */}
+        <nav aria-label="Admin Navigation" className="space-y-1.5">
+          {ADMIN_NAV.map((item) => {
+            const Icon = item.icon;
             const isActive =
               item.href === '/dashboard'
                 ? pathname === '/dashboard'
                 : pathname.startsWith(item.href);
 
-            return (
-              <li key={item.href}>
-                <a
+            if (isCollapsed) {
+              return (
+                <Link
+                  key={item.href}
                   href={item.href}
-                  aria-current={isActive ? 'page' : undefined}
-                  className={`flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition ${
+                  title={item.label}
+                  className={`h-10 w-10 mx-auto flex items-center justify-center transition ${
                     isActive
-                      ? 'bg-gray-900 text-white'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                      ? 'bg-white text-[#1b1c1c]'
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
                   }`}
                 >
-                  <span aria-hidden="true">{item.icon}</span>
-                  {item.label}
-                </a>
-              </li>
+                  <Icon className="h-5 w-5 stroke-[1.5] shrink-0" />
+                </Link>
+              );
+            }
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onMobileClose}
+                className={`flex items-center gap-3 px-3.5 py-2.5 text-xs font-semibold uppercase tracking-wider transition ${
+                  isActive
+                    ? 'bg-white text-[#1b1c1c]'
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <Icon className="h-4 w-4 stroke-[1.5] shrink-0" />
+                <span className="truncate">{item.label}</span>
+              </Link>
             );
           })}
-        </ul>
-      </nav>
-
-      {/* Sign out */}
-      <div className="border-t border-gray-200 px-3 py-4">
-        <form action={logoutAction}>
-          <button
-            id="admin-logout"
-            type="submit"
-            className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
-          >
-            <span aria-hidden="true">→</span>
-            Sign out
-          </button>
-        </form>
+        </nav>
       </div>
-    </aside>
+
+      {/* Return to Storefront */}
+      <div className="border-t border-white/10 pt-4">
+        {isCollapsed ? (
+          <Link
+            href="/"
+            title="View Storefront"
+            className="h-10 w-10 mx-auto flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition"
+          >
+            <ExternalLink className="h-5 w-5 stroke-[1.5] shrink-0" />
+          </Link>
+        ) : (
+          <Link
+            href="/"
+            onClick={onMobileClose}
+            className="flex items-center gap-2.5 px-2 py-1.5 text-xs font-medium text-white/70 hover:text-white transition"
+          >
+            <ExternalLink className="h-4 w-4 stroke-[1.5] shrink-0" />
+            <span className="truncate">View Storefront</span>
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop Sidebar */}
+      <aside
+        className={`hidden lg:flex flex-col bg-[#1b1c1c] text-white shrink-0 sticky top-0 h-screen transition-all duration-300 ${
+          isCollapsed ? 'w-16' : 'w-64'
+        }`}
+      >
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile Drawer Backdrop */}
+      {isMobileOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+            onClick={onMobileClose}
+          />
+          <aside className="relative z-10 w-72 max-w-[80vw] bg-[#1b1c1c] text-white h-full shadow-2xl animate-in slide-in-from-left duration-200">
+            {sidebarContent}
+          </aside>
+        </div>
+      )}
+    </>
   );
 }

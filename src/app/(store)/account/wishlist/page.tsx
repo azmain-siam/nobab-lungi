@@ -1,56 +1,74 @@
 import type { Metadata } from 'next';
+import { Container } from '@/components/ui/container';
+import { Section } from '@/components/ui/section';
+import { AccountSidebar } from '@/components/shared/account-sidebar';
+import { ProductCard, type ProductCardData } from '@/components/shared/product-card';
 
 export const metadata: Metadata = {
-  title: 'Wishlist',
-  description: 'Your saved products on Nobab Lungi.',
+  title: 'My Wishlist — Nabab Lungi',
+  description: 'View your saved favorite handcrafted lungis and sarees.',
 };
 
-/**
- * Wishlist page — placeholder for Phase 4.
- */
-export default function AccountWishlistPage() {
+const WISHLIST_PRODUCTS: ProductCardData[] = [
+  {
+    id: '1',
+    name: 'Midnight Indigo',
+    collectionTag: 'Heritage Collection',
+    description: 'Hand-woven fine cotton with traditional pattern borders.',
+    image: 'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?q=80&w=600&auto=format&fit=crop',
+    price: '৳2,450',
+    badge: 'New Arrival',
+  },
+  {
+    id: '2',
+    name: 'Charcoal Silk Weave',
+    collectionTag: 'Executive Series',
+    description: 'Premium silk blend for executive comfort and occasion wear.',
+    image: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?q=80&w=600&auto=format&fit=crop',
+    price: '৳4,800',
+    originalPrice: '৳5,500',
+    badge: 'Premium',
+  },
+  {
+    id: '5',
+    name: 'Traditional Jamdani Saree',
+    collectionTag: 'Artisanal Saree Series',
+    description: 'Fine translucent cotton Jamdani with woven gold motifs.',
+    image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=600&auto=format&fit=crop',
+    price: '৳4,500',
+    badge: 'NEW',
+  },
+];
+
+export default function WishlistPage() {
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Wishlist</h1>
-        <p className="mt-1 text-sm text-gray-500">Products you&apos;ve saved for later.</p>
-      </div>
+    <Section variant="default" className="py-12 lg:py-16">
+      <Container>
+        <h1 className="font-display text-3xl font-semibold tracking-tight text-[#1b1c1c] sm:text-4xl mb-8">
+          My Account
+        </h1>
 
-      {/* Account navigation */}
-      <nav aria-label="Account sections" className="mb-8 flex gap-4 border-b border-gray-200">
-        {[
-          { label: 'Profile', href: '/account' },
-          { label: 'Orders', href: '/account/orders' },
-          { label: 'Wishlist', href: '/account/wishlist' },
-          { label: 'Addresses', href: '/account/addresses' },
-        ].map((item) => (
-          <a
-            key={item.href}
-            href={item.href}
-            className={`-mb-px border-b-2 pb-3 text-sm font-medium transition ${
-              item.href === '/account/wishlist'
-                ? 'border-gray-900 text-gray-900'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            {item.label}
-          </a>
-        ))}
-      </nav>
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-start">
+          <AccountSidebar />
 
-      <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-6 py-16 text-center">
-        <p className="text-2xl">❤️</p>
-        <p className="mt-3 text-sm font-medium text-gray-700">Your wishlist is empty</p>
-        <p className="mt-1 text-sm text-gray-500">
-          Save products you love and find them here later.
-        </p>
-        <a
-          href="/products"
-          className="mt-4 inline-block rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-700"
-        >
-          Browse products
-        </a>
-      </div>
-    </div>
+          <div className="flex-1 bg-white border border-[#e3e2e2] p-6 sm:p-8 space-y-6">
+            <div className="border-b border-[#e3e2e2] pb-4">
+              <h2 className="font-display text-lg font-semibold text-[#1b1c1c]">
+                My Wishlist ({WISHLIST_PRODUCTS.length} Saved Items)
+              </h2>
+              <p className="text-xs font-light text-[#5e5e5b] mt-1">
+                Your saved favorite lungis and sarees. Add them to your cart anytime.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {WISHLIST_PRODUCTS.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </Container>
+    </Section>
   );
 }

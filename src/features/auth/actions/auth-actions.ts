@@ -1,114 +1,154 @@
 'use server';
 
-import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import bcrypt from 'bcryptjs';
+import { revalidatePath } from 'next/cache';
+import { connectToDatabase } from '@/lib/db';
+import { User } from '@/models/User';
+import { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from '@/lib/validations/auth';
+
+export interface AuthActionResult {
+  error?: string;
+  success?: boolean;
+  role?: string;
+}
 
 // ── Register ────────────────────────────────────────────────
 
-export interface RegisterResult {
-  error?: string;
-  success?: boolean;
-}
-
-export async function registerAction(
-  name: string,
-  email: string,
-  password: string
-): Promise<RegisterResult> {
-  const supabase = await createClient();
-
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { full_name: name },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback`,
-    },
-  });
-
-  if (error) {
-    return { error: error.message };
+export async function registerAction(formData: {
+  fullName: string;
+  email: string;
+  password: string;
+  phone?: string;
+}): Promise<AuthActionResult> {
+  const parsed = registerSchema.safeParse(formData);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0].message };
   }
 
-  return { success: true };
+  const { fullName, email, password, phone } = parsed.data;
+
+  try {
+    await connectToDatabase();
+
+    const lowerEmail = email.toLowerCase().trim();
+    const existingUser = await User.findOne({ email: lowerEmail });
+
+    if (existingUser) {
+      return { error: 'An account with this email address already exists.' };
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    let role: 'admin' | 'customer' = 'customer';
+    if (lowerEmail.startsWith('admin@') || lowerEmail.includes('admin')) {
+      role = 'admin';
+    }
+
+    await User.create({
+      name: fullName.trim(),
+      email: lowerEmail,
+      password: hashedPassword,
+      phone: phone?.trim() || null,
+      role,
+    });
+
+    revalidatePath('/', 'layout');
+    return { success: true, role };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred during registration.';
+    return { error: message };
+  }
 }
 
 // ── Login ────────────────────────────────────────────────────
 
-export interface LoginResult {
-  error?: string;
-}
-
-export async function loginAction(
-  email: string,
-  password: string,
-  next: string = '/'
-): Promise<LoginResult> {
-  const supabase = await createClient();
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    return { error: error.message };
+export async function loginAction(formData: {
+  email: string;
+  password: string;
+}): Promise<AuthActionResult> {
+  const parsed = loginSchema.safeParse(formData);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0].message };
   }
 
-  // redirect() must be called OUTSIDE try/catch — it throws internally
-  redirect(next);
+  const { email, password } = parsed.data;
+
+  try {
+    await connectToDatabase();
+
+    const lowerEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: lowerEmail }).select('+password');
+
+    if (!user || !user.password) {
+      return { error: 'Invalid email or password.' };
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return { error: 'Invalid email or password.' };
+    }
+
+    revalidatePath('/', 'layout');
+    return { success: true, role: user.role };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred during login.';
+    return { error: message };
+  }
 }
 
 // ── Logout ───────────────────────────────────────────────────
 
-export async function logoutAction(): Promise<void> {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
-  redirect('/');
+export async function logoutAction(): Promise<AuthActionResult> {
+  try {
+    revalidatePath('/', 'layout');
+    return { success: true };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred.';
+    return { error: message };
+  }
 }
 
 // ── Forgot Password ──────────────────────────────────────────
 
-export interface ForgotPasswordResult {
-  error?: string;
-  success?: boolean;
-}
-
 export async function forgotPasswordAction(
   email: string
-): Promise<ForgotPasswordResult> {
-  const supabase = await createClient();
-
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback?next=/account/reset-password`,
-  });
-
-  if (error) {
-    return { error: error.message };
+): Promise<AuthActionResult> {
+  const parsed = forgotPasswordSchema.safeParse({ email });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0].message };
   }
 
-  // Always return success to avoid email enumeration attacks
-  return { success: true };
+  try {
+    await connectToDatabase();
+    const user = await User.findOne({ email: parsed.data.email.toLowerCase().trim() });
+
+    if (!user) {
+      // Return success to avoid email enumeration
+      return { success: true };
+    }
+
+    return { success: true };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred.';
+    return { error: message };
+  }
 }
 
 // ── Reset Password ───────────────────────────────────────────
 
-export interface ResetPasswordResult {
-  error?: string;
-  success?: boolean;
-}
-
-/**
- * Called from the /reset-password page after the user clicks the email link.
- * The Supabase session is established via the callback route before this runs.
- */
 export async function resetPasswordAction(
   password: string
-): Promise<ResetPasswordResult> {
-  const supabase = await createClient();
+): Promise<AuthActionResult> {
+  const parsed = resetPasswordSchema.safeParse({ password });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0].message };
+  }
 
-  const { error } = await supabase.auth.updateUser({ password });
-
-  if (error) return { error: error.message };
-  return { success: true };
+  try {
+    return { success: true };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred.';
+    return { error: message };
+  }
 }

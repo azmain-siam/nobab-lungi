@@ -1,44 +1,62 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import type { User } from '@supabase/supabase-js';
-import { createClient } from '@/lib/supabase/client';
+import { useSession, signOut as nextAuthSignOut } from 'next-auth/react';
+import type { Profile } from '@/types';
 
-interface UseUserReturn {
-  user: User | null;
-  loading: boolean;
+interface CustomUser {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+  user_metadata?: { full_name?: string };
 }
 
-/**
- * Client-side hook to get the current authenticated user.
- * Subscribes to auth state changes automatically.
- *
- * Use in Client Components only.
- * Server Components should use `supabase.auth.getUser()` directly.
- */
+interface SessionUserShape {
+  id?: string;
+  name?: string | null;
+  email?: string | null;
+  role?: 'admin' | 'customer';
+  image?: string | null;
+}
+
+interface UseUserReturn {
+  user: CustomUser | null;
+  profile: Profile | null;
+  loading: boolean;
+  signOut: () => Promise<void>;
+}
+
 export function useUser(): UseUserReturn {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: session, status } = useSession();
 
-  useEffect(() => {
-    const supabase = createClient();
+  const loading = status === 'loading';
 
-    // Initial fetch
-    supabase.auth.getUser().then(({ data: { user: currentUser } }) => {
-      setUser(currentUser);
-      setLoading(false);
-    });
+  const sessionUser = session?.user as SessionUserShape | undefined;
 
-    // Subscribe to auth state changes (login, logout, token refresh)
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+  const user: CustomUser | null = sessionUser
+    ? {
+        id: sessionUser.id || sessionUser.email || 'user',
+        name: sessionUser.name,
+        email: sessionUser.email,
+        user_metadata: { full_name: sessionUser.name ?? undefined },
+      }
+    : null;
 
-    return () => subscription.unsubscribe();
-  }, []);
+  const profile: Profile | null = sessionUser
+    ? {
+        id: sessionUser.id || sessionUser.email || 'user',
+        name: sessionUser.name ?? null,
+        email: sessionUser.email ?? null,
+        phone: null,
+        role: sessionUser.role || 'customer',
+        avatar_url: sessionUser.image ?? null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+    : null;
 
-  return { user, loading };
+  const signOut = async () => {
+    await nextAuthSignOut({ callbackUrl: '/login' });
+  };
+
+  return { user, profile, loading, signOut };
 }

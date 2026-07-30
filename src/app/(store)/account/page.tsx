@@ -1,72 +1,161 @@
-import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
-import { getUserProfile } from '@/services/user-service';
-import { EditProfileForm } from '@/features/auth/components/edit-profile-form';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'My Profile',
-  description: 'Manage your Nobab Lungi account profile.',
-};
+import { useState } from 'react';
+import { Container } from '@/components/ui/container';
+import { Section } from '@/components/ui/section';
+import { Button } from '@/components/ui/button';
+import { AccountSidebar } from '@/components/shared/account-sidebar';
+import { updateProfileAction, updatePasswordAction } from '@/features/auth/actions/profile-actions';
+import { useUser } from '@/features/auth/hooks/use-user';
+import { CheckCircle2, AlertCircle } from 'lucide-react';
 
-/**
- * Account profile page — Server Component.
- * Middleware already guards this route, but we double-check for safety.
- */
-export default async function AccountPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+function ProfileForm() {
+  const { user, profile } = useUser();
+  const [fullName, setFullName] = useState<string | null>(null);
+  const [phone, setPhone] = useState<string | null>(null);
+  const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  if (!user) redirect('/login?next=/account');
+  const currentName = fullName ?? profile?.name ?? user?.user_metadata?.full_name ?? '';
+  const currentPhone = phone ?? profile?.phone ?? '';
+  const currentEmail = user?.email || profile?.email || '';
 
-  const profile = await getUserProfile(user.id);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setIsSaved(false);
+    setErrorMsg('');
+
+    try {
+      const profileRes = await updateProfileAction(currentName, currentPhone);
+      if (profileRes.error) {
+        setErrorMsg(profileRes.error);
+        return;
+      }
+
+      if (password) {
+        const passRes = await updatePasswordAction(password);
+        if (passRes.error) {
+          setErrorMsg(passRes.error);
+          return;
+        }
+      }
+
+      setIsSaved(true);
+      setPassword('');
+      setTimeout(() => setIsSaved(false), 3000);
+    } catch {
+      setErrorMsg('An error occurred while updating profile.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Manage your personal information.
+    <div className="flex-1 bg-white border border-[#e3e2e2] p-6 sm:p-8 space-y-6">
+      <div className="border-b border-[#e3e2e2] pb-4">
+        <h2 className="font-display text-lg font-semibold text-[#1b1c1c]">
+          Profile Information
+        </h2>
+        <p className="text-xs font-light text-[#5e5e5b] mt-1">
+          Update your account profile details and login preferences.
         </p>
       </div>
 
-      {/* Account navigation */}
-      <nav aria-label="Account sections" className="mb-8 flex gap-4 border-b border-gray-200">
-        {[
-          { label: 'Profile', href: '/account' },
-          { label: 'Orders', href: '/account/orders' },
-          { label: 'Wishlist', href: '/account/wishlist' },
-          { label: 'Addresses', href: '/account/addresses' },
-        ].map((item) => (
-          <a
-            key={item.href}
-            href={item.href}
-            className={`-mb-px border-b-2 pb-3 text-sm font-medium transition ${
-              item.href === '/account'
-                ? 'border-gray-900 text-gray-900'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            {item.label}
-          </a>
-        ))}
-      </nav>
+      {isSaved && (
+        <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-medium">
+          <CheckCircle2 className="h-4 w-4 stroke-[2]" />
+          Profile settings saved successfully!
+        </div>
+      )}
 
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
-        {/* Read-only email */}
-        <div className="mb-6 space-y-1">
-          <p className="text-sm font-medium text-gray-700">Email address</p>
-          <p className="text-sm text-gray-900">{user.email}</p>
-          <p className="text-xs text-gray-400">Email cannot be changed.</p>
+      {errorMsg && (
+        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 text-xs text-red-700 font-medium">
+          <AlertCircle className="h-4 w-4 stroke-[2]" />
+          {errorMsg}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-[#1b1c1c]">
+              Full Name *
+            </label>
+            <input
+              type="text"
+              required
+              value={currentName}
+              onChange={(e) => setFullName(e.target.value)}
+              className="w-full bg-[#fbf9f8] border border-[#e3e2e2] px-3.5 py-2.5 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-[#1b1c1c]">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              value={currentPhone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="017XXXXXXXX"
+              className="w-full bg-[#fbf9f8] border border-[#e3e2e2] px-3.5 py-2.5 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
+            />
+          </div>
         </div>
 
-        <EditProfileForm
-          initialName={profile?.name ?? ''}
-          initialPhone={profile?.phone ?? ''}
-        />
-      </div>
+        <div className="space-y-1">
+          <label className="text-xs font-semibold text-[#1b1c1c]">
+            Email Address *
+          </label>
+          <input
+            type="email"
+            required
+            disabled
+            value={currentEmail}
+            className="w-full bg-[#f5f3f3] border border-[#e3e2e2] px-3.5 py-2.5 text-xs text-[#5e5e5b] rounded-none cursor-not-allowed"
+          />
+        </div>
+
+        <div className="space-y-1 pt-2">
+          <label className="text-xs font-semibold text-[#1b1c1c]">
+            New Password (Leave blank to keep unchanged)
+          </label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            className="w-full bg-[#fbf9f8] border border-[#e3e2e2] px-3.5 py-2.5 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
+          />
+        </div>
+
+        <div className="pt-2">
+          <Button type="submit" variant="primary" size="md" disabled={isSubmitting}>
+            {isSubmitting ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </div>
+      </form>
     </div>
+  );
+}
+
+export default function AccountPage() {
+  return (
+    <Section variant="default" className="py-12 lg:py-16">
+      <Container>
+        <h1 className="font-display text-3xl font-semibold tracking-tight text-[#1b1c1c] sm:text-4xl mb-8">
+          My Account
+        </h1>
+
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-start">
+          <AccountSidebar />
+          <ProfileForm />
+        </div>
+      </Container>
+    </Section>
   );
 }

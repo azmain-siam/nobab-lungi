@@ -1,25 +1,17 @@
-import { createClient } from '@/lib/supabase/server';
-import { Navbar } from '@/components/layout/navbar';
-import { Footer } from '@/components/layout/footer';
+import { Footer } from "@/components/layout/footer";
+import { Header } from "@/components/layout/header";
 
-/**
- * Store Layout — wraps all customer-facing pages.
- * Fetches the session server-side once and passes to Navbar.
- */
-export default async function StoreLayout({
+export default function StoreLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   return (
-    <div className="flex min-h-screen flex-col">
-      <Navbar user={user} />
-      <main className="flex-1">{children}</main>
+    <div className="relative min-h-screen bg-[#fbf9f8] flex flex-col justify-between">
+      <div>
+        <Header />
+        <main>{children}</main>
+      </div>
       <Footer />
     </div>
   );

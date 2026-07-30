@@ -18,11 +18,13 @@ export { cloudinary };
 // nobab-lungi/products/   → product images
 // nobab-lungi/banners/    → homepage banners
 // nobab-lungi/collections/→ collection banners
+// nobab-lungi/categories/ → category thumbnails
 // nobab-lungi/avatars/    → user avatars
 
 export const CLOUDINARY_FOLDERS = {
   PRODUCTS:    'nobab-lungi/products',
   BANNERS:     'nobab-lungi/banners',
   COLLECTIONS: 'nobab-lungi/collections',
+  CATEGORIES:  'nobab-lungi/categories',
   AVATARS:     'nobab-lungi/avatars',
 } as const;

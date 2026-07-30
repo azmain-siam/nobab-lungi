@@ -1,5 +1,9 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Hanken_Grotesk } from 'next/font/google';
+import { CartProvider } from '@/context/cart-context';
+import { ToastProvider } from '@/providers/toast-provider';
+import { SessionProvider } from '@/providers/session-provider';
+import { CartDrawer } from '@/components/shared/cart-drawer';
 import './globals.css';
 
 const inter = Inter({
@@ -8,21 +12,17 @@ const inter = Inter({
   display: 'swap',
 });
 
+const hankenGrotesk = Hanken_Grotesk({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-hanken',
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
-  title: {
-    default: 'Nobab Lungi — Premium Bangladeshi Lungi & Saree',
-    template: '%s | Nobab Lungi',
-  },
+  title: 'Nabab Lungi — Traditional Bangladeshi Lungi & Saree Store',
   description:
-    'Bangladesh\'s finest lungi and saree store. Shop premium cotton, handloom, Jamdani, and export-quality products. Fast delivery across Bangladesh.',
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-  ),
-  openGraph: {
-    siteName: 'Nobab Lungi',
-    type: 'website',
-    locale: 'bn_BD',
-  },
+    'Wear Tradition with Pride. Premium handcrafted lungis made with exceptional fabrics, timeless craftsmanship, and modern comfort.',
 };
 
 export default function RootLayout({
@@ -31,8 +31,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="bn" className={`${inter.variable} h-full`}>
-      <body className="min-h-full font-sans antialiased">{children}</body>
+    <html
+      lang="en"
+      className={`${inter.variable} ${hankenGrotesk.variable} h-full scroll-smooth`}
+    >
+      <body className="min-h-full bg-[#fbf9f8] text-[#1b1c1c] font-sans antialiased">
+        <SessionProvider>
+          <ToastProvider>
+            <CartProvider>
+              {children}
+              <CartDrawer />
+            </CartProvider>
+          </ToastProvider>
+        </SessionProvider>
+      </body>
     </html>
   );
 }

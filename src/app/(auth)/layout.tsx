@@ -1,15 +1,18 @@
-/**
- * Auth Layout — minimal, centered, no navbar or footer.
- * Used by: /login, /register, /forgot-password
- */
+import { Header } from '@/components/layout/header';
+import { Footer } from '@/components/layout/footer';
+
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-gray-50">
-      {children}
+    <div className="relative min-h-screen bg-[#fbf9f8] flex flex-col justify-between">
+      <div>
+        <Header variant="light" />
+        <main>{children}</main>
+      </div>
+      <Footer />
     </div>
   );
 }
