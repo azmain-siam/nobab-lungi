@@ -1,13 +1,17 @@
-import Image from 'next/image';
-import { Container } from '@/components/ui/container';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
+import { Container } from "@/components/ui/container";
+import Image from "next/image";
+import bannerImg from "../../../../public/images/banner/banner.jpeg";
 
 export function HeroSection() {
   return (
-    <section aria-label="Hero" className="relative min-h-[90vh] w-full overflow-hidden bg-stone-900 flex items-end pb-20 pt-32 lg:min-h-[95vh] lg:pb-28">
+    <section
+      aria-label="Hero"
+      className="relative min-h-[90vh] w-full overflow-hidden bg-stone-900 flex items-end pb-20 pt-32 lg:min-h-[95vh] lg:pb-28"
+    >
       {/* Background Image with subtle zoom on load */}
       <Image
-        src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=2000&auto=format&fit=crop"
+        src={bannerImg}
         alt="Man wearing traditional handcrafted Bangladeshi lungi in a sunny courtyard"
         fill
         className="object-cover object-top opacity-85 transition-transform duration-1000 scale-105 animate-pulse-slow"
@@ -27,14 +31,25 @@ export function HeroSection() {
             </h1>
 
             <p className="max-w-md text-sm font-light leading-relaxed text-white/90 sm:text-base animate-fade-in-up animation-delay-100">
-              Premium handcrafted lungis made with exceptional fabrics, timeless craftsmanship, and modern comfort.
+              Premium handcrafted lungis made with exceptional fabrics, timeless
+              craftsmanship, and modern comfort.
             </p>
 
             <div className="pt-2 flex flex-wrap items-center gap-4 animate-fade-in-up animation-delay-200">
-              <Button href="#shop" variant="white" size="lg" className="hover:scale-105 transition-transform">
+              <Button
+                href="#shop"
+                variant="white"
+                size="lg"
+                className="hover:scale-105 transition-transform"
+              >
                 SHOP COLLECTION
               </Button>
-              <Button href="#collections" variant="ghost-white" size="lg" className="hover:scale-105 transition-transform">
+              <Button
+                href="#collections"
+                variant="ghost-white"
+                size="lg"
+                className="hover:scale-105 transition-transform"
+              >
                 EXPLORE PREMIUM SERIES
               </Button>
             </div>
