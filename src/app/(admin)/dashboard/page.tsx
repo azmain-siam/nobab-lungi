@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
-import { DollarSign, ShoppingBag, Package, AlertTriangle, ArrowUpRight } from 'lucide-react';
+import { DollarSign, ShoppingBag, Package, AlertTriangle, ArrowUpRight, Activity, UserPlus, Truck } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard — Nabab Lungi',
@@ -70,13 +70,58 @@ const RECENT_ORDERS = [
     status: 'Pending',
     date: '2026-07-27',
   },
+  {
+    id: 'NL-548102',
+    customer: 'Nusrat Jahan',
+    phone: '01755443322',
+    area: 'Outside Dhaka',
+    total: '৳4,200',
+    method: 'Nagad',
+    status: 'Shipped',
+    date: '2026-07-26',
+  },
+];
+
+const RECENT_ACTIVITY = [
+  {
+    id: 1,
+    title: 'New order #NL-849201 placed',
+    time: '10 mins ago',
+    type: 'order',
+    icon: ShoppingBag,
+    iconColor: 'text-blue-600 bg-blue-50',
+  },
+  {
+    id: 2,
+    title: 'Low stock warning for "Check Lungi - Navy Blue"',
+    time: '1 hour ago',
+    type: 'stock',
+    icon: AlertTriangle,
+    iconColor: 'text-amber-600 bg-amber-50',
+  },
+  {
+    id: 3,
+    title: 'Order #NL-710492 marked as Shipped',
+    time: '3 hours ago',
+    type: 'shipping',
+    icon: Truck,
+    iconColor: 'text-emerald-600 bg-emerald-50',
+  },
+  {
+    id: 4,
+    title: 'New customer account created: mahmud@example.com',
+    time: '5 hours ago',
+    type: 'user',
+    icon: UserPlus,
+    iconColor: 'text-purple-600 bg-purple-50',
+  },
 ];
 
 export default function DashboardPage() {
   return (
     <>
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-[#e3e2e2] pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#e3e2e2] pb-5">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight text-[#1b1c1c] sm:text-3xl">
             Merchant Overview
@@ -89,13 +134,13 @@ export default function DashboardPage() {
       </div>
 
       {/* Metrics Grid */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {METRICS.map((metric) => {
           const Icon = metric.icon;
           return (
             <div
               key={metric.title}
-              className="bg-white border border-[#e3e2e2] p-5 space-y-3"
+              className="bg-white border border-[#e3e2e2] p-5 space-y-3 shadow-xs hover:border-[#1b1c1c] transition"
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-[#5e5e5b] uppercase tracking-wider">
@@ -119,74 +164,113 @@ export default function DashboardPage() {
         })}
       </div>
 
-      {/* Recent Orders Section */}
-      <div className="bg-white border border-[#e3e2e2] p-6 space-y-5">
-        <div className="flex items-center justify-between border-b border-[#e3e2e2] pb-4">
-          <div>
-            <h2 className="font-display text-base font-semibold text-[#1b1c1c]">
-              Recent Orders
-            </h2>
-            <p className="text-xs text-[#5e5e5b]">
-              Latest customer purchases requiring processing.
-            </p>
+      {/* Grid Section: Recent Orders & Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Recent Orders Section (2 Cols) */}
+        <div className="lg:col-span-2 bg-white border border-[#e3e2e2] p-6 space-y-5">
+          <div className="flex items-center justify-between border-b border-[#e3e2e2] pb-4">
+            <div>
+              <h2 className="font-display text-base font-semibold text-[#1b1c1c]">
+                Recent Orders
+              </h2>
+              <p className="text-xs text-[#5e5e5b]">
+                Latest customer purchases requiring fulfillment.
+              </p>
+            </div>
+            <Link
+              href="/dashboard/orders"
+              className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-[#1b1c1c] hover:underline"
+            >
+              View All
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
-          <Link
-            href="/dashboard/orders"
-            className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-[#1b1c1c] hover:underline"
-          >
-            View All Orders
-            <ArrowUpRight className="h-3.5 w-3.5" />
-          </Link>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-[#e3e2e2] bg-[#fbf9f8] text-[#5e5e5b] uppercase tracking-wider">
+                  <th className="p-3 font-semibold">Order ID</th>
+                  <th className="p-3 font-semibold">Customer</th>
+                  <th className="p-3 font-semibold">Location</th>
+                  <th className="p-3 font-semibold">Payment</th>
+                  <th className="p-3 font-semibold">Total</th>
+                  <th className="p-3 font-semibold">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#e3e2e2]">
+                {RECENT_ORDERS.map((order) => (
+                  <tr key={order.id} className="hover:bg-[#fbf9f8] transition">
+                    <td className="p-3 font-display font-semibold text-[#1b1c1c]">
+                      {order.id}
+                    </td>
+                    <td className="p-3">
+                      <div className="font-semibold text-[#1b1c1c]">
+                        {order.customer}
+                      </div>
+                      <div className="text-[10px] text-[#5e5e5b]">{order.phone}</div>
+                    </td>
+                    <td className="p-3 text-[#5e5e5b]">{order.area}</td>
+                    <td className="p-3 text-[#1b1c1c] font-medium">{order.method}</td>
+                    <td className="p-3 font-display font-semibold text-[#1b1c1c]">
+                      {order.total}
+                    </td>
+                    <td className="p-3">
+                      {order.status === 'Delivered' ? (
+                        <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200">
+                          Delivered
+                        </span>
+                      ) : order.status === 'Shipped' ? (
+                        <span className="text-[10px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 border border-blue-200">
+                          Shipped
+                        </span>
+                      ) : order.status === 'Processing' ? (
+                        <span className="text-[10px] font-semibold text-cyan-700 bg-cyan-50 px-2 py-0.5 border border-cyan-200">
+                          Processing
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 border border-amber-200">
+                          Pending
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-[#e3e2e2] bg-[#fbf9f8] text-[#5e5e5b] uppercase tracking-wider">
-                <th className="p-3 font-semibold">Order ID</th>
-                <th className="p-3 font-semibold">Customer</th>
-                <th className="p-3 font-semibold">Location</th>
-                <th className="p-3 font-semibold">Payment</th>
-                <th className="p-3 font-semibold">Total</th>
-                <th className="p-3 font-semibold">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#e3e2e2]">
-              {RECENT_ORDERS.map((order) => (
-                <tr key={order.id} className="hover:bg-[#fbf9f8]">
-                  <td className="p-3 font-display font-semibold text-[#1b1c1c]">
-                    {order.id}
-                  </td>
-                  <td className="p-3">
-                    <div className="font-semibold text-[#1b1c1c]">
-                      {order.customer}
-                    </div>
-                    <div className="text-[10px] text-[#5e5e5b]">{order.phone}</div>
-                  </td>
-                  <td className="p-3 text-[#5e5e5b]">{order.area}</td>
-                  <td className="p-3 text-[#1b1c1c] font-medium">{order.method}</td>
-                  <td className="p-3 font-display font-semibold text-[#1b1c1c]">
-                    {order.total}
-                  </td>
-                  <td className="p-3">
-                    {order.status === 'Delivered' ? (
-                      <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200">
-                        Delivered
-                      </span>
-                    ) : order.status === 'Processing' ? (
-                      <span className="text-[10px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 border border-blue-200">
-                        Processing
-                      </span>
-                    ) : (
-                      <span className="text-[10px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 border border-amber-200">
-                        Pending
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {/* Recent Activity Log (1 Col) */}
+        <div className="bg-white border border-[#e3e2e2] p-6 space-y-5">
+          <div className="flex items-center justify-between border-b border-[#e3e2e2] pb-4">
+            <div>
+              <h2 className="font-display text-base font-semibold text-[#1b1c1c] flex items-center gap-2">
+                <Activity className="h-4 w-4 text-emerald-600 stroke-[1.5]" />
+                Recent Activity
+              </h2>
+              <p className="text-xs text-[#5e5e5b]">Real-time store audit events.</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {RECENT_ACTIVITY.map((activity) => {
+              const Icon = activity.icon;
+              return (
+                <div key={activity.id} className="flex items-start gap-3 p-2.5 rounded-none hover:bg-[#fbf9f8] transition">
+                  <div className={`p-2 rounded-full border border-current/20 shrink-0 ${activity.iconColor}`}>
+                    <Icon className="h-3.5 w-3.5 stroke-[1.5]" />
+                  </div>
+                  <div className="space-y-0.5 overflow-hidden">
+                    <p className="text-xs font-semibold text-[#1b1c1c] leading-tight leading-snug">
+                      {activity.title}
+                    </p>
+                    <span className="text-[10px] text-[#5e5e5b] block">{activity.time}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </>
