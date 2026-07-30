@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { seedAdminUser } from './seed-admin';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -6,21 +7,17 @@ if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
 }
 
-/**
- * Global is used here to maintain a cached connection across hot reloads
- * in development. This prevents connections growing exponentially
- * during API Route / Server Action execution.
- */
 interface MongooseCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
+  seeded: boolean;
 }
 
 declare global {
   var mongooseCache: MongooseCache | undefined;
 }
 
-const cached: MongooseCache = global.mongooseCache || { conn: null, promise: null };
+const cached: MongooseCache = global.mongooseCache || { conn: null, promise: null, seeded: false };
 
 if (!global.mongooseCache) {
   global.mongooseCache = cached;
@@ -28,6 +25,10 @@ if (!global.mongooseCache) {
 
 export async function connectToDatabase(): Promise<typeof mongoose> {
   if (cached.conn) {
+    if (!cached.seeded) {
+      cached.seeded = true;
+      seedAdminUser().catch((err) => console.error('Background admin seed error:', err));
+    }
     return cached.conn;
   }
 
@@ -43,6 +44,10 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
 
   try {
     cached.conn = await cached.promise;
+    if (!cached.seeded) {
+      cached.seeded = true;
+      seedAdminUser().catch((err) => console.error('Background admin seed error:', err));
+    }
   } catch (e) {
     cached.promise = null;
     throw e;

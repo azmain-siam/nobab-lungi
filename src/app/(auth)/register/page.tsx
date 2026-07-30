@@ -3,13 +3,16 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { Container } from '@/components/ui/container';
 import { Button } from '@/components/ui/button';
 import { registerAction } from '@/actions/auth';
+import { useToast } from '@/providers/toast-provider';
 import { ArrowRight, Lock, Mail, User, Phone } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const toast = useToast();
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -31,8 +34,24 @@ export default function RegisterPage() {
       });
 
       if (res.success) {
-        router.push('/account');
-        router.refresh();
+        toast.success('Account created successfully!');
+        // Automatically sign in to create NextAuth session
+        const loginRes = await signIn('credentials', {
+          redirect: false,
+          email: email.trim().toLowerCase(),
+          password,
+        });
+
+        if (loginRes?.error) {
+          router.push('/login');
+        } else {
+          router.refresh();
+          if (res.role === 'admin') {
+            router.push('/dashboard');
+          } else {
+            router.push('/account');
+          }
+        }
       } else {
         setErrorMsg(res.error ?? 'Failed to register account.');
       }
@@ -85,13 +104,12 @@ export default function RegisterPage() {
 
             <div className="space-y-1">
               <label className="text-xs font-semibold text-[#1b1c1c]">
-                Phone Number *
+                Phone Number
               </label>
               <div className="relative">
                 <Phone className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5e5e5b] stroke-[1.5]" />
                 <input
                   type="tel"
-                  required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="017XXXXXXXX"

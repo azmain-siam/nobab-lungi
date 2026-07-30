@@ -3,7 +3,7 @@
 import { Container } from '@/components/ui/container';
 import { useCart } from '@/context/cart-context';
 import { useUser } from '@/features/auth/hooks/use-user';
-import { Heart, Menu, Search, ShoppingBag, User, X, ShieldCheck, LogOut } from 'lucide-react';
+import { Heart, Menu, Search, ShoppingBag, User, X, ShieldCheck, LogOut, Package } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -154,37 +154,70 @@ export function Header({ variant }: HeaderProps) {
               <Heart className="h-5 w-5 stroke-[1.5]" />
             </Link>
 
-            {/* Admin Portal Shortcut if Admin */}
-            {profile?.role === 'admin' && (
-              <Link
-                href="/dashboard"
-                aria-label="Admin Dashboard"
-                className="transition hover:opacity-75 focus:outline-none cursor-pointer"
-                title="Admin Dashboard"
-              >
-                <ShieldCheck className="h-5 w-5 stroke-[1.5] text-emerald-600" />
-              </Link>
-            )}
+            {/* Logged in Navigation Controls */}
+            {user ? (
+              <>
+                <Link
+                  href="/account/orders"
+                  aria-label="My Orders"
+                  className="transition hover:opacity-75 focus:outline-none cursor-pointer hidden sm:block"
+                  title="My Orders"
+                >
+                  <Package className="h-5 w-5 stroke-[1.5]" />
+                </Link>
 
-            {/* User Account / Sign In */}
-            <Link
-              href={user ? '/account' : '/login'}
-              aria-label={user ? 'Account Profile' : 'Sign In'}
-              className="transition hover:opacity-75 focus:outline-none cursor-pointer flex items-center gap-1"
-            >
-              <User className="h-5 w-5 stroke-[1.5]" />
-              {!user && (
-                <span className="hidden sm:inline text-xs font-semibold uppercase tracking-wider ml-1">
-                  Sign In
-                </span>
-              )}
-            </Link>
+                {profile?.role === 'admin' && (
+                  <Link
+                    href="/dashboard"
+                    aria-label="Admin Dashboard"
+                    className="transition hover:opacity-75 focus:outline-none cursor-pointer"
+                    title="Admin Dashboard"
+                  >
+                    <ShieldCheck className="h-5 w-5 stroke-[1.5] text-emerald-600" />
+                  </Link>
+                )}
+
+                <Link
+                  href="/account"
+                  aria-label="Account Profile"
+                  className="transition hover:opacity-75 focus:outline-none cursor-pointer"
+                  title="Profile"
+                >
+                  <User className="h-5 w-5 stroke-[1.5]" />
+                </Link>
+
+                <button
+                  onClick={handleSignOut}
+                  aria-label="Logout"
+                  className="transition hover:opacity-75 focus:outline-none cursor-pointer hidden sm:block text-red-600"
+                  title="Logout"
+                >
+                  <LogOut className="h-5 w-5 stroke-[1.5]" />
+                </button>
+              </>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/login"
+                  className="text-xs font-semibold uppercase tracking-wider transition hover:opacity-75"
+                >
+                  Login
+                </Link>
+                <span className="text-xs opacity-40">|</span>
+                <Link
+                  href="/register"
+                  className="text-xs font-semibold uppercase tracking-wider transition hover:opacity-75"
+                >
+                  Register
+                </Link>
+              </div>
+            )}
 
             {/* Shopping Bag Drawer */}
             <button
               onClick={openCart}
               aria-label="Shopping Bag"
-              className="relative transition hover:opacity-75 focus:outline-none cursor-pointer"
+              className="relative transition hover:opacity-75 focus:outline-none cursor-pointer ml-1"
             >
               <ShoppingBag className="h-5 w-5 stroke-[1.5]" />
               {cartCount > 0 && (
@@ -230,10 +263,19 @@ export function Header({ variant }: HeaderProps) {
                       onClick={() => setMobileMenuOpen(false)}
                       className="text-[#1b1c1c] hover:text-[#5e5e5b] flex items-center justify-between"
                     >
-                      <span>My Account</span>
+                      <span>Profile</span>
                       <span className="text-xs font-normal text-[#5e5e5b] lowercase">
                         {user.email}
                       </span>
+                    </Link>
+
+                    <Link
+                      href="/account/orders"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-[#1b1c1c] hover:text-[#5e5e5b] flex items-center gap-2"
+                    >
+                      <Package className="h-4 w-4" />
+                      Orders
                     </Link>
 
                     {profile?.role === 'admin' && (
@@ -249,10 +291,10 @@ export function Header({ variant }: HeaderProps) {
 
                     <button
                       onClick={handleSignOut}
-                      className="text-red-600 hover:text-red-800 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider cursor-pointer"
+                      className="text-red-600 hover:text-red-800 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider cursor-pointer pt-1"
                     >
                       <LogOut className="h-4 w-4" />
-                      Sign Out
+                      Logout
                     </button>
                   </>
                 ) : (
@@ -262,14 +304,14 @@ export function Header({ variant }: HeaderProps) {
                       onClick={() => setMobileMenuOpen(false)}
                       className="text-[#1b1c1c] hover:text-[#5e5e5b] block"
                     >
-                      Sign In
+                      Login
                     </Link>
                     <Link
                       href="/register"
                       onClick={() => setMobileMenuOpen(false)}
                       className="text-[#5e5e5b] hover:text-[#1b1c1c] block"
                     >
-                      Create Account
+                      Register
                     </Link>
                   </>
                 )}

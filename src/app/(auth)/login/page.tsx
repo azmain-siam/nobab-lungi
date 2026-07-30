@@ -3,9 +3,9 @@
 import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { Container } from '@/components/ui/container';
 import { Button } from '@/components/ui/button';
-import { loginAction } from '@/actions/auth';
 import { useToast } from '@/providers/toast-provider';
 import { ArrowRight, Lock, Mail } from 'lucide-react';
 
@@ -26,19 +26,23 @@ function LoginForm() {
     setErrorMsg('');
 
     try {
-      const res = await loginAction({ email, password });
-      if (res.success) {
+      const res = await signIn('credentials', {
+        redirect: false,
+        email: email.trim().toLowerCase(),
+        password,
+      });
+
+      if (res?.error) {
+        setErrorMsg('Invalid email or password.');
+      } else {
         toast.success('Signed in successfully.');
+        router.refresh();
+
         if (nextParam) {
           router.push(nextParam);
-        } else if (res.role === 'admin') {
-          router.push('/dashboard');
         } else {
           router.push('/account');
         }
-        router.refresh();
-      } else {
-        setErrorMsg(res.error ?? 'Invalid email or password.');
       }
     } catch {
       setErrorMsg('An unexpected error occurred. Please try again.');
