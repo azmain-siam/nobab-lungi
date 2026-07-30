@@ -1,11 +1,12 @@
 'use client';
 
 import { Container } from '@/components/ui/container';
-import { Heart, Search, ShoppingBag, User, Menu, X } from 'lucide-react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import { useCart } from '@/context/cart-context';
+import { useUser } from '@/features/auth/hooks/use-user';
+import { Heart, Menu, Search, ShoppingBag, User, X, ShieldCheck, LogOut } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface HeaderProps {
   variant?: 'transparent' | 'light';
@@ -13,11 +14,14 @@ interface HeaderProps {
 
 export function Header({ variant }: HeaderProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const activeVariant = variant ?? (pathname === '/' ? 'transparent' : 'light');
   const isTransparentVariant = activeVariant === 'transparent';
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const { openCart, cartCount } = useCart();
+  const { user, profile, signOut } = useUser();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,18 +36,24 @@ export function Header({ variant }: HeaderProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Determine navbar styling dynamically based on variant and scroll position
+  const handleSignOut = async () => {
+    await signOut();
+    setMobileMenuOpen(false);
+    router.push('/login');
+    router.refresh();
+  };
+
   const getHeaderStyles = () => {
     if (isTransparentVariant) {
       if (scrolled) {
-        return 'fixed top-0 left-0 right-0 z-50 w-full bg-[#1b1c1c]/90 backdrop-blur-md shadow-lg transition-all duration-300';
+        return 'fixed top-0 left-0 right-0 z-50 w-full bg-[#1b1c1c]/70 backdrop-blur-md shadow-lg transition-all duration-300';
       }
       return 'absolute top-0 left-0 right-0 z-50 w-full bg-transparent transition-all duration-300';
     }
     return 'sticky top-0 z-50 w-full border-b border-[#e3e2e2] bg-[#fbf9f8]/95 backdrop-blur-md transition-all duration-300';
   };
 
-  const isDarkText = !isTransparentVariant || (isTransparentVariant && scrolled);
+  const isDarkText = !isTransparentVariant;
 
   return (
     <header className={getHeaderStyles()}>
@@ -53,7 +63,7 @@ export function Header({ variant }: HeaderProps) {
             scrolled ? 'py-4' : 'py-5'
           }`}
         >
-          {/* Mobile Menu Toggle (Left on mobile) */}
+          {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className={`md:hidden p-1 focus:outline-none ${
@@ -61,7 +71,11 @@ export function Header({ variant }: HeaderProps) {
             }`}
             aria-label="Toggle mobile menu"
           >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {mobileMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
           </button>
 
           {/* Brand Logo */}
@@ -84,8 +98,8 @@ export function Header({ variant }: HeaderProps) {
                     ? 'text-[#1b1c1c] after:absolute after:-bottom-1 after:left-0 after:h-[1.5px] after:w-full after:bg-[#1b1c1c]'
                     : 'text-white after:absolute after:-bottom-1 after:left-0 after:h-[1px] after:w-full after:bg-white'
                   : isDarkText
-                  ? 'text-[#5e5e5b] hover:text-[#1b1c1c]'
-                  : 'text-white/80 hover:text-white'
+                    ? 'text-[#5e5e5b] hover:text-[#1b1c1c]'
+                    : 'text-white/80 hover:text-white'
               }`}
             >
               COLLECTIONS
@@ -98,8 +112,8 @@ export function Header({ variant }: HeaderProps) {
                     ? 'text-[#1b1c1c] after:absolute after:-bottom-1 after:left-0 after:h-[1.5px] after:w-full after:bg-[#1b1c1c]'
                     : 'text-white after:absolute after:-bottom-1 after:left-0 after:h-[1px] after:w-full after:bg-white'
                   : isDarkText
-                  ? 'text-[#5e5e5b] hover:text-[#1b1c1c]'
-                  : 'text-white/80 hover:text-white'
+                    ? 'text-[#5e5e5b] hover:text-[#1b1c1c]'
+                    : 'text-white/80 hover:text-white'
               }`}
             >
               SHOP
@@ -140,13 +154,30 @@ export function Header({ variant }: HeaderProps) {
               <Heart className="h-5 w-5 stroke-[1.5]" />
             </Link>
 
-            {/* User Account */}
+            {/* Admin Portal Shortcut if Admin */}
+            {profile?.role === 'admin' && (
+              <Link
+                href="/dashboard"
+                aria-label="Admin Dashboard"
+                className="transition hover:opacity-75 focus:outline-none cursor-pointer"
+                title="Admin Dashboard"
+              >
+                <ShieldCheck className="h-5 w-5 stroke-[1.5] text-emerald-600" />
+              </Link>
+            )}
+
+            {/* User Account / Sign In */}
             <Link
-              href="/account"
-              aria-label="Account Profile"
-              className="transition hover:opacity-75 focus:outline-none cursor-pointer"
+              href={user ? '/account' : '/login'}
+              aria-label={user ? 'Account Profile' : 'Sign In'}
+              className="transition hover:opacity-75 focus:outline-none cursor-pointer flex items-center gap-1"
             >
               <User className="h-5 w-5 stroke-[1.5]" />
+              {!user && (
+                <span className="hidden sm:inline text-xs font-semibold uppercase tracking-wider ml-1">
+                  Sign In
+                </span>
+              )}
             </Link>
 
             {/* Shopping Bag Drawer */}
@@ -190,13 +221,59 @@ export function Header({ variant }: HeaderProps) {
               >
                 About
               </Link>
-              <Link
-                href="/account"
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-[#1b1c1c] hover:text-[#5e5e5b]"
-              >
-                My Account
-              </Link>
+
+              <div className="border-t border-[#e3e2e2] pt-4 space-y-3">
+                {user ? (
+                  <>
+                    <Link
+                      href="/account"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-[#1b1c1c] hover:text-[#5e5e5b] flex items-center justify-between"
+                    >
+                      <span>My Account</span>
+                      <span className="text-xs font-normal text-[#5e5e5b] lowercase">
+                        {user.email}
+                      </span>
+                    </Link>
+
+                    {profile?.role === 'admin' && (
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="text-emerald-700 hover:text-emerald-900 flex items-center gap-2"
+                      >
+                        <ShieldCheck className="h-4 w-4" />
+                        Admin Dashboard
+                      </Link>
+                    )}
+
+                    <button
+                      onClick={handleSignOut}
+                      className="text-red-600 hover:text-red-800 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider cursor-pointer"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-[#1b1c1c] hover:text-[#5e5e5b] block"
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/register"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-[#5e5e5b] hover:text-[#1b1c1c] block"
+                    >
+                      Create Account
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         )}

@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Search, Plus, Edit, Trash2, X, Upload, CheckCircle2 } from 'lucide-react';
 import { createProductAction, deleteProductAction } from '@/actions/product';
 import { uploadImageAction } from '@/actions/upload';
@@ -77,7 +76,7 @@ export default function AdminProductsPage() {
   const [name, setName] = useState('');
   const [sku, setSku] = useState('');
   const [category, setCategory] = useState('Premium Cotton');
-  const [collection, setCollection] = useState('Heritage Collection');
+  const [collection] = useState('Heritage Collection');
   const [price, setPrice] = useState('');
   const [stock, setStock] = useState('10');
   const [imageUrl, setImageUrl] = useState('');

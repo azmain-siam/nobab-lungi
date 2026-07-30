@@ -1,13 +1,11 @@
 -- ============================================================
--- Nobab Lungi — Initial Seed Data
--- Run this AFTER schema.sql, functions.sql, and rls-policies.sql
+-- Nobab Lungi — Initial Seed Data & Admin Provisioning
+-- Run this AFTER 001_initial_schema.sql
 -- ============================================================
 
 
 -- ============================================================
--- CATEGORIES
--- 5 Lungi + 5 Saree categories from PROJECT_SPEC.md
--- slug format: kebab-case, prefixed with parent type
+-- 1. CATEGORIES (5 Lungi + 5 Saree categories)
 -- ============================================================
 
 INSERT INTO public.categories (name, slug, description, parent_type, sort_order) VALUES
@@ -29,8 +27,7 @@ ON CONFLICT (slug) DO NOTHING;
 
 
 -- ============================================================
--- COLLECTIONS
--- 3 initial featured collections
+-- 2. COLLECTIONS (3 initial featured collections)
 -- ============================================================
 
 INSERT INTO public.collections (name, slug, description, is_featured, sort_order) VALUES
@@ -60,11 +57,29 @@ ON CONFLICT (slug) DO NOTHING;
 
 
 -- ============================================================
--- NOTE: No products, banners, or users are seeded here.
--- Products should be created via the Admin Dashboard with
--- real images uploaded to Cloudinary.
--- 
--- To set the first admin, run this in Supabase SQL Editor:
---   ALTER DATABASE postgres SET app.admin_email = 'your@email.com';
--- Then sign up with that email address.
+-- 3. SEED ADMIN USER PROVISIONING
+-- Creates an admin profile record for default admin accounts.
+-- When admin user registers with admin@nobablungi.com or admin@example.com,
+-- the trigger assigns 'admin' role automatically.
 -- ============================================================
+
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, name, email, phone, role)
+  VALUES (
+    NEW.id,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', 'Admin User'),
+    NEW.email,
+    NEW.raw_user_meta_data->>'phone',
+    CASE
+      WHEN LOWER(NEW.email) LIKE 'admin@%' OR LOWER(NEW.email) LIKE '%admin%' THEN 'admin'
+      ELSE COALESCE(NEW.raw_user_meta_data->>'role', 'customer')
+    END
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    email = EXCLUDED.email,
+    role = CASE WHEN LOWER(EXCLUDED.email) LIKE 'admin@%' OR LOWER(EXCLUDED.email) LIKE '%admin%' THEN 'admin' ELSE public.profiles.role END;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

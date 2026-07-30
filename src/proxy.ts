@@ -1,8 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { type NextRequest, NextResponse } from 'next/server';
 
-// Next.js 16: middleware has been renamed to "proxy".
-// File must be src/proxy.ts; function export must be named "proxy".
+// Next.js 16: proxy convention
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -70,6 +69,8 @@ export async function proxy(request: NextRequest) {
 
   return supabaseResponse;
 }
+
+export const middleware = proxy;
 
 export const config = {
   matcher: [

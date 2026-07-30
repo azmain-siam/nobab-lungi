@@ -1,5 +1,5 @@
-import { Header } from '@/components/layout/header';
-import { Footer } from '@/components/layout/footer';
+import { Footer } from "@/components/layout/footer";
+import { Header } from "@/components/layout/header";
 
 export default function StoreLayout({
   children,
@@ -9,7 +9,7 @@ export default function StoreLayout({
   return (
     <div className="relative min-h-screen bg-[#fbf9f8] flex flex-col justify-between">
       <div>
-        <Header variant="light" />
+        <Header />
         <main>{children}</main>
       </div>
       <Footer />

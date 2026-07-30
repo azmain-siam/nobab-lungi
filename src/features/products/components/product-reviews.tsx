@@ -82,7 +82,7 @@ export function ProductReviews() {
             </div>
 
             <p className="text-xs font-light leading-relaxed text-[#5e5e5b] sm:text-sm pt-1">
-              "{review.comment}"
+              &quot;{review.comment}&quot;
             </p>
           </div>
         ))}

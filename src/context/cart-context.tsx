@@ -27,34 +27,29 @@ const CART_STORAGE_KEY = 'nobab_lungi_cart';
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  // Read cart from localStorage on initial client mount
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(CART_STORAGE_KEY);
-      if (saved) {
-        setItems(JSON.parse(saved));
+  const [items, setItems] = useState<CartItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem(CART_STORAGE_KEY);
+        if (saved) {
+          return JSON.parse(saved);
+        }
+      } catch (e) {
+        console.error('Failed to load cart from localStorage:', e);
       }
-    } catch (e) {
-      console.error('Failed to load cart from localStorage:', e);
-    } finally {
-      setIsLoaded(true);
     }
-  }, []);
+    return [];
+  });
+  const [isOpen, setIsOpen] = useState(false);
 
   // Save cart to localStorage whenever items state changes
   useEffect(() => {
-    if (isLoaded) {
-      try {
-        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
-      } catch (e) {
-        console.error('Failed to save cart to localStorage:', e);
-      }
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+    } catch (e) {
+      console.error('Failed to save cart to localStorage:', e);
     }
-  }, [items, isLoaded]);
+  }, [items]);
 
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);

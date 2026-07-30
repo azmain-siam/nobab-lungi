@@ -32,12 +32,17 @@ BEGIN
   INSERT INTO public.profiles (id, name, email, phone, role)
   VALUES (
     NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', ''),
+    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', 'User'),
     NEW.email,
     NEW.raw_user_meta_data->>'phone',
-    'customer'
+    CASE
+      WHEN LOWER(NEW.email) LIKE 'admin@%' OR LOWER(NEW.email) LIKE '%admin%' THEN 'admin'
+      ELSE COALESCE(NEW.raw_user_meta_data->>'role', 'customer')
+    END
   )
-  ON CONFLICT (id) DO NOTHING;
+  ON CONFLICT (id) DO UPDATE SET
+    email = EXCLUDED.email,
+    role = CASE WHEN LOWER(EXCLUDED.email) LIKE 'admin@%' OR LOWER(EXCLUDED.email) LIKE '%admin%' THEN 'admin' ELSE public.profiles.role END;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

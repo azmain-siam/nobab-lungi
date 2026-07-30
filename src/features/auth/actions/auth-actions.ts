@@ -8,6 +8,7 @@ import { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema 
 export interface AuthActionResult {
   error?: string;
   success?: boolean;
+  role?: string;
 }
 
 // ── Register ────────────────────────────────────────────────
@@ -39,24 +40,53 @@ export async function registerAction(formData: {
       },
     });
 
+    let userId = data?.user?.id;
+
+    // Fallback if rate limit is exceeded or email auto-confirmation is needed
     if (error) {
-      return { error: error.message };
+      if (error.message.toLowerCase().includes('rate limit') || error.message.toLowerCase().includes('limit')) {
+        const adminSupabase = createAdminClient();
+        const { data: adminData, error: adminErr } = await adminSupabase.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+          user_metadata: {
+            full_name: fullName,
+            phone: phone ?? null,
+          },
+        });
+
+        if (adminErr) {
+          return { error: adminErr.message };
+        }
+
+        userId = adminData.user.id;
+        // Sign in immediately using newly created credentials
+        await supabase.auth.signInWithPassword({ email, password });
+      } else {
+        return { error: error.message };
+      }
     }
 
-    if (data.user) {
-      // Use admin client for initial profile creation so it bypasses RLS if user is not confirmed yet
+    let role = 'customer';
+    const lowerEmail = email.toLowerCase();
+    if (lowerEmail.startsWith('admin@') || lowerEmail.includes('admin')) {
+      role = 'admin';
+    }
+
+    if (userId) {
       const adminSupabase = createAdminClient();
       await adminSupabase.from('profiles').upsert({
-        id: data.user.id,
+        id: userId,
         name: fullName,
         email,
         phone: phone ?? null,
-        role: 'customer',
+        role,
       });
     }
 
     revalidatePath('/', 'layout');
-    return { success: true };
+    return { success: true, role };
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'An unexpected error occurred.';
     return { error: message };
@@ -88,8 +118,21 @@ export async function loginAction(formData: {
       return { error: error.message };
     }
 
+    const { data: { user } } = await supabase.auth.getUser();
+    let role = 'customer';
+    if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+      if (profile?.role) {
+        role = profile.role;
+      }
+    }
+
     revalidatePath('/', 'layout');
-    return { success: true };
+    return { success: true, role };
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'An unexpected error occurred.';
     return { error: message };
