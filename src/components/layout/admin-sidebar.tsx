@@ -45,43 +45,66 @@ export function AdminSidebar({
   const pathname = usePathname();
 
   const sidebarContent = (
-    <div className="flex flex-col justify-between h-full p-4 lg:p-6 space-y-6">
+    <div className={`flex flex-col justify-between h-full space-y-6 ${isCollapsed ? 'p-3' : 'p-4 lg:p-6'}`}>
       <div className="space-y-6">
         {/* Brand Header */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-5">
-          <Link
-            href="/dashboard"
-            onClick={onMobileClose}
-            className="font-display text-lg font-bold tracking-tight text-white flex items-center gap-2 overflow-hidden"
-          >
-            <ShieldCheck className="h-5 w-5 text-emerald-400 stroke-[2] shrink-0" />
-            {!isCollapsed && <span className="truncate">Nabab Admin</span>}
-          </Link>
+        <div className="border-b border-white/10 pb-5">
+          {isCollapsed ? (
+            <div className="flex flex-col items-center gap-2">
+              <Link
+                href="/dashboard"
+                className="font-display text-lg font-bold tracking-tight text-white flex items-center justify-center p-1"
+                title="Nabab Admin Dashboard"
+              >
+                <ShieldCheck className="h-6 w-6 text-emerald-400 stroke-[2]" />
+              </Link>
+              {onToggleCollapse && (
+                <button
+                  onClick={onToggleCollapse}
+                  className="hidden lg:flex p-1 text-white/60 hover:text-white hover:bg-white/10 transition"
+                  title="Expand sidebar"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              <Link
+                href="/dashboard"
+                onClick={onMobileClose}
+                className="font-display text-lg font-bold tracking-tight text-white flex items-center gap-2 overflow-hidden"
+              >
+                <ShieldCheck className="h-5 w-5 text-emerald-400 stroke-[2] shrink-0" />
+                <span className="truncate">Nabab Admin</span>
+              </Link>
 
-          {/* Desktop collapse toggle button */}
-          {onToggleCollapse && (
-            <button
-              onClick={onToggleCollapse}
-              className="hidden lg:flex p-1 text-white/60 hover:text-white hover:bg-white/10 transition"
-              title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            >
-              {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-            </button>
-          )}
+              {/* Desktop collapse toggle button */}
+              {onToggleCollapse && (
+                <button
+                  onClick={onToggleCollapse}
+                  className="hidden lg:flex p-1 text-white/60 hover:text-white hover:bg-white/10 transition"
+                  title="Collapse sidebar"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+              )}
 
-          {/* Mobile close button */}
-          {onMobileClose && (
-            <button
-              onClick={onMobileClose}
-              className="lg:hidden p-1 text-white/60 hover:text-white"
-            >
-              <X className="h-5 w-5" />
-            </button>
+              {/* Mobile close button */}
+              {onMobileClose && (
+                <button
+                  onClick={onMobileClose}
+                  className="lg:hidden p-1 text-white/60 hover:text-white"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              )}
+            </div>
           )}
         </div>
 
         {/* Navigation List */}
-        <nav aria-label="Admin Navigation" className="space-y-1">
+        <nav aria-label="Admin Navigation" className="space-y-1.5">
           {ADMIN_NAV.map((item) => {
             const Icon = item.icon;
             const isActive =
@@ -89,12 +112,28 @@ export function AdminSidebar({
                 ? pathname === '/dashboard'
                 : pathname.startsWith(item.href);
 
+            if (isCollapsed) {
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  title={item.label}
+                  className={`h-10 w-10 mx-auto flex items-center justify-center transition ${
+                    isActive
+                      ? 'bg-white text-[#1b1c1c]'
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  <Icon className="h-5 w-5 stroke-[1.5] shrink-0" />
+                </Link>
+              );
+            }
+
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={onMobileClose}
-                title={isCollapsed ? item.label : undefined}
                 className={`flex items-center gap-3 px-3.5 py-2.5 text-xs font-semibold uppercase tracking-wider transition ${
                   isActive
                     ? 'bg-white text-[#1b1c1c]'
@@ -102,7 +141,7 @@ export function AdminSidebar({
                 }`}
               >
                 <Icon className="h-4 w-4 stroke-[1.5] shrink-0" />
-                {!isCollapsed && <span className="truncate">{item.label}</span>}
+                <span className="truncate">{item.label}</span>
               </Link>
             );
           })}
@@ -111,15 +150,24 @@ export function AdminSidebar({
 
       {/* Return to Storefront */}
       <div className="border-t border-white/10 pt-4">
-        <Link
-          href="/"
-          onClick={onMobileClose}
-          title={isCollapsed ? 'View Storefront' : undefined}
-          className="flex items-center gap-2.5 px-2 py-1.5 text-xs font-medium text-white/70 hover:text-white transition"
-        >
-          <ExternalLink className="h-4 w-4 stroke-[1.5] shrink-0" />
-          {!isCollapsed && <span className="truncate">View Storefront</span>}
-        </Link>
+        {isCollapsed ? (
+          <Link
+            href="/"
+            title="View Storefront"
+            className="h-10 w-10 mx-auto flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition"
+          >
+            <ExternalLink className="h-5 w-5 stroke-[1.5] shrink-0" />
+          </Link>
+        ) : (
+          <Link
+            href="/"
+            onClick={onMobileClose}
+            className="flex items-center gap-2.5 px-2 py-1.5 text-xs font-medium text-white/70 hover:text-white transition"
+          >
+            <ExternalLink className="h-4 w-4 stroke-[1.5] shrink-0" />
+            <span className="truncate">View Storefront</span>
+          </Link>
+        )}
       </div>
     </div>
   );
@@ -129,7 +177,7 @@ export function AdminSidebar({
       {/* Desktop Sidebar */}
       <aside
         className={`hidden lg:flex flex-col bg-[#1b1c1c] text-white shrink-0 sticky top-0 h-screen transition-all duration-300 ${
-          isCollapsed ? 'w-20' : 'w-64'
+          isCollapsed ? 'w-16' : 'w-64'
         }`}
       >
         {sidebarContent}

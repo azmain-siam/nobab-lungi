@@ -48,14 +48,16 @@ export interface Address {
 }
 
 export interface Category {
-  id:          number;
-  name:        string;
-  slug:        string;
-  description: string | null;
-  image_url:   string | null;
-  parent_type: ParentType;
-  sort_order:  number;
-  created_at:  string;
+  id:            number;
+  name:          string;
+  slug:          string;
+  description:   string | null;
+  image_url:     string | null;
+  parent_type:   ParentType;
+  sort_order:    number;
+  is_active?:    boolean;
+  product_count?: number;
+  created_at:    string;
 }
 
 export interface Collection {
