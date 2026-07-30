@@ -61,15 +61,20 @@ export interface Category {
 }
 
 export interface Collection {
-  id:          number;
-  name:        string;
-  slug:        string;
-  description: string | null;
-  banner_url:  string | null;
-  is_featured: boolean;
-  sort_order:  number;
-  created_at:  string;
-  updated_at:  string;
+  id:              number;
+  name:            string;
+  slug:            string;
+  description:     string | null;
+  cover_image:     string | null;
+  banner_url:      string | null;
+  is_featured:     boolean;
+  sort_order:      number;
+  is_active?:      boolean;
+  seo_title?:      string | null;
+  seo_description?: string | null;
+  product_count?:  number;
+  created_at:      string;
+  updated_at:      string;
 }
 
 export interface Product {

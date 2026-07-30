@@ -652,11 +652,10 @@ export default function AdminCategoriesPage() {
                   <button
                     type="button"
                     onClick={() => setIsActive(!isActive)}
-                    className={`w-full py-2 px-3 text-xs font-semibold uppercase tracking-wider border transition ${
-                      isActive
+                    className={`w-full py-2 px-3 text-xs font-semibold uppercase tracking-wider border transition ${isActive
                         ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                         : 'bg-red-50 text-red-800 border-red-300'
-                    }`}
+                      }`}
                   >
                     {isActive ? 'Active' : 'Inactive'}
                   </button>
@@ -683,8 +682,8 @@ export default function AdminCategoriesPage() {
                   {isSubmitting
                     ? 'Saving...'
                     : editingCategory
-                    ? 'Update Category'
-                    : 'Create Category'}
+                      ? 'Update Category'
+                      : 'Create Category'}
                 </Button>
               </div>
             </form>

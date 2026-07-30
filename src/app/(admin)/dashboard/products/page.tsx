@@ -41,9 +41,9 @@ const MOCK_PRODUCTS: MockProduct[] = [
   },
   {
     id: 'prod-3',
-    name: 'Jamdani Motif Premium Cotton Saree — Royal Blue',
-    sku: 'SAR-JAM-003',
-    category: 'Jamdani Saree',
+    name: 'Traditional Jacquard Heritage Lungi — Royal Blue',
+    sku: 'LUN-JAC-003',
+    category: 'Handloom Lungi',
     price: 4500,
     stock: 8,
     image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=500&auto=format&fit=crop&q=60',
