@@ -98,7 +98,8 @@
 - [x] Banner Management
 - [x] Homepage Management (CMS)
 - [x] Customer Management
-- [ ] Coupon Management
+- [x] Coupon Management
+- [x] Store Settings
 
 ---
 

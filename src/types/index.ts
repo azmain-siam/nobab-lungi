@@ -31,4 +31,5 @@ export type {
   CustomerListItem,
   CustomerAddressItem,
   CustomerDetails,
+  StoreSettings,
 } from './database';

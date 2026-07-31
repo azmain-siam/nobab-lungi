@@ -275,3 +275,59 @@ export interface CustomerDetails {
   addresses: CustomerAddressItem[];
   recent_orders: OrderWithItems[];
 }
+
+export interface StoreSettings {
+  general: {
+    store_name: string;
+    store_logo: string | null;
+    store_favicon: string | null;
+    store_description: string | null;
+    store_email: string;
+    store_phone: string;
+    whatsapp_number: string;
+  };
+  address: {
+    store_address: string;
+    city: string;
+    district: string;
+    postal_code: string;
+    country: string;
+  };
+  social: {
+    facebook_url: string | null;
+    instagram_url: string | null;
+    youtube_url: string | null;
+    tiktok_url: string | null;
+  };
+  delivery: {
+    inside_dhaka_charge: number;
+    outside_dhaka_charge: number;
+    free_delivery_min_amount: number | null;
+    estimated_delivery_time: string;
+  };
+  payment: {
+    cod_enabled: boolean;
+    bkash_enabled: boolean;
+    bkash_merchant_number: string | null;
+    nagad_enabled: boolean;
+    nagad_merchant_number: string | null;
+    bank_transfer_enabled: boolean;
+  };
+  seo: {
+    default_meta_title: string;
+    default_meta_description: string;
+    default_og_image: string | null;
+  };
+  homepage: {
+    products_per_page: number;
+    featured_products_limit: number;
+    new_arrivals_limit: number;
+    best_sellers_limit: number;
+  };
+  maintenance: {
+    maintenance_mode: boolean;
+    maintenance_message: string;
+  };
+  created_at?: string;
+  updated_at?: string;
+}
