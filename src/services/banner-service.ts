@@ -4,13 +4,21 @@ import type { Banner } from '@/types';
 
 function mapDocToBanner(doc: Record<string, unknown>): Banner {
   return {
-    id: (doc.id || doc._id) as number,
+    id: Number(doc.id || doc._id),
     title: doc.title as string,
     subtitle: (doc.subtitle as string) ?? null,
-    image_url: doc.image_url as string,
-    link: (doc.link as string) ?? null,
-    sort_order: (doc.sort_order as number) ?? 0,
+    description: (doc.description as string) ?? null,
+    desktop_image: (doc.desktop_image as string) || (doc.image_url as string) || '',
+    mobile_image: (doc.mobile_image as string) ?? null,
+    primary_btn_text: (doc.primary_btn_text as string) ?? null,
+    primary_btn_url: (doc.primary_btn_url as string) || (doc.link as string) || null,
+    secondary_btn_text: (doc.secondary_btn_text as string) ?? null,
+    secondary_btn_url: (doc.secondary_btn_url as string) ?? null,
     is_active: (doc.is_active as boolean) ?? true,
+    is_primary: (doc.is_primary as boolean) ?? false,
+    sort_order: (doc.sort_order as number) ?? 0,
+    start_date: doc.start_date ? new Date(doc.start_date as Date).toISOString() : null,
+    end_date: doc.end_date ? new Date(doc.end_date as Date).toISOString() : null,
     created_at: doc.created_at ? (doc.created_at as Date).toISOString() : new Date().toISOString(),
     updated_at: doc.updated_at ? (doc.updated_at as Date).toISOString() : new Date().toISOString(),
   };

@@ -180,15 +180,67 @@ export interface Wishlist {
 }
 
 export interface Banner {
-  id:         number;
-  title:      string;
-  subtitle:   string | null;
-  image_url:  string;
-  link:       string | null;
+  id:                 number;
+  title:              string;
+  subtitle:           string | null;
+  description:        string | null;
+  desktop_image:      string;
+  mobile_image:       string | null;
+  primary_btn_text:   string | null;
+  primary_btn_url:    string | null;
+  secondary_btn_text: string | null;
+  secondary_btn_url:  string | null;
+  is_active:          boolean;
+  is_primary:         boolean;
+  sort_order:         number;
+  start_date:         string | null;
+  end_date:           string | null;
+  created_at:         string;
+  updated_at:         string;
+}
+
+export interface HomepageSection {
+  key:        string;
+  name:       string;
+  is_visible: boolean;
   sort_order: number;
-  is_active:  boolean;
-  created_at: string;
-  updated_at: string;
+}
+
+export interface WhyChooseUsCard {
+  id:          string;
+  icon:        string;
+  title:       string;
+  description: string;
+  sort_order:  number;
+}
+
+export interface BrandStoryConfig {
+  title:        string;
+  description:  string;
+  image_url:    string | null;
+  button_text:  string | null;
+  button_url:   string | null;
+  is_active:    boolean;
+}
+
+export interface NewsletterConfig {
+  heading:     string;
+  description: string;
+  is_enabled:  boolean;
+}
+
+export interface HomepageConfig {
+  sections:                HomepageSection[];
+  featured_category_ids:   number[];
+  featured_collection_ids: number[];
+  featured_product_ids:    string[];
+  best_seller_product_ids: string[];
+  new_arrivals_config:     { limit: number; is_active: boolean };
+  brand_story:             BrandStoryConfig;
+  why_choose_us:           WhyChooseUsCard[];
+  newsletter:              NewsletterConfig;
+  created_at?:             string;
+  updated_at?:             string;
 }
 
 export interface ContactMessage {
