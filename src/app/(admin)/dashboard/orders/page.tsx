@@ -268,7 +268,6 @@ export default function AdminOrdersPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#e3e2e2] pb-5">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight text-[#1b1c1c] sm:text-3xl flex items-center gap-2">
-            <ShoppingCart className="h-6 w-6 stroke-[1.5] text-amber-800" />
             Order Management
           </h1>
           <p className="text-xs text-[#5e5e5b] mt-1">

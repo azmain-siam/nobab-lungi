@@ -77,6 +77,13 @@ const ProductSchema = new Schema<IProduct>(
   }
 );
 
+ProductSchema.index({ category_id: 1, status: 1 });
+ProductSchema.index({ collection_ids: 1, status: 1 });
+ProductSchema.index({ status: 1, created_at: -1 });
+ProductSchema.index({ is_featured: 1, is_active: 1 });
+ProductSchema.index({ is_best_seller: 1, is_active: 1 });
+ProductSchema.index({ is_new_arrival: 1, is_active: 1 });
+
 if (process.env.NODE_ENV !== 'production') {
   delete (mongoose.models as Record<string, unknown>).Product;
 }

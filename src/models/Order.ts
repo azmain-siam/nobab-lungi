@@ -116,6 +116,10 @@ const OrderSchema = new Schema<IOrder>(
   }
 );
 
+OrderSchema.index({ user_id: 1, created_at: -1 });
+OrderSchema.index({ status: 1, created_at: -1 });
+OrderSchema.index({ payment_status: 1 });
+
 if (process.env.NODE_ENV !== 'production') {
   delete (mongoose.models as Record<string, unknown>).Order;
 }

@@ -39,10 +39,7 @@ export async function registerAction(formData: {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    let role: 'admin' | 'customer' = 'customer';
-    if (lowerEmail.startsWith('admin@') || lowerEmail.includes('admin')) {
-      role = 'admin';
-    }
+    const role: 'admin' | 'customer' = 'customer';
 
     await User.create({
       name: fullName.trim(),

@@ -108,7 +108,7 @@ export default function AdminCustomersPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#e3e2e2] pb-5">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight text-[#1b1c1c] sm:text-3xl flex items-center gap-2">
-            <Users className="h-6 w-6 stroke-[1.5] text-amber-800" />
+            {/* <Users className="h-6 w-6 stroke-[1.5] text-amber-800" /> */}
             Customer Management
           </h1>
           <p className="text-xs text-[#5e5e5b] mt-1">
@@ -250,10 +250,10 @@ export default function AdminCustomersPage() {
                     <td className="p-4 text-[11px] text-[#5e5e5b]">
                       {c.last_order_date
                         ? new Date(c.last_order_date).toLocaleDateString('en-GB', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                          })
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                        })
                         : 'No orders yet'}
                     </td>
                     <td className="p-4 text-[11px] text-[#5e5e5b]">
