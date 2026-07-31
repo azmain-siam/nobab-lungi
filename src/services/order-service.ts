@@ -1,5 +1,6 @@
 import { connectToDatabase } from '@/lib/db';
 import { Order } from '@/models/Order';
+import { Product } from '@/models/Product';
 import type { OrderWithItems, OrderStatus, PaymentStatus, ShippingAddressSnapshot, TimelineEvent } from '@/types';
 
 export interface CreateOrderParams {
@@ -289,6 +290,31 @@ export async function updateAdminOrder(
   try {
     await connectToDatabase();
     const query = orderId.startsWith('NL-') ? { order_number: orderId } : { _id: orderId };
+
+    const existingOrder = await Order.findOne(query);
+    if (!existingOrder) {
+      return { success: false, error: 'Order not found.' };
+    }
+
+    // Auto-restore inventory stock if order is cancelled or returned
+    if (
+      updates.status &&
+      (updates.status === 'cancelled' || updates.status === 'returned') &&
+      existingOrder.status !== 'cancelled' &&
+      existingOrder.status !== 'returned'
+    ) {
+      for (const item of existingOrder.order_items) {
+        if (item.product_id) {
+          try {
+            await Product.findByIdAndUpdate(item.product_id, {
+              $inc: { stock: item.quantity },
+            });
+          } catch (err) {
+            console.error(`Failed to restore stock for product ${item.product_id}:`, err);
+          }
+        }
+      }
+    }
 
     const updateFields: Record<string, unknown> = {
       updated_at: new Date(),

@@ -11,7 +11,6 @@ import {
 } from '@/features/dashboard/actions/settings-actions';
 import type { StoreSettings } from '@/types';
 import {
-  Settings,
   Store,
   MapPin,
   Truck,
@@ -188,7 +187,7 @@ export default function AdminSettingsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#e3e2e2] pb-5">
           <div>
             <h1 className="font-display text-2xl font-semibold tracking-tight text-[#1b1c1c] sm:text-3xl flex items-center gap-2">
-              <Settings className="h-6 w-6 stroke-[1.5] text-amber-800" />
+              {/* <Settings className="h-6 w-6 stroke-[1.5] text-amber-800" /> */}
               Centralized Store Settings
             </h1>
             <p className="text-xs text-[#5e5e5b] mt-1">
@@ -243,11 +242,10 @@ export default function AdminSettingsPage() {
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                  className={`flex items-center gap-2 py-3 px-4 border-b-2 transition ${
-                    isActive
+                  className={`flex items-center gap-2 py-3 px-4 border-b-2 transition ${isActive
                       ? 'border-[#1b1c1c] text-[#1b1c1c] bg-[#fbf9f8]'
                       : 'border-transparent text-[#5e5e5b] hover:text-[#1b1c1c] hover:bg-[#fbf9f8]'
-                  }`}
+                    }`}
                 >
                   <Icon className={`h-4 w-4 ${isActive ? 'text-[#1b1c1c]' : 'text-[#5e5e5b]'}`} />
                   {tab.label}
@@ -645,11 +643,10 @@ export default function AdminSettingsPage() {
                             payment: { ...settings.payment, cod_enabled: !settings.payment.cod_enabled },
                           })
                         }
-                        className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider border transition ${
-                          settings.payment.cod_enabled
+                        className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider border transition ${settings.payment.cod_enabled
                             ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                             : 'bg-red-50 text-red-800 border-red-300'
-                        }`}
+                          }`}
                       >
                         {settings.payment.cod_enabled ? 'Enabled' : 'Disabled'}
                       </button>
@@ -671,11 +668,10 @@ export default function AdminSettingsPage() {
                               payment: { ...settings.payment, bkash_enabled: !settings.payment.bkash_enabled },
                             })
                           }
-                          className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider border transition ${
-                            settings.payment.bkash_enabled
+                          className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider border transition ${settings.payment.bkash_enabled
                               ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                               : 'bg-red-50 text-red-800 border-red-300'
-                          }`}
+                            }`}
                         >
                           {settings.payment.bkash_enabled ? 'Enabled' : 'Disabled'}
                         </button>
@@ -716,11 +712,10 @@ export default function AdminSettingsPage() {
                               payment: { ...settings.payment, nagad_enabled: !settings.payment.nagad_enabled },
                             })
                           }
-                          className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider border transition ${
-                            settings.payment.nagad_enabled
+                          className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider border transition ${settings.payment.nagad_enabled
                               ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                               : 'bg-red-50 text-red-800 border-red-300'
-                          }`}
+                            }`}
                         >
                           {settings.payment.nagad_enabled ? 'Enabled' : 'Disabled'}
                         </button>
@@ -763,11 +758,10 @@ export default function AdminSettingsPage() {
                             },
                           })
                         }
-                        className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider border transition ${
-                          settings.payment.bank_transfer_enabled
+                        className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider border transition ${settings.payment.bank_transfer_enabled
                             ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                             : 'bg-red-50 text-red-800 border-red-300'
-                        }`}
+                          }`}
                       >
                         {settings.payment.bank_transfer_enabled ? 'Enabled' : 'Disabled'}
                       </button>
@@ -1041,11 +1035,10 @@ export default function AdminSettingsPage() {
                             },
                           })
                         }
-                        className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider border transition ${
-                          settings.maintenance.maintenance_mode
+                        className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider border transition ${settings.maintenance.maintenance_mode
                             ? 'bg-amber-50 text-amber-800 border-amber-300'
                             : 'bg-[#f5f3f3] text-[#5e5e5b] border-[#e3e2e2]'
-                        }`}
+                          }`}
                       >
                         {settings.maintenance.maintenance_mode ? 'Maintenance ON' : 'Normal Operations'}
                       </button>

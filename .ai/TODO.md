@@ -90,7 +90,7 @@
 
 # Phase 5 - Admin Dashboard
 
-- [x] Dashboard Statistics
+- [x] Dashboard Overview
 - [x] Product Management
 - [x] Category Management
 - [x] Collection Management

@@ -27,5 +27,9 @@ const BannerSchema = new Schema<IBanner>(
   }
 );
 
+if (process.env.NODE_ENV !== 'production') {
+  delete (mongoose.models as Record<string, unknown>).Banner;
+}
+
 export const Banner: Model<IBanner> =
-  mongoose.models.Banner || mongoose.model<IBanner>('Banner', BannerSchema);
+  (mongoose.models.Banner as Model<IBanner>) || mongoose.model<IBanner>('Banner', BannerSchema);
