@@ -6,8 +6,15 @@
 // ============================================================
 
 export type UserRole     = 'admin' | 'customer';
-export type OrderStatus  = 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
-export type PaymentStatus = 'unpaid' | 'paid' | 'refunded';
+export type OrderStatus  = 'pending' | 'confirmed' | 'processing' | 'packed' | 'shipped' | 'delivered' | 'cancelled' | 'returned';
+export type PaymentStatus = 'unpaid' | 'pending_verification' | 'paid' | 'refunded';
+
+export interface TimelineEvent {
+  status:     string;
+  message:    string;
+  timestamp:  string;
+  updated_by?: string;
+}
 export type PaymentMethod = 'cod' | 'bkash' | 'nagad';
 export type ParentType   = 'lungi' | 'saree';
 export type CouponType   = 'percentage' | 'fixed';
@@ -133,7 +140,12 @@ export interface Order {
   shipping_address: ShippingAddressSnapshot;
   transaction_id:   string | null;
   coupon_code:      string | null;
+  courier?:         string | null;
+  tracking_number?: string | null;
+  delivery_status?: string | null;
   notes:            string | null;
+  admin_notes?:     string | null;
+  timeline?:        TimelineEvent[];
   created_at:       string;
   updated_at:       string;
 }

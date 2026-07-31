@@ -8,6 +8,7 @@ export type {
   PaymentMethod,
   ParentType,
   CouponType,
+  TimelineEvent,
   ShippingAddressSnapshot,
   Profile,
   Address,
