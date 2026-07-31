@@ -35,5 +35,9 @@ const CollectionSchema = new Schema<ICollection>(
   }
 );
 
+if (process.env.NODE_ENV !== 'production') {
+  delete (mongoose.models as Record<string, unknown>).Collection;
+}
+
 export const Collection: Model<ICollection> =
   (mongoose.models.Collection as Model<ICollection>) || mongoose.model<ICollection>('Collection', CollectionSchema);

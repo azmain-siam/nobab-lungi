@@ -8,7 +8,6 @@ import {
   ShoppingCart,
   Layers,
   Users,
-  Ticket,
   Settings,
   Grid,
   ExternalLink,
@@ -25,7 +24,7 @@ const ADMIN_NAV = [
   { href: '/dashboard/collections', label: 'Collections & Banners', icon: Layers },
   { href: '/dashboard/orders', label: 'Orders', icon: ShoppingCart },
   { href: '/dashboard/customers', label: 'Customers', icon: Users },
-  { href: '/dashboard/coupons', label: 'Coupons', icon: Ticket },
+  // { href: '/dashboard/coupons', label: 'Coupons', icon: Ticket },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -118,11 +117,10 @@ export function AdminSidebar({
                   key={item.href}
                   href={item.href}
                   title={item.label}
-                  className={`h-10 w-10 mx-auto flex items-center justify-center transition ${
-                    isActive
-                      ? 'bg-white text-[#1b1c1c]'
-                      : 'text-white/70 hover:text-white hover:bg-white/10'
-                  }`}
+                  className={`h-10 w-10 mx-auto flex items-center justify-center transition ${isActive
+                    ? 'bg-white text-[#1b1c1c]'
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                    }`}
                 >
                   <Icon className="h-5 w-5 stroke-[1.5] shrink-0" />
                 </Link>
@@ -134,11 +132,10 @@ export function AdminSidebar({
                 key={item.href}
                 href={item.href}
                 onClick={onMobileClose}
-                className={`flex items-center gap-3 px-3.5 py-2.5 text-xs font-semibold uppercase tracking-wider transition ${
-                  isActive
-                    ? 'bg-white text-[#1b1c1c]'
-                    : 'text-white/70 hover:text-white hover:bg-white/10'
-                }`}
+                className={`flex items-center gap-3 px-3.5 py-2.5 text-xs font-semibold uppercase tracking-wider transition ${isActive
+                  ? 'bg-white text-[#1b1c1c]'
+                  : 'text-white/70 hover:text-white hover:bg-white/10'
+                  }`}
               >
                 <Icon className="h-4 w-4 stroke-[1.5] shrink-0" />
                 <span className="truncate">{item.label}</span>
@@ -176,9 +173,8 @@ export function AdminSidebar({
     <>
       {/* Desktop Sidebar */}
       <aside
-        className={`hidden lg:flex flex-col bg-[#1b1c1c] text-white shrink-0 sticky top-0 h-screen transition-all duration-300 ${
-          isCollapsed ? 'w-16' : 'w-64'
-        }`}
+        className={`hidden lg:flex flex-col bg-[#1b1c1c] text-white shrink-0 sticky top-0 h-screen transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'
+          }`}
       >
         {sidebarContent}
       </aside>

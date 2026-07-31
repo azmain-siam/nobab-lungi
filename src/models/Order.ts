@@ -18,10 +18,17 @@ export interface IShippingAddress {
   fullAddress: string;
 }
 
+export interface ITimelineEvent {
+  status: string;
+  message: string;
+  timestamp: Date;
+  updated_by?: string;
+}
+
 export interface IOrder extends Document {
   user_id?: string | null;
   order_number: string;
-  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
+  status: 'pending' | 'confirmed' | 'processing' | 'packed' | 'shipped' | 'delivered' | 'cancelled' | 'returned';
   subtotal: number;
   delivery_charge: number;
   discount_amount: number;
@@ -31,8 +38,13 @@ export interface IOrder extends Document {
   shipping_address: IShippingAddress;
   transaction_id?: string | null;
   coupon_code?: string | null;
+  courier?: string | null;
+  tracking_number?: string | null;
+  delivery_status?: string | null;
   notes?: string | null;
+  admin_notes?: string | null;
   order_items: IOrderItem[];
+  timeline: ITimelineEvent[];
   created_at: Date;
   updated_at: Date;
 }
@@ -59,13 +71,23 @@ const ShippingAddressSchema = new Schema<IShippingAddress>(
   { _id: false }
 );
 
+const TimelineEventSchema = new Schema<ITimelineEvent>(
+  {
+    status: { type: String, required: true },
+    message: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now },
+    updated_by: { type: String, default: 'Admin' },
+  },
+  { _id: false }
+);
+
 const OrderSchema = new Schema<IOrder>(
   {
     user_id: { type: String, default: null },
     order_number: { type: String, required: true, unique: true },
     status: {
       type: String,
-      enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'],
+      enum: ['pending', 'confirmed', 'processing', 'packed', 'shipped', 'delivered', 'cancelled', 'returned'],
       default: 'pending',
     },
     subtotal: { type: Number, required: true },
@@ -81,13 +103,22 @@ const OrderSchema = new Schema<IOrder>(
     shipping_address: { type: ShippingAddressSchema, required: true },
     transaction_id: { type: String, default: null },
     coupon_code: { type: String, default: null },
+    courier: { type: String, default: null },
+    tracking_number: { type: String, default: null },
+    delivery_status: { type: String, default: null },
     notes: { type: String, default: null },
+    admin_notes: { type: String, default: null },
     order_items: [OrderItemSchema],
+    timeline: { type: [TimelineEventSchema], default: [] },
   },
   {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
   }
 );
+
+if (process.env.NODE_ENV !== 'production') {
+  delete (mongoose.models as Record<string, unknown>).Order;
+}
 
 export const Order: Model<IOrder> =
   (mongoose.models.Order as Model<IOrder>) || mongoose.model<IOrder>('Order', OrderSchema);

@@ -96,7 +96,10 @@
 - [x] Collection Management
 - [x] Order Management
 - [x] Banner Management
-- [ ] Coupon Management
+- [x] Homepage Management (CMS)
+- [x] Customer Management
+- [x] Coupon Management
+- [x] Store Settings
 
 ---
 

@@ -7,6 +7,7 @@ export interface IUser extends Document {
   phone?: string | null;
   role: 'admin' | 'customer';
   avatar_url?: string | null;
+  provider?: 'credentials' | 'google' | string;
   created_at: Date;
   updated_at: Date;
 }
@@ -19,11 +20,16 @@ const UserSchema = new Schema<IUser>(
     phone: { type: String, default: null },
     role: { type: String, enum: ['admin', 'customer'], default: 'customer' },
     avatar_url: { type: String, default: null },
+    provider: { type: String, default: 'credentials' },
   },
   {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
   }
 );
+
+if (process.env.NODE_ENV !== 'production') {
+  delete (mongoose.models as Record<string, unknown>).User;
+}
 
 export const User: Model<IUser> =
   (mongoose.models.User as Model<IUser>) || mongoose.model<IUser>('User', UserSchema);

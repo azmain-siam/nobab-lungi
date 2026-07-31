@@ -6,8 +6,15 @@
 // ============================================================
 
 export type UserRole     = 'admin' | 'customer';
-export type OrderStatus  = 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
-export type PaymentStatus = 'unpaid' | 'paid' | 'refunded';
+export type OrderStatus  = 'pending' | 'confirmed' | 'processing' | 'packed' | 'shipped' | 'delivered' | 'cancelled' | 'returned';
+export type PaymentStatus = 'unpaid' | 'pending_verification' | 'paid' | 'refunded';
+
+export interface TimelineEvent {
+  status:     string;
+  message:    string;
+  timestamp:  string;
+  updated_by?: string;
+}
 export type PaymentMethod = 'cod' | 'bkash' | 'nagad';
 export type ParentType   = 'lungi' | 'saree';
 export type CouponType   = 'percentage' | 'fixed';
@@ -78,23 +85,31 @@ export interface Collection {
 }
 
 export interface Product {
-  id:              string;
-  name:            string;
-  slug:            string;
-  sku:             string | null;
-  description:     string | null;
-  price:           number;    // whole BDT
-  discount_price:  number | null;
-  stock:           number;
-  category_id:     number | null;
-  is_featured:     boolean;
-  is_best_seller:  boolean;
-  is_new_arrival:  boolean;
-  is_active:       boolean;
-  seo_title:       string | null;
-  seo_description: string | null;
-  created_at:      string;
-  updated_at:      string;
+  id:                string;
+  name:              string;
+  slug:              string;
+  sku:               string | null;
+  short_description?: string | null;
+  description:       string | null;
+  price:             number;    // whole BDT
+  discount_price:    number | null;
+  stock:             number;
+  category_id:       number | null;
+  collection_ids?:   number[];
+  fabric?:           string | null;
+  pattern?:          string | null;
+  color?:            string | null;
+  weight?:           string | null;
+  country_of_origin?: string;
+  status?:           'published' | 'draft';
+  is_featured:       boolean;
+  is_best_seller:    boolean;
+  is_new_arrival:    boolean;
+  is_active:         boolean;
+  seo_title:         string | null;
+  seo_description:   string | null;
+  created_at:        string;
+  updated_at:        string;
 }
 
 export interface ProductImage {
@@ -103,6 +118,7 @@ export interface ProductImage {
   url:        string;
   alt_text:   string | null;
   sort_order: number;
+  is_cover?:  boolean;
 }
 
 export interface CollectionProduct {
@@ -124,7 +140,12 @@ export interface Order {
   shipping_address: ShippingAddressSnapshot;
   transaction_id:   string | null;
   coupon_code:      string | null;
+  courier?:         string | null;
+  tracking_number?: string | null;
+  delivery_status?: string | null;
   notes:            string | null;
+  admin_notes?:     string | null;
+  timeline?:        TimelineEvent[];
   created_at:       string;
   updated_at:       string;
 }
@@ -207,8 +228,106 @@ export interface ProductWithCategory extends Product {
 export interface ProductFull extends Product {
   product_images: ProductImage[];
   categories:     Category | null;
+  collections:    Collection[];
 }
 
 export interface OrderWithItems extends Order {
   order_items: OrderItem[];
+}
+
+export interface CustomerListItem {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  avatar_url: string | null;
+  role: string;
+  total_orders: number;
+  total_spent: number;
+  last_order_date: string | null;
+  account_status: 'Active' | 'Blocked';
+  created_at: string;
+}
+
+export interface CustomerAddressItem {
+  id: string;
+  name: string;
+  phone: string;
+  district: string;
+  address: string;
+  is_default: boolean;
+}
+
+export interface CustomerDetails {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  avatar_url: string | null;
+  role: string;
+  created_at: string;
+  stats: {
+    total_orders: number;
+    total_spent: number;
+    avg_order_value: number;
+    last_order_date: string | null;
+  };
+  addresses: CustomerAddressItem[];
+  recent_orders: OrderWithItems[];
+}
+
+export interface StoreSettings {
+  general: {
+    store_name: string;
+    store_logo: string | null;
+    store_favicon: string | null;
+    store_description: string | null;
+    store_email: string;
+    store_phone: string;
+    whatsapp_number: string;
+  };
+  address: {
+    store_address: string;
+    city: string;
+    district: string;
+    postal_code: string;
+    country: string;
+  };
+  social: {
+    facebook_url: string | null;
+    instagram_url: string | null;
+    youtube_url: string | null;
+    tiktok_url: string | null;
+  };
+  delivery: {
+    inside_dhaka_charge: number;
+    outside_dhaka_charge: number;
+    free_delivery_min_amount: number | null;
+    estimated_delivery_time: string;
+  };
+  payment: {
+    cod_enabled: boolean;
+    bkash_enabled: boolean;
+    bkash_merchant_number: string | null;
+    nagad_enabled: boolean;
+    nagad_merchant_number: string | null;
+    bank_transfer_enabled: boolean;
+  };
+  seo: {
+    default_meta_title: string;
+    default_meta_description: string;
+    default_og_image: string | null;
+  };
+  homepage: {
+    products_per_page: number;
+    featured_products_limit: number;
+    new_arrivals_limit: number;
+    best_sellers_limit: number;
+  };
+  maintenance: {
+    maintenance_mode: boolean;
+    maintenance_message: string;
+  };
+  created_at?: string;
+  updated_at?: string;
 }
