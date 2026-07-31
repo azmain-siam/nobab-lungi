@@ -29,5 +29,9 @@ const CategorySchema = new Schema<ICategory>(
   }
 );
 
+if (process.env.NODE_ENV !== 'production') {
+  delete (mongoose.models as Record<string, unknown>).Category;
+}
+
 export const Category: Model<ICategory> =
   (mongoose.models.Category as Model<ICategory>) || mongoose.model<ICategory>('Category', CategorySchema);

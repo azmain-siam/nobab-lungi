@@ -78,23 +78,31 @@ export interface Collection {
 }
 
 export interface Product {
-  id:              string;
-  name:            string;
-  slug:            string;
-  sku:             string | null;
-  description:     string | null;
-  price:           number;    // whole BDT
-  discount_price:  number | null;
-  stock:           number;
-  category_id:     number | null;
-  is_featured:     boolean;
-  is_best_seller:  boolean;
-  is_new_arrival:  boolean;
-  is_active:       boolean;
-  seo_title:       string | null;
-  seo_description: string | null;
-  created_at:      string;
-  updated_at:      string;
+  id:                string;
+  name:              string;
+  slug:              string;
+  sku:               string | null;
+  short_description?: string | null;
+  description:       string | null;
+  price:             number;    // whole BDT
+  discount_price:    number | null;
+  stock:             number;
+  category_id:       number | null;
+  collection_ids?:   number[];
+  fabric?:           string | null;
+  pattern?:          string | null;
+  color?:            string | null;
+  weight?:           string | null;
+  country_of_origin?: string;
+  status?:           'published' | 'draft';
+  is_featured:       boolean;
+  is_best_seller:    boolean;
+  is_new_arrival:    boolean;
+  is_active:         boolean;
+  seo_title:         string | null;
+  seo_description:   string | null;
+  created_at:        string;
+  updated_at:        string;
 }
 
 export interface ProductImage {
@@ -103,6 +111,7 @@ export interface ProductImage {
   url:        string;
   alt_text:   string | null;
   sort_order: number;
+  is_cover?:  boolean;
 }
 
 export interface CollectionProduct {
