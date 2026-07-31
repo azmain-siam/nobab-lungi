@@ -28,4 +28,7 @@ export type {
   ProductWithCategory,
   ProductFull,
   OrderWithItems,
+  CustomerListItem,
+  CustomerAddressItem,
+  CustomerDetails,
 } from './database';

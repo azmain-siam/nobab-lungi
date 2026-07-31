@@ -228,8 +228,50 @@ export interface ProductWithCategory extends Product {
 export interface ProductFull extends Product {
   product_images: ProductImage[];
   categories:     Category | null;
+  collections:    Collection[];
 }
 
 export interface OrderWithItems extends Order {
   order_items: OrderItem[];
+}
+
+export interface CustomerListItem {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  avatar_url: string | null;
+  role: string;
+  total_orders: number;
+  total_spent: number;
+  last_order_date: string | null;
+  account_status: 'Active' | 'Blocked';
+  created_at: string;
+}
+
+export interface CustomerAddressItem {
+  id: string;
+  name: string;
+  phone: string;
+  district: string;
+  address: string;
+  is_default: boolean;
+}
+
+export interface CustomerDetails {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  avatar_url: string | null;
+  role: string;
+  created_at: string;
+  stats: {
+    total_orders: number;
+    total_spent: number;
+    avg_order_value: number;
+    last_order_date: string | null;
+  };
+  addresses: CustomerAddressItem[];
+  recent_orders: OrderWithItems[];
 }
