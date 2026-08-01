@@ -90,14 +90,16 @@
 
 # Phase 5 - Admin Dashboard
 
-- [x] Dashboard Statistics
+- [x] Dashboard Overview
 - [x] Product Management
 - [x] Category Management
 - [x] Collection Management
 - [x] Order Management
 - [x] Banner Management
 - [x] Homepage Management (CMS)
-- [ ] Coupon Management
+- [x] Customer Management
+- [x] Coupon Management
+- [x] Store Settings
 
 ---
 

@@ -59,7 +59,12 @@ export default function CheckoutPage() {
       });
 
       clearCart();
-      const finalOrderId = response.orderNumber ?? response.orderId ?? `NL-${Math.floor(100000 + Math.random() * 900000)}`;
+      const finalOrderId =
+        'orderNumber' in response && response.orderNumber
+          ? response.orderNumber
+          : 'orderId' in response && response.orderId
+          ? response.orderId
+          : `NL-${Math.floor(100000 + Math.random() * 900000)}`;
       router.push(`/order-success/${finalOrderId}`);
     } catch {
       clearCart();

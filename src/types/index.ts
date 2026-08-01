@@ -8,6 +8,7 @@ export type {
   PaymentMethod,
   ParentType,
   CouponType,
+  TimelineEvent,
   ShippingAddressSnapshot,
   Profile,
   Address,
@@ -32,4 +33,8 @@ export type {
   ProductWithCategory,
   ProductFull,
   OrderWithItems,
+  CustomerListItem,
+  CustomerAddressItem,
+  CustomerDetails,
+  StoreSettings,
 } from './database';
