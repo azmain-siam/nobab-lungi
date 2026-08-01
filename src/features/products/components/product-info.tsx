@@ -2,27 +2,38 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Star, Heart, Check, Minus, Plus, ShoppingBag } from 'lucide-react';
+import { Star, Heart, Check, Minus, Plus, ShoppingBag, XCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/cart-context';
 
+export interface ProductInfoData {
+  id: string;
+  name: string;
+  slug?: string;
+  sku?: string | null;
+  collectionTag: string;
+  categoryTag: string;
+  description: string;
+  price: string;
+  originalPrice?: string;
+  discountPercent?: number | null;
+  rating: string;
+  reviewsCount: number;
+  badge?: string | null;
+  inStock: boolean;
+  stockCount: number;
+  fabricDetails: string;
+  color?: string | null;
+  pattern?: string | null;
+  weight?: string | null;
+  craftsmanship?: string;
+  origin?: string;
+  images?: string[];
+}
+
 interface ProductInfoProps {
-  product: {
-    id: string;
-    name: string;
-    collectionTag: string;
-    categoryTag: string;
-    description: string;
-    price: string;
-    originalPrice?: string;
-    rating: string;
-    reviewsCount: number;
-    badge?: string | null;
-    inStock: boolean;
-    fabricDetails: string;
-    images?: string[];
-  };
+  product: ProductInfoData;
 }
 
 export function ProductInfo({ product }: ProductInfoProps) {
@@ -31,16 +42,20 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
+  const maxStock = Math.max(0, product.stockCount);
+  const isOutOfStock = !product.inStock || maxStock <= 0;
+
   const decrementQuantity = () => {
     if (quantity > 1) setQuantity(quantity - 1);
   };
 
   const incrementQuantity = () => {
-    setQuantity(quantity + 1);
+    if (quantity < maxStock) setQuantity(quantity + 1);
   };
 
   const productCardData = {
     id: product.id,
+    slug: product.slug,
     name: product.name,
     collectionTag: product.collectionTag,
     description: product.description,
@@ -53,10 +68,12 @@ export function ProductInfo({ product }: ProductInfoProps) {
   };
 
   const handleAddToCart = () => {
+    if (isOutOfStock) return;
     addToCart(productCardData, quantity);
   };
 
   const handleBuyNow = () => {
+    if (isOutOfStock) return;
     addToCart(productCardData, quantity);
     router.push('/checkout');
   };
@@ -64,21 +81,33 @@ export function ProductInfo({ product }: ProductInfoProps) {
   return (
     <div className="space-y-6">
       {/* Badges & Tags */}
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <Badge variant="pill">{product.collectionTag}</Badge>
         {product.badge && <Badge variant="square">{product.badge}</Badge>}
-        {product.inStock && (
+        {product.inStock && maxStock > 0 ? (
           <span className="flex items-center gap-1.5 text-xs text-emerald-700 font-medium bg-emerald-50 px-2.5 py-0.5 border border-emerald-200/60">
             <Check className="h-3 w-3 stroke-[2.5]" />
-            In Stock
+            {maxStock <= 5 ? `Only ${maxStock} left in stock!` : `In Stock (${maxStock} available)`}
+          </span>
+        ) : (
+          <span className="flex items-center gap-1.5 text-xs text-rose-700 font-medium bg-rose-50 px-2.5 py-0.5 border border-rose-200/60">
+            <XCircle className="h-3 w-3 stroke-[2.5]" />
+            Out of Stock
           </span>
         )}
       </div>
 
       {/* Product Title */}
-      <h1 className="font-display text-3xl font-semibold tracking-tight text-[#1b1c1c] sm:text-4xl">
-        {product.name}
-      </h1>
+      <div>
+        <h1 className="font-display text-3xl font-semibold tracking-tight text-[#1b1c1c] sm:text-4xl">
+          {product.name}
+        </h1>
+        {product.sku && (
+          <p className="mt-1 text-[11px] font-mono uppercase tracking-wider text-[#5e5e5b]">
+            SKU: {product.sku}
+          </p>
+        )}
+      </div>
 
       {/* Ratings */}
       <div className="flex items-center gap-2">
@@ -95,14 +124,19 @@ export function ProductInfo({ product }: ProductInfoProps) {
         </span>
       </div>
 
-      {/* Price */}
-      <div className="flex items-baseline gap-3 pt-2">
+      {/* Price & Savings */}
+      <div className="flex items-center gap-3 pt-2">
         <span className="font-display text-3xl font-semibold text-[#1b1c1c]">
           {product.price}
         </span>
         {product.originalPrice && (
           <span className="text-base text-[#5e5e5b] line-through font-normal">
             {product.originalPrice}
+          </span>
+        )}
+        {product.discountPercent && product.discountPercent > 0 && (
+          <span className="text-xs font-semibold uppercase tracking-wider text-rose-700 bg-rose-50 px-2 py-0.5 border border-rose-200/60">
+            SAVE {product.discountPercent}%
           </span>
         )}
       </div>
@@ -112,19 +146,43 @@ export function ProductInfo({ product }: ProductInfoProps) {
         {product.description}
       </p>
 
-      {/* Fabric Specs */}
+      {/* Specifications Grid */}
       <div className="border-y border-[#e3e2e2] py-4 space-y-2 text-xs text-[#5e5e5b]">
+        {product.sku && (
+          <div className="flex justify-between">
+            <span className="font-medium text-[#1b1c1c]">SKU:</span>
+            <span className="font-mono text-[11px]">{product.sku}</span>
+          </div>
+        )}
         <div className="flex justify-between">
           <span className="font-medium text-[#1b1c1c]">Material:</span>
           <span>{product.fabricDetails}</span>
         </div>
+        {product.color && (
+          <div className="flex justify-between">
+            <span className="font-medium text-[#1b1c1c]">Color:</span>
+            <span>{product.color}</span>
+          </div>
+        )}
+        {product.pattern && (
+          <div className="flex justify-between">
+            <span className="font-medium text-[#1b1c1c]">Pattern:</span>
+            <span>{product.pattern}</span>
+          </div>
+        )}
+        {product.weight && (
+          <div className="flex justify-between">
+            <span className="font-medium text-[#1b1c1c]">Weight:</span>
+            <span>{product.weight}</span>
+          </div>
+        )}
         <div className="flex justify-between">
           <span className="font-medium text-[#1b1c1c]">Craftsmanship:</span>
-          <span>Traditional Handloom Weave</span>
+          <span>{product.craftsmanship || 'Traditional Handloom Weave'}</span>
         </div>
         <div className="flex justify-between">
           <span className="font-medium text-[#1b1c1c]">Origin:</span>
-          <span>Pabna / Sirajganj, Bangladesh</span>
+          <span>{product.origin || 'Bangladesh'}</span>
         </div>
       </div>
 
@@ -137,19 +195,20 @@ export function ProductInfo({ product }: ProductInfoProps) {
           <div className="flex items-center border border-[#e3e2e2] bg-white">
             <button
               onClick={decrementQuantity}
-              disabled={quantity <= 1}
+              disabled={quantity <= 1 || isOutOfStock}
               aria-label="Decrease quantity"
               className="p-2.5 text-[#1b1c1c] transition hover:bg-[#efeded] disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <Minus className="h-3.5 w-3.5" />
             </button>
             <span className="w-10 text-center font-display text-sm font-semibold text-[#1b1c1c]">
-              {quantity}
+              {isOutOfStock ? 0 : quantity}
             </span>
             <button
               onClick={incrementQuantity}
+              disabled={quantity >= maxStock || isOutOfStock}
               aria-label="Increase quantity"
-              className="p-2.5 text-[#1b1c1c] transition hover:bg-[#efeded]"
+              className="p-2.5 text-[#1b1c1c] transition hover:bg-[#efeded] disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <Plus className="h-3.5 w-3.5" />
             </button>
@@ -162,15 +221,17 @@ export function ProductInfo({ product }: ProductInfoProps) {
             variant="secondary"
             size="lg"
             className="flex-1 gap-2"
+            disabled={isOutOfStock}
             onClick={handleAddToCart}
           >
             <ShoppingBag className="h-4 w-4 stroke-[1.5]" />
-            Add to Cart
+            {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
           </Button>
           <Button
             variant="primary"
             size="lg"
             className="flex-1"
+            disabled={isOutOfStock}
             onClick={handleBuyNow}
           >
             Buy Now

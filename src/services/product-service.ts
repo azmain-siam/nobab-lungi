@@ -233,13 +233,67 @@ export async function getProductBySlug(slug: string): Promise<ProductWithImages 
 export async function getProductById(id: string): Promise<ProductWithImages | null> {
   try {
     await connectToDatabase();
-    const product = await Product.findById(id).lean();
+    let product = null;
+
+    if (id.match(/^[0-9a-fA-F]{24}$/)) {
+      product = await Product.findOne({ _id: id, is_active: true }).lean();
+    }
+    if (!product) {
+      product = await Product.findOne({ slug: id, is_active: true }).lean();
+    }
+    if (!product && !isNaN(Number(id))) {
+      product = await Product.findOne({ id: Number(id), is_active: true }).lean();
+    }
 
     if (!product) return null;
     return mapProductToProductWithImages(product as unknown as Record<string, unknown>);
   } catch (error) {
     console.error('Error fetching product by id:', error);
     return null;
+  }
+}
+
+export async function getRelatedProducts(
+  categoryId?: number | null,
+  currentProductId?: string,
+  limit = 4
+): Promise<ProductWithImages[]> {
+  try {
+    await connectToDatabase();
+    const query: Record<string, unknown> = {
+      is_active: true,
+      status: 'published',
+    };
+
+    if (currentProductId) {
+      if (currentProductId.match(/^[0-9a-fA-F]{24}$/)) {
+        query._id = { $ne: currentProductId };
+      } else {
+        query.slug = { $ne: currentProductId };
+      }
+    }
+
+    let products: Record<string, unknown>[] = [];
+    if (categoryId && categoryId > 0) {
+      query.category_id = categoryId;
+      products = (await Product.find(query).limit(limit).lean()) as unknown as Record<string, unknown>[];
+    }
+
+    if (products.length < limit) {
+      delete query.category_id;
+      const needed = limit - products.length;
+      const existingIds = products.map((p) => String(p._id));
+      if (existingIds.length > 0) {
+        query._id = { $nin: existingIds };
+      }
+      const additional = (await Product.find(query).limit(needed).lean()) as unknown as Record<string, unknown>[];
+      products = [...products, ...additional];
+    }
+
+    return products.map((p) => mapProductToProductWithImages(p));
+  } catch (error) {
+    console.error('Error fetching related products:', error);
+    return [];
   }
 }
 
