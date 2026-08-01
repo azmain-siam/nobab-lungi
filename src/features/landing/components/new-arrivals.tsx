@@ -22,35 +22,28 @@ function mapProductToCardData(product: ProductWithImages): ProductCardData {
       ? `৳${product.discount_price?.toLocaleString('en-BD')}`
       : `৳${product.price.toLocaleString('en-BD')}`,
     originalPrice: hasDiscount ? `৳${product.price.toLocaleString('en-BD')}` : undefined,
-    badge: product.is_best_seller
-      ? 'Best Seller'
-      : product.is_new_arrival
-      ? 'New Arrival'
-      : product.is_featured
-      ? 'Featured'
-      : null,
+    badge: 'New Arrival',
   };
 }
 
-interface BestSellersProps {
+interface NewArrivalsProps {
   products?: ProductWithImages[];
 }
 
-export function BestSellers({ products = [] }: BestSellersProps) {
+export function NewArrivals({ products = [] }: NewArrivalsProps) {
   const displayProducts = products.map(mapProductToCardData);
 
   if (displayProducts.length === 0) return null;
 
   return (
-    <Section id="shop" variant="default" className="py-20 lg:py-28">
+    <Section id="new-arrivals" variant="default" className="py-20 lg:py-28 bg-[#f5f3f3]/50">
       <Container>
         {/* Section Header */}
         <SectionHeading
-          title="Best Sellers"
-          subtitle="Discover the handloom pieces our community loves most."
+          title="New Arrivals Showcase"
+          subtitle="Explore the latest handcrafted drops straight from the loom."
           actionHref="/products"
-          actionLabel="VIEW ALL"
-          align="center"
+          actionLabel="EXPLORE ALL"
         />
 
         {/* Product Grid */}

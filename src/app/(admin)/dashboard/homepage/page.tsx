@@ -558,7 +558,7 @@ export default function AdminHomepageCMSPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#e3e2e2] pb-5">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight text-[#1b1c1c] sm:text-3xl flex items-center gap-2">
-            <Sliders className="h-6 w-6 stroke-[1.5] text-amber-800" />
+            {/* <Sliders className="h-6 w-6 stroke-[1.5] text-amber-800" /> */}
             Homepage CMS Management
           </h1>
           <p className="text-xs text-[#5e5e5b] mt-1">
@@ -637,11 +637,10 @@ export default function AdminHomepageCMSPage() {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                className={`flex items-center gap-2 py-3 px-4 border-b-2 transition ${
-                  isActive
+                className={`flex items-center gap-2 py-3 px-4 border-b-2 transition ${isActive
                     ? 'border-[#1b1c1c] text-[#1b1c1c] bg-[#fbf9f8]'
                     : 'border-transparent text-[#5e5e5b] hover:text-[#1b1c1c] hover:bg-[#fbf9f8]'
-                }`}
+                  }`}
               >
                 <Icon className={`h-4 w-4 ${isActive ? 'text-[#1b1c1c]' : 'text-[#5e5e5b]'}`} />
                 {tab.label}
@@ -790,9 +789,8 @@ export default function AdminHomepageCMSPage() {
                   {config.sections.map((section: HomepageSection, idx: number) => (
                     <div
                       key={section.key}
-                      className={`flex items-center justify-between p-4 transition ${
-                        section.is_visible ? 'bg-white' : 'bg-[#fbf9f8] opacity-60'
-                      }`}
+                      className={`flex items-center justify-between p-4 transition ${section.is_visible ? 'bg-white' : 'bg-[#fbf9f8] opacity-60'
+                        }`}
                     >
                       <div className="flex items-center gap-3">
                         <span className="font-mono text-xs font-bold text-[#5e5e5b] w-6">
@@ -831,11 +829,10 @@ export default function AdminHomepageCMSPage() {
                         <button
                           type="button"
                           onClick={() => handleToggleSectionVisible(section.key)}
-                          className={`flex items-center gap-1.5 px-3 py-1 text-xs font-semibold uppercase tracking-wider border transition ${
-                            section.is_visible
+                          className={`flex items-center gap-1.5 px-3 py-1 text-xs font-semibold uppercase tracking-wider border transition ${section.is_visible
                               ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                               : 'bg-red-50 text-red-800 border-red-300'
-                          }`}
+                            }`}
                         >
                           {section.is_visible ? (
                             <>
@@ -874,11 +871,10 @@ export default function AdminHomepageCMSPage() {
                       <div
                         key={cat.id}
                         onClick={() => handleToggleFeaturedCategory(cat.id)}
-                        className={`p-4 border text-center cursor-pointer transition relative ${
-                          isSelected
+                        className={`p-4 border text-center cursor-pointer transition relative ${isSelected
                             ? 'border-emerald-600 bg-emerald-50/50 shadow-xs'
                             : 'border-[#e3e2e2] bg-[#fbf9f8] hover:border-[#1b1c1c]'
-                        }`}
+                          }`}
                       >
                         {isSelected && (
                           <div className="absolute top-2 right-2 text-emerald-700">
@@ -914,11 +910,10 @@ export default function AdminHomepageCMSPage() {
                       <div
                         key={col.id}
                         onClick={() => handleToggleFeaturedCollection(col.id)}
-                        className={`p-4 border flex items-center justify-between cursor-pointer transition ${
-                          isSelected
+                        className={`p-4 border flex items-center justify-between cursor-pointer transition ${isSelected
                             ? 'border-emerald-600 bg-emerald-50/50 shadow-xs'
                             : 'border-[#e3e2e2] bg-[#fbf9f8] hover:border-[#1b1c1c]'
-                        }`}
+                          }`}
                       >
                         <div>
                           <div className="font-semibold text-xs text-[#1b1c1c]">{col.name}</div>
@@ -959,11 +954,10 @@ export default function AdminHomepageCMSPage() {
                       <div
                         key={p.id}
                         onClick={() => handleToggleFeaturedProduct(p.id)}
-                        className={`p-3 border flex items-center justify-between cursor-pointer transition ${
-                          isSelected
+                        className={`p-3 border flex items-center justify-between cursor-pointer transition ${isSelected
                             ? 'border-emerald-600 bg-emerald-50/50'
                             : 'border-[#e3e2e2] bg-[#fbf9f8] hover:border-[#1b1c1c]'
-                        }`}
+                          }`}
                       >
                         <div className="truncate pr-2">
                           <div className="font-semibold text-xs text-[#1b1c1c] truncate">{p.name}</div>
@@ -1004,11 +998,10 @@ export default function AdminHomepageCMSPage() {
                       <div
                         key={p.id}
                         onClick={() => handleToggleBestSellerProduct(p.id)}
-                        className={`p-3 border flex items-center justify-between cursor-pointer transition ${
-                          isSelected
+                        className={`p-3 border flex items-center justify-between cursor-pointer transition ${isSelected
                             ? 'border-purple-600 bg-purple-50/50'
                             : 'border-[#e3e2e2] bg-[#fbf9f8] hover:border-[#1b1c1c]'
-                        }`}
+                          }`}
                       >
                         <div className="truncate pr-2">
                           <div className="font-semibold text-xs text-[#1b1c1c] truncate">{p.name}</div>
@@ -1069,11 +1062,10 @@ export default function AdminHomepageCMSPage() {
                           !config.new_arrivals_config.is_active
                         )
                       }
-                      className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider border transition ${
-                        config.new_arrivals_config.is_active
+                      className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider border transition ${config.new_arrivals_config.is_active
                           ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                           : 'bg-red-50 text-red-800 border-red-300'
-                      }`}
+                        }`}
                     >
                       {config.new_arrivals_config.is_active ? 'Active' : 'Inactive'}
                     </button>
@@ -1339,11 +1331,10 @@ export default function AdminHomepageCMSPage() {
                           },
                         })
                       }
-                      className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider border transition ${
-                        config.newsletter.is_enabled
+                      className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider border transition ${config.newsletter.is_enabled
                           ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                           : 'bg-red-50 text-red-800 border-red-300'
-                      }`}
+                        }`}
                     >
                       {config.newsletter.is_enabled ? 'Enabled' : 'Disabled'}
                     </button>
@@ -1508,11 +1499,10 @@ export default function AdminHomepageCMSPage() {
                   <button
                     type="button"
                     onClick={() => setBannerIsPrimary(!bannerIsPrimary)}
-                    className={`w-full py-2 px-2 text-xs font-semibold uppercase tracking-wider border transition ${
-                      bannerIsPrimary
+                    className={`w-full py-2 px-2 text-xs font-semibold uppercase tracking-wider border transition ${bannerIsPrimary
                         ? 'bg-amber-50 text-amber-800 border-amber-300'
                         : 'bg-[#f5f3f3] text-[#5e5e5b] border-[#e3e2e2]'
-                    }`}
+                      }`}
                   >
                     {bannerIsPrimary ? 'Primary' : 'Standard'}
                   </button>
@@ -1523,11 +1513,10 @@ export default function AdminHomepageCMSPage() {
                   <button
                     type="button"
                     onClick={() => setBannerIsActive(!bannerIsActive)}
-                    className={`w-full py-2 px-2 text-xs font-semibold uppercase tracking-wider border transition ${
-                      bannerIsActive
+                    className={`w-full py-2 px-2 text-xs font-semibold uppercase tracking-wider border transition ${bannerIsActive
                         ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                         : 'bg-red-50 text-red-800 border-red-300'
-                    }`}
+                      }`}
                   >
                     {bannerIsActive ? 'Active' : 'Inactive'}
                   </button>
@@ -1553,8 +1542,8 @@ export default function AdminHomepageCMSPage() {
                   {isSubmitting
                     ? 'Saving Banner...'
                     : editingBanner
-                    ? 'Update Banner'
-                    : 'Create Banner'}
+                      ? 'Update Banner'
+                      : 'Create Banner'}
                 </Button>
               </div>
             </form>
