@@ -1,6 +1,7 @@
 import { connectToDatabase } from '@/lib/db';
 import { Product } from '@/models/Product';
 import { Category as CategoryModel } from '@/models/Category';
+import { Collection as CollectionModel } from '@/models/Collection';
 import type { ProductWithImages } from '@/types';
 
 export interface AdminProductListItem extends ProductWithImages {
@@ -241,3 +242,161 @@ export async function getProductById(id: string): Promise<ProductWithImages | nu
     return null;
   }
 }
+
+export interface PublicProductsQueryOptions {
+  search?: string;
+  categoryId?: number;
+  collectionId?: number;
+  categories?: string[];
+  collections?: string[];
+  minPrice?: number;
+  maxPrice?: number;
+  sort?: string;
+  page?: number;
+  limit?: number;
+}
+
+export async function getPublicProducts(options?: PublicProductsQueryOptions): Promise<{
+  products: ProductWithImages[];
+  total: number;
+  pages: number;
+  currentPage: number;
+}> {
+  try {
+    await connectToDatabase();
+
+    const search = options?.search?.trim();
+    const categoryId = options?.categoryId;
+    const collectionId = options?.collectionId;
+    const categories = options?.categories;
+    const collections = options?.collections;
+    const minPrice = options?.minPrice;
+    const maxPrice = options?.maxPrice;
+    const sort = options?.sort || 'featured';
+    const page = Math.max(1, options?.page || 1);
+    const limit = Math.max(1, options?.limit || 6);
+
+    const query: Record<string, unknown> = {
+      is_active: true,
+      status: 'published',
+    };
+
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { sku: { $regex: search, $options: 'i' } },
+        { slug: { $regex: search, $options: 'i' } },
+        { short_description: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    if (categoryId && categoryId > 0) {
+      query.category_id = Number(categoryId);
+    } else if (categories && categories.length > 0) {
+      const categoryDocIds: number[] = [];
+      const categoryDocs = await CategoryModel.find({
+        $or: [
+          { slug: { $in: categories } },
+          { id: { $in: categories.map((c) => Number(c)).filter((n) => !isNaN(n)) } },
+        ],
+      }).lean();
+      categoryDocs.forEach((c) => categoryDocIds.push(c.id));
+
+      if (categoryDocIds.length > 0) {
+        query.category_id = { $in: categoryDocIds };
+      }
+    }
+
+    if (collectionId && collectionId > 0) {
+      query.collection_ids = Number(collectionId);
+    } else if (collections && collections.length > 0) {
+      const collectionDocIds: number[] = [];
+      const collectionDocs = await CollectionModel.find({
+        $or: [
+          { slug: { $in: collections } },
+          { id: { $in: collections.map((c) => Number(c)).filter((n) => !isNaN(n)) } },
+        ],
+      }).lean();
+      collectionDocs.forEach((col) => collectionDocIds.push(col.id));
+
+      if (collectionDocIds.length > 0) {
+        query.collection_ids = { $in: collectionDocIds };
+      }
+    }
+
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      const priceQuery: Record<string, number> = {};
+      if (minPrice !== undefined) priceQuery.$gte = minPrice;
+      if (maxPrice !== undefined) priceQuery.$lte = maxPrice;
+      query.price = priceQuery;
+    }
+
+    let sortOption: Record<string, 1 | -1> = { created_at: -1 };
+
+    switch (sort) {
+      case 'price-low':
+      case 'price_asc':
+        sortOption = { price: 1 };
+        break;
+      case 'price-high':
+      case 'price_desc':
+        sortOption = { price: -1 };
+        break;
+      case 'newest':
+        sortOption = { created_at: -1 };
+        break;
+      case 'featured':
+      default:
+        sortOption = { is_featured: -1, created_at: -1 };
+    }
+
+    const total = await Product.countDocuments(query);
+    const pages = Math.ceil(total / limit) || 1;
+
+    const docs = await Product.find(query)
+      .sort(sortOption)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean();
+
+    const products = docs.map((doc) =>
+      mapProductToProductWithImages(doc as unknown as Record<string, unknown>)
+    );
+
+    return { products, total, pages, currentPage: page };
+  } catch (error) {
+    console.error('Error fetching public products:', error);
+    return { products: [], total: 0, pages: 1, currentPage: 1 };
+  }
+}
+
+export async function getShopFilterData() {
+  try {
+    await connectToDatabase();
+    const [categories, collections] = await Promise.all([
+      CategoryModel.find({ is_active: true }).sort({ sort_order: 1, name: 1 }).lean(),
+      CollectionModel.find({ is_active: true }).sort({ sort_order: 1, name: 1 }).lean(),
+    ]);
+
+    return {
+      categories: categories.map((c) => ({
+        id: c.slug || String(c.id),
+        numeric_id: c.id,
+        name: c.name,
+        slug: c.slug,
+        parent_type: c.parent_type,
+      })),
+      collections: collections.map((col) => ({
+        id: col.slug || String(col.id),
+        numeric_id: col.id,
+        name: col.name,
+        slug: col.slug,
+        is_featured: col.is_featured,
+      })),
+    };
+  } catch (error) {
+    console.error('Error fetching shop filter data:', error);
+    return { categories: [], collections: [] };
+  }
+}
+
