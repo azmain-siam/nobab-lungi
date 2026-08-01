@@ -1,119 +1,44 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { ProductCard, type ProductCardData } from '@/components/shared/product-card';
 import { ShopHeader } from './shop-header';
 import { ShopSidebar } from './shop-sidebar';
 import { ShopPagination } from './shop-pagination';
 import { PackageX } from 'lucide-react';
-
-const CATEGORIES_DATA = [
-  { id: 'cotton', label: 'Cotton' },
-  { id: 'silk-blend', label: 'Silk Blend' },
-  { id: 'executive', label: 'Executive' },
-];
-
-const COLLECTIONS_DATA = [
-  { id: 'heritage', label: 'Heritage' },
-  { id: 'luxury', label: 'Luxury' },
-  { id: 'daily-elegance', label: 'Daily Elegance' },
-];
-
-const SHOP_PRODUCTS: (ProductCardData & {
-  category: string;
-  collection: string;
-  rawPrice: number;
-  dateAdded: string;
-})[] = [
-  {
-    id: '1',
-    name: 'Midnight Indigo',
-    collectionTag: 'Heritage',
-    description: 'Hand-woven fine cotton with traditional pattern borders.',
-    category: 'cotton',
-    collection: 'heritage',
-    image: 'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?q=80&w=600&auto=format&fit=crop',
-    price: '৳2,450',
-    rawPrice: 2450,
-    badge: 'New Arrival',
-    subTag: null,
-    dateAdded: '2026-07-20',
-  },
-  {
-    id: '2',
-    name: 'Charcoal Silk Weave',
-    collectionTag: 'Luxury',
-    description: 'Premium silk blend for executive comfort and occasion wear.',
-    category: 'silk-blend',
-    collection: 'luxury',
-    image: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?q=80&w=600&auto=format&fit=crop',
-    price: '৳4,800',
-    originalPrice: '৳5,500',
-    rawPrice: 4800,
-    badge: 'Premium',
-    subTag: null,
-    dateAdded: '2026-07-25',
-  },
-  {
-    id: '3',
-    name: 'Earth Tone Essential',
-    collectionTag: 'Daily Elegance',
-    description: 'Breathable everyday cotton comfort designed for easy lounge.',
-    category: 'executive',
-    collection: 'daily-elegance',
-    image: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?q=80&w=600&auto=format&fit=crop',
-    price: '৳1,850',
-    rawPrice: 1850,
-    badge: null,
-    subTag: 'Limited Edition',
-    dateAdded: '2026-07-15',
-  },
-  {
-    id: '4',
-    name: 'Heritage Check Lungi',
-    collectionTag: 'Heritage',
-    description: '100% fine cotton yarn with traditional Bengali check pattern.',
-    category: 'cotton',
-    collection: 'heritage',
-    image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=600&auto=format&fit=crop',
-    price: '৳1,250',
-    rawPrice: 1250,
-    badge: null,
-    subTag: null,
-    dateAdded: '2026-07-18',
-  },
-  {
-    id: '5',
-    name: 'Royal Silk Blend',
-    collectionTag: 'Luxury',
-    description: 'Rich lustrous fabric with hand-embroidered border motifs.',
-    category: 'silk-blend',
-    collection: 'luxury',
-    image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=600&auto=format&fit=crop',
-    price: '৳5,200',
-    originalPrice: '৳6,000',
-    rawPrice: 5200,
-    badge: 'Premium',
-    subTag: null,
-    dateAdded: '2026-07-28',
-  },
-  {
-    id: '6',
-    name: 'Executive Dark Stripe',
-    collectionTag: 'Executive',
-    description: 'Sophisticated deep charcoal lungi with modern minimalist weave.',
-    category: 'executive',
-    collection: 'daily-elegance',
-    image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=600&auto=format&fit=crop',
-    price: '৳2,950',
-    rawPrice: 2950,
-    badge: 'New Arrival',
-    subTag: null,
-    dateAdded: '2026-07-22',
-  },
-];
+import { fetchPublicProductsAction } from '@/features/products/actions/shop-actions';
+import type { ProductWithImages } from '@/types';
 
 const ITEMS_PER_PAGE = 6;
+
+function mapProductToCardData(product: ProductWithImages): ProductCardData {
+  const coverImage =
+    product.product_images?.find((img) => img.is_cover)?.url ||
+    product.product_images?.[0]?.url ||
+    'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?q=80&w=600&auto=format&fit=crop';
+
+  let badge: string | null = null;
+  if (product.is_new_arrival) badge = 'New Arrival';
+  else if (product.is_best_seller) badge = 'Best Seller';
+  else if (product.is_featured) badge = 'Featured';
+
+  const priceStr = `৳${(product.discount_price ?? product.price).toLocaleString()}`;
+  const originalPriceStr = product.discount_price
+    ? `৳${product.price.toLocaleString()}`
+    : undefined;
+
+  return {
+    id: product.id,
+    slug: product.slug,
+    name: product.name,
+    collectionTag: product.fabric || 'Heritage',
+    description: product.short_description || product.description || undefined,
+    image: coverImage,
+    price: priceStr,
+    originalPrice: originalPriceStr,
+    badge,
+  };
+}
 
 export function ShopView() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -122,6 +47,12 @@ export function ShopView() {
   const [priceRange, setPriceRange] = useState<[number, number]>([1000, 10000]);
   const [selectedSort, setSelectedSort] = useState('featured');
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [products, setProducts] = useState<ProductCardData[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [categoriesData, setCategoriesData] = useState<{ id: string; label: string }[]>([]);
+  const [collectionsData, setCollectionsData] = useState<{ id: string; label: string }[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const handleCategoryToggle = (id: string) => {
     setSelectedCategories((prev) =>
@@ -142,54 +73,65 @@ export function ShopView() {
     setCurrentPage(1);
   };
 
-  // Filter & Sort products
-  const filteredProducts = useMemo(() => {
-    return SHOP_PRODUCTS.filter((product) => {
-      // Live Search
-      if (
-        searchQuery &&
-        !product.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        !(product.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false)
-      ) {
-        return false;
-      }
-      // Category filter
-      if (
-        selectedCategories.length > 0 &&
-        !selectedCategories.includes(product.category)
-      ) {
-        return false;
-      }
-      // Collection filter
-      if (
-        selectedCollections.length > 0 &&
-        !selectedCollections.includes(product.collection)
-      ) {
-        return false;
-      }
-      // Price filter
-      if (
-        product.rawPrice < priceRange[0] ||
-        product.rawPrice > priceRange[1]
-      ) {
-        return false;
-      }
-      return true;
-    }).sort((a, b) => {
-      if (selectedSort === 'price-low') return a.rawPrice - b.rawPrice;
-      if (selectedSort === 'price-high') return b.rawPrice - a.rawPrice;
-      if (selectedSort === 'newest')
-        return new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime();
-      return 0; // default featured
-    });
-  }, [searchQuery, selectedCategories, selectedCollections, priceRange, selectedSort]);
+  // Fetch dynamic product and filter data from MongoDB
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
 
-  // Pagination
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
-  const paginatedProducts = useMemo(() => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
-  }, [filteredProducts, currentPage]);
+    const timer = setTimeout(() => {
+      fetchPublicProductsAction({
+        search: searchQuery,
+        categories: selectedCategories,
+        collections: selectedCollections,
+        minPrice: priceRange[0],
+        maxPrice: priceRange[1],
+        sort: selectedSort,
+        page: currentPage,
+        limit: ITEMS_PER_PAGE,
+      })
+        .then((res) => {
+          if (!isMounted) return;
+          const cardProducts = res.products.map(mapProductToCardData);
+          setProducts(cardProducts);
+          setTotalPages(res.pages || 1);
+
+          if (res.categories && res.categories.length > 0) {
+            setCategoriesData(
+              res.categories.map((c) => ({
+                id: c.slug || c.id,
+                label: c.name,
+              }))
+            );
+          }
+          if (res.collections && res.collections.length > 0) {
+            setCollectionsData(
+              res.collections.map((col) => ({
+                id: col.slug || col.id,
+                label: col.name,
+              }))
+            );
+          }
+        })
+        .catch((err) => {
+          console.error('Error fetching dynamic products:', err);
+        })
+        .finally(() => {
+          if (isMounted) setLoading(false);
+        });
+    }, 250);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
+  }, [
+    searchQuery,
+    selectedCategories,
+    selectedCollections,
+    priceRange,
+    selectedSort,
+    currentPage,
+  ]);
 
   return (
     <div>
@@ -198,15 +140,18 @@ export function ShopView() {
         searchQuery={searchQuery}
         selectedSort={selectedSort}
         onSearchChange={handleSearchChange}
-        onSortChange={setSelectedSort}
+        onSortChange={(sort) => {
+          setSelectedSort(sort);
+          setCurrentPage(1);
+        }}
       />
 
       {/* Main Split Layout: Left Sidebar + Right Product Grid */}
       <div className="flex flex-col gap-12 lg:flex-row lg:items-start">
         {/* Left Sidebar Filters */}
         <ShopSidebar
-          categories={CATEGORIES_DATA}
-          collections={COLLECTIONS_DATA}
+          categories={categoriesData}
+          collections={collectionsData}
           selectedCategories={selectedCategories}
           selectedCollections={selectedCollections}
           priceRange={priceRange}
@@ -214,14 +159,30 @@ export function ShopView() {
           maxPriceLimit={10000}
           onCategoryToggle={handleCategoryToggle}
           onCollectionToggle={handleCollectionToggle}
-          onPriceChange={setPriceRange}
+          onPriceChange={(newRange) => {
+            setPriceRange(newRange);
+            setCurrentPage(1);
+          }}
         />
 
         {/* Right Product Grid Area */}
         <div className="flex-1 space-y-8">
-          {paginatedProducts.length > 0 ? (
+          {loading ? (
+            /* Loading Skeleton Grid */
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {paginatedProducts.map((product) => (
+              {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+                <div key={i} className="animate-pulse space-y-3">
+                  <div className="aspect-[3/4] w-full bg-[#efeded]" />
+                  <div className="h-3 w-1/3 bg-[#efeded]" />
+                  <div className="h-4 w-2/3 bg-[#efeded]" />
+                  <div className="h-3 w-full bg-[#efeded]" />
+                  <div className="h-4 w-1/4 bg-[#efeded]" />
+                </div>
+              ))}
+            </div>
+          ) : products.length > 0 ? (
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {products.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
@@ -253,11 +214,13 @@ export function ShopView() {
           )}
 
           {/* Pagination */}
-          <ShopPagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
+          {!loading && (
+            <ShopPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          )}
         </div>
       </div>
     </div>
