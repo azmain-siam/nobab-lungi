@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   ChevronLeft,
   ChevronRight,
+  Sliders,
   X,
 } from 'lucide-react';
 
@@ -21,7 +22,8 @@ const ADMIN_NAV = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
   { href: '/dashboard/products', label: 'Products', icon: Package },
   { href: '/dashboard/categories', label: 'Categories', icon: Grid },
-  { href: '/dashboard/collections', label: 'Collections & Banners', icon: Layers },
+  { href: '/dashboard/collections', label: 'Collections', icon: Layers },
+  { href: '/dashboard/homepage', label: 'Homepage CMS', icon: Sliders },
   { href: '/dashboard/orders', label: 'Orders', icon: ShoppingCart },
   { href: '/dashboard/customers', label: 'Customers', icon: Users },
   // { href: '/dashboard/coupons', label: 'Coupons', icon: Ticket },
