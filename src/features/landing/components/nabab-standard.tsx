@@ -1,10 +1,21 @@
-import { Sparkles, Layers, Scissors, Truck, ShieldCheck, RefreshCw, Award, Heart, PackageCheck, Zap } from 'lucide-react';
-import { Section } from '@/components/ui/section';
-import { Container } from '@/components/ui/container';
-import { SectionHeading } from '@/components/ui/section-heading';
-import type { HomepageConfig } from '@/types';
+import { Container } from "@/components/ui/container";
+import { Section } from "@/components/ui/section";
+import { SectionHeading } from "@/components/ui/section-heading";
+import type { HomepageConfig } from "@/types";
+import {
+  Award,
+  Heart,
+  Layers,
+  PackageCheck,
+  RefreshCw,
+  Scissors,
+  ShieldCheck,
+  Sparkles,
+  Truck,
+  Zap,
+} from "lucide-react";
 
-type WhyChooseUsItem = HomepageConfig['why_choose_us'][number];
+type WhyChooseUsItem = HomepageConfig["why_choose_us"][number];
 
 const ICON_MAP: Record<string, typeof Sparkles> = {
   Sparkles,
@@ -21,31 +32,35 @@ const ICON_MAP: Record<string, typeof Sparkles> = {
 
 const DEFAULT_STANDARDS = [
   {
-    id: '1',
-    icon: 'Sparkles',
-    title: '100% Organic Cotton',
-    description: 'Sourced from the finest mills to ensure breathability and unsurpassed softness.',
+    id: "1",
+    icon: "Sparkles",
+    title: "100% Organic Cotton",
+    description:
+      "Sourced from the finest mills to ensure breathability and unsurpassed softness.",
     sort_order: 1,
   },
   {
-    id: '2',
-    icon: 'Layers',
-    title: 'Authentic Heritage',
-    description: 'Woven by master artisans preserving generations of traditional loom artistry.',
+    id: "2",
+    icon: "Layers",
+    title: "Authentic Heritage",
+    description:
+      "Woven by master artisans preserving generations of traditional loom artistry.",
     sort_order: 2,
   },
   {
-    id: '3',
-    icon: 'Scissors',
-    title: 'Modern Comfort',
-    description: 'Designed for everyday elegance, offering freedom of movement and style.',
+    id: "3",
+    icon: "Scissors",
+    title: "Modern Comfort",
+    description:
+      "Designed for everyday elegance, offering freedom of movement and style.",
     sort_order: 3,
   },
   {
-    id: '4',
-    icon: 'Truck',
-    title: 'Nationwide Delivery',
-    description: 'Bringing authentic luxury directly to your doorstep, anywhere in Bangladesh.',
+    id: "4",
+    icon: "Truck",
+    title: "Nationwide Delivery",
+    description:
+      "Bringing authentic luxury directly to your doorstep, anywhere in Bangladesh.",
     sort_order: 4,
   },
 ];
@@ -60,7 +75,7 @@ export function NababStandard({ items = [] }: NababStandardProps) {
   return (
     <Section variant="default" className="py-20 lg:py-28">
       <Container>
-        <SectionHeading title="Why Choose Nabab Lungi" align="center" />
+        <SectionHeading title="The Nabab Standard" align="center" />
 
         <div className="mt-16 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {cards.map((item) => {
