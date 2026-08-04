@@ -279,17 +279,42 @@ export async function createOrder(
   }
 }
 
-export async function getUserOrders(userId: string): Promise<OrderWithItems[]> {
+export async function getUserOrders(userId: string, limit?: number): Promise<OrderWithItems[]> {
   try {
     await connectToDatabase();
-    const orders = await Order.find({ user_id: userId })
-      .sort({ created_at: -1 })
-      .lean();
+    let query = Order.find({ user_id: userId }).sort({ created_at: -1 });
+    if (limit && limit > 0) {
+      query = query.limit(limit);
+    }
+    const orders = await query.lean();
 
     return orders.map((o) => mapOrderToOrderWithItems(o as unknown as Record<string, unknown>));
   } catch (error) {
     console.error('Error fetching user orders:', error);
     return [];
+  }
+}
+
+export async function getUserOrderStats(userId: string): Promise<{
+  totalOrders: number;
+  processingOrders: number;
+  deliveredOrders: number;
+}> {
+  try {
+    await connectToDatabase();
+    const [totalOrders, processingOrders, deliveredOrders] = await Promise.all([
+      Order.countDocuments({ user_id: userId }),
+      Order.countDocuments({
+        user_id: userId,
+        status: { $in: ['pending', 'confirmed', 'processing', 'packed', 'shipped'] },
+      }),
+      Order.countDocuments({ user_id: userId, status: 'delivered' }),
+    ]);
+
+    return { totalOrders, processingOrders, deliveredOrders };
+  } catch (error) {
+    console.error('Error fetching user order stats:', error);
+    return { totalOrders: 0, processingOrders: 0, deliveredOrders: 0 };
   }
 }
 

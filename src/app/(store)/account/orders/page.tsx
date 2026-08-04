@@ -10,7 +10,7 @@ import { AccountSidebar } from '@/components/shared/account-sidebar';
 import { Package, ChevronRight, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Order History — Nabab Lungi',
+  title: 'My Orders — Nabab Lungi',
   description: 'View your order history, track deliveries, and view invoices.',
 };
 
@@ -21,20 +21,20 @@ export default async function OrderHistoryPage() {
   const orders = userId ? await getUserOrders(userId) : [];
 
   return (
-    <Section variant="default" className="py-12 lg:py-16">
+    <Section variant="default" className="py-10 lg:py-16">
       <Container>
-        <h1 className="font-display text-3xl font-semibold tracking-tight text-[#1b1c1c] sm:text-4xl mb-8">
+        <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight text-[#1b1c1c] mb-8">
           My Account
         </h1>
 
-        <div className="flex flex-col gap-10 lg:flex-row lg:items-start">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
           <AccountSidebar />
 
           <div className="flex-1 bg-white border border-[#e3e2e2] p-6 sm:p-8 space-y-6">
             <div className="border-b border-[#e3e2e2] pb-4 flex items-center justify-between">
               <div>
                 <h2 className="font-display text-lg font-semibold text-[#1b1c1c]">
-                  Order History
+                  My Orders
                 </h2>
                 <p className="text-xs font-light text-[#5e5e5b] mt-1">
                   Track past and current orders placed with Nabab Lungi.
@@ -88,11 +88,16 @@ export default async function OrderHistoryPage() {
                       </div>
 
                       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-xs">
-                        <div className="flex-1 pr-4">
-                          <span className="text-[#5e5e5b]">Items: </span>
-                          <span className="font-medium text-[#1b1c1c] line-clamp-1">
-                            {itemsSummary}
-                          </span>
+                        <div className="flex-1 pr-4 space-y-0.5">
+                          <div>
+                            <span className="text-[#5e5e5b]">Items: </span>
+                            <span className="font-medium text-[#1b1c1c] line-clamp-1">
+                              {itemsSummary}
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-[#5e5e5b]">
+                            Payment: <strong className="uppercase text-[#1b1c1c]">{order.payment_method}</strong> ({order.payment_status.replace('_', ' ')})
+                          </div>
                         </div>
 
                         <div className="flex items-center gap-4 shrink-0">
@@ -103,7 +108,7 @@ export default async function OrderHistoryPage() {
                             href={`/order-success/${order.order_number}`}
                             className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-[#1b1c1c] hover:underline"
                           >
-                            View Invoice
+                            View Details
                             <ChevronRight className="h-3.5 w-3.5" />
                           </Link>
                         </div>
@@ -117,16 +122,16 @@ export default async function OrderHistoryPage() {
                 <div className="p-3 bg-white border border-[#e3e2e2] w-fit mx-auto text-[#5e5e5b]">
                   <AlertCircle className="h-6 w-6 stroke-[1.5]" />
                 </div>
-                <h3 className="font-display text-base font-semibold text-[#1b1c1c]">No Orders Placed Yet</h3>
+                <h3 className="font-display text-base font-semibold text-[#1b1c1c]">No Orders Yet</h3>
                 <p className="text-xs text-[#5e5e5b] max-w-sm mx-auto">
-                  You haven&apos;t placed any orders with this account yet. Explore our handcrafted collections to place your first order.
+                  You haven&apos;t placed any orders with this account yet. Explore our handcrafted Lungi collection and find something you&apos;ll love.
                 </p>
                 <div className="pt-2">
                   <Link
                     href="/products"
                     className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1b1c1c] text-white text-xs font-semibold uppercase tracking-wider hover:bg-black transition"
                   >
-                    Explore Products
+                    Start Shopping
                   </Link>
                 </div>
               </div>
