@@ -166,7 +166,7 @@ export default async function AccountPage() {
                     )}
 
                     <Link
-                      href={`/order-success/${order.order_number}`}
+                      href={`/account/orders/${order.order_number}`}
                       className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-[#1b1c1c] hover:underline"
                     >
                       View Order

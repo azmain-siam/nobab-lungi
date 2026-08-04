@@ -15,7 +15,6 @@ import {
   ChevronDown,
   ChevronUp,
   Headphones,
-  Sparkles,
 } from 'lucide-react';
 import { useUser } from '@/features/auth/hooks/use-user';
 import { useToast } from '@/providers/toast-provider';
