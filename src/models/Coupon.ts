@@ -6,11 +6,11 @@ export interface ICoupon extends Document {
   type: 'percentage' | 'fixed';
   value: number;
   minimum_amount: number;
-  max_discount_amount?: number;
-  usage_limit?: number;
+  max_discount_amount?: number | null;
+  usage_limit?: number | null;
   used_count: number;
-  start_date?: Date;
-  end_date?: Date;
+  start_date?: Date | null;
+  end_date?: Date | null;
   is_active: boolean;
   created_at: Date;
 }

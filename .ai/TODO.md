@@ -99,7 +99,7 @@
 - [x] Banner Management
 - [x] Homepage Management (CMS)
 - [x] Customer Management
-- [x] Coupon Management
+- [x] Coupon Management (Full MongoDB CRUD, percentage/fixed discounts, usage tracking, start/expiry dates, search & status filters)
 - [x] Store Settings
 
 ---

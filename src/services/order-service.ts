@@ -178,10 +178,14 @@ export async function createOrder(
     let validatedCouponCode: string | null = null;
     if (params.couponCode) {
       const couponRes = await validateCoupon(params.couponCode, serverSubtotal);
-      if (couponRes.success && couponRes.discountAmount) {
-        serverDiscountAmount = couponRes.discountAmount;
-        validatedCouponCode = couponRes.code || params.couponCode.toUpperCase();
+      if (!couponRes.success || !couponRes.discountAmount) {
+        return {
+          success: false,
+          error: couponRes.error || 'The applied coupon code is no longer valid or has expired.',
+        };
       }
+      serverDiscountAmount = couponRes.discountAmount;
+      validatedCouponCode = couponRes.code || params.couponCode.toUpperCase();
     }
 
     // 4. Recalculate Final Grand Total
@@ -232,7 +236,12 @@ export async function createOrder(
       timeline: initialTimeline,
     });
 
-    // 7. Decrement stock for ordered products
+    // 7. Increment coupon usage count & decrement stock for ordered products
+    if (validatedCouponCode) {
+      const { incrementCouponUsage } = await import('@/services/coupon-service');
+      await incrementCouponUsage(validatedCouponCode);
+    }
+
     for (const item of params.items) {
       if (item.productId.match(/^[0-9a-fA-F]{24}$/)) {
         await Product.updateOne({ _id: item.productId }, { $inc: { stock: -item.quantity } });
