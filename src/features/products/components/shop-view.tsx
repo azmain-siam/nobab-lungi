@@ -76,7 +76,6 @@ export function ShopView() {
   // Fetch dynamic product and filter data from MongoDB
   useEffect(() => {
     let isMounted = true;
-    setLoading(true);
 
     const timer = setTimeout(() => {
       fetchPublicProductsAction({

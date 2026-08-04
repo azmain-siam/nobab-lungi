@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Star, Heart, Check, Minus, Plus, ShoppingBag, XCircle } from 'lucide-react';
+import { Star, Heart, Check, Minus, Plus, ShoppingBag, XCircle, Truck, Banknote, ShieldCheck } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/cart-context';
@@ -18,25 +18,32 @@ export interface ProductInfoData {
   price: string;
   originalPrice?: string;
   discountPercent?: number | null;
-  rating: string;
-  reviewsCount: number;
+  rating?: string;
+  reviewsCount?: number;
   badge?: string | null;
   inStock: boolean;
   stockCount: number;
-  fabricDetails: string;
+  fabricDetails?: string | null;
   color?: string | null;
   pattern?: string | null;
   weight?: string | null;
-  craftsmanship?: string;
-  origin?: string;
+  craftsmanship?: string | null;
+  origin?: string | null;
   images?: string[];
 }
 
 interface ProductInfoProps {
   product: ProductInfoData;
+  insideDhakaCharge?: number;
+  outsideDhakaCharge?: number;
+  estimatedDeliveryTime?: string;
 }
 
-export function ProductInfo({ product }: ProductInfoProps) {
+export function ProductInfo({
+  product,
+  insideDhakaCharge = 70,
+  outsideDhakaCharge = 130,
+}: ProductInfoProps) {
   const router = useRouter();
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
@@ -78,6 +85,15 @@ export function ProductInfo({ product }: ProductInfoProps) {
     router.push('/checkout');
   };
 
+  // Has specs helper
+  const hasSpecs =
+    Boolean(product.fabricDetails) ||
+    Boolean(product.color) ||
+    Boolean(product.pattern) ||
+    Boolean(product.weight) ||
+    Boolean(product.craftsmanship) ||
+    Boolean(product.origin);
+
   return (
     <div className="space-y-6">
       {/* Badges & Tags */}
@@ -87,7 +103,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
         {product.inStock && maxStock > 0 ? (
           <span className="flex items-center gap-1.5 text-xs text-emerald-700 font-medium bg-emerald-50 px-2.5 py-0.5 border border-emerald-200/60">
             <Check className="h-3 w-3 stroke-[2.5]" />
-            {maxStock <= 5 ? `Only ${maxStock} left in stock!` : `In Stock (${maxStock} available)`}
+            {maxStock <= 5 ? `Only ${maxStock} left in stock!` : `In Stock`}
           </span>
         ) : (
           <span className="flex items-center gap-1.5 text-xs text-rose-700 font-medium bg-rose-50 px-2.5 py-0.5 border border-rose-200/60">
@@ -102,11 +118,11 @@ export function ProductInfo({ product }: ProductInfoProps) {
         <h1 className="font-display text-3xl font-semibold tracking-tight text-[#1b1c1c] sm:text-4xl">
           {product.name}
         </h1>
-        {product.sku && (
+        {/* {product.sku && (
           <p className="mt-1 text-[11px] font-mono uppercase tracking-wider text-[#5e5e5b]">
             SKU: {product.sku}
           </p>
-        )}
+        )} */}
       </div>
 
       {/* Ratings */}
@@ -116,12 +132,20 @@ export function ProductInfo({ product }: ProductInfoProps) {
             <Star key={i} className="h-4 w-4 fill-current stroke-none" />
           ))}
         </div>
-        <span className="text-xs font-medium text-[#1b1c1c]">
-          {product.rating}
-        </span>
-        <span className="text-xs text-[#5e5e5b]">
-          ({product.reviewsCount} verified reviews)
-        </span>
+        {product.reviewsCount && product.reviewsCount > 0 ? (
+          <>
+            <span className="text-xs font-medium text-[#1b1c1c]">
+              {product.rating || '5.0'}
+            </span>
+            <span className="text-xs text-[#5e5e5b]">
+              ({product.reviewsCount} verified reviews)
+            </span>
+          </>
+        ) : (
+          <span className="text-xs text-[#5e5e5b]">
+            (No customer reviews yet)
+          </span>
+        )}
       </div>
 
       {/* Price & Savings */}
@@ -142,47 +166,77 @@ export function ProductInfo({ product }: ProductInfoProps) {
       </div>
 
       {/* Description */}
-      <p className="text-xs font-light leading-relaxed text-[#5e5e5b] sm:text-sm">
-        {product.description}
-      </p>
+      {product.description && (
+        <p className="text-xs font-light leading-relaxed text-[#5e5e5b] sm:text-sm">
+          {product.description}
+        </p>
+      )}
 
       {/* Specifications Grid */}
-      <div className="border-y border-[#e3e2e2] py-4 space-y-2 text-xs text-[#5e5e5b]">
-        {product.sku && (
-          <div className="flex justify-between">
-            <span className="font-medium text-[#1b1c1c]">SKU:</span>
-            <span className="font-mono text-[11px]">{product.sku}</span>
-          </div>
-        )}
-        <div className="flex justify-between">
-          <span className="font-medium text-[#1b1c1c]">Material:</span>
-          <span>{product.fabricDetails}</span>
+      {hasSpecs && (
+        <div className="border-y border-[#e3e2e2] py-4 space-y-2 text-xs text-[#5e5e5b]">
+          {product.fabricDetails && (
+            <div className="flex justify-between">
+              <span className="font-medium text-[#1b1c1c]">Material:</span>
+              <span>{product.fabricDetails}</span>
+            </div>
+          )}
+          {product.color && (
+            <div className="flex justify-between">
+              <span className="font-medium text-[#1b1c1c]">Color:</span>
+              <span>{product.color}</span>
+            </div>
+          )}
+          {product.pattern && (
+            <div className="flex justify-between">
+              <span className="font-medium text-[#1b1c1c]">Pattern:</span>
+              <span>{product.pattern}</span>
+            </div>
+          )}
+          {product.weight && (
+            <div className="flex justify-between">
+              <span className="font-medium text-[#1b1c1c]">Weight:</span>
+              <span>{product.weight}</span>
+            </div>
+          )}
+          {product.craftsmanship && (
+            <div className="flex justify-between">
+              <span className="font-medium text-[#1b1c1c]">Craftsmanship:</span>
+              <span>{product.craftsmanship}</span>
+            </div>
+          )}
+          {product.origin && (
+            <div className="flex justify-between">
+              <span className="font-medium text-[#1b1c1c]">Origin:</span>
+              <span>{product.origin}</span>
+            </div>
+          )}
         </div>
-        {product.color && (
-          <div className="flex justify-between">
-            <span className="font-medium text-[#1b1c1c]">Color:</span>
-            <span>{product.color}</span>
+      )}
+
+      {/* Subtle Near-Purchase Delivery & Policy Summary */}
+      <div className="rounded-none border border-[#e3e2e2] bg-[#fbf9f8] p-4 space-y-2.5 text-xs text-[#5e5e5b]">
+        <div className="flex items-center justify-between font-medium text-[#1b1c1c]">
+          <div className="flex items-center gap-2">
+            <Truck className="h-4 w-4 stroke-[1.5] text-amber-800" />
+            <span>Nationwide Delivery Available</span>
           </div>
-        )}
-        {product.pattern && (
-          <div className="flex justify-between">
-            <span className="font-medium text-[#1b1c1c]">Pattern:</span>
-            <span>{product.pattern}</span>
-          </div>
-        )}
-        {product.weight && (
-          <div className="flex justify-between">
-            <span className="font-medium text-[#1b1c1c]">Weight:</span>
-            <span>{product.weight}</span>
-          </div>
-        )}
-        <div className="flex justify-between">
-          <span className="font-medium text-[#1b1c1c]">Craftsmanship:</span>
-          <span>{product.craftsmanship || 'Traditional Handloom Weave'}</span>
+          <span className="text-[11px] font-normal text-[#5e5e5b]">Cash on Delivery</span>
         </div>
-        <div className="flex justify-between">
-          <span className="font-medium text-[#1b1c1c]">Origin:</span>
-          <span>{product.origin || 'Bangladesh'}</span>
+        <div className="pl-6 space-y-1 text-[11px]">
+          <p>• Inside Dhaka: <span className="font-medium text-[#1b1c1c]">৳{insideDhakaCharge}</span> (1–2 business days)</p>
+          <p>• Outside Dhaka: <span className="font-medium text-[#1b1c1c]">৳{outsideDhakaCharge}</span> (2–5 business days)</p>
+        </div>
+        <div className="flex items-center gap-3 pt-2 border-t border-[#e3e2e2]/60 text-[11px] text-[#1b1c1c] font-medium">
+          <div className="flex items-center gap-1.5">
+            <Banknote className="h-3.5 w-3.5 stroke-[1.5] text-emerald-700" />
+            <span>Pay on Delivery</span>
+          </div>
+          <span>•</span>
+          <div className="flex items-center gap-1.5">
+            <ShieldCheck className="h-3.5 w-3.5 stroke-[1.5] text-blue-700" />
+            <span>100% Handloom Authenticity</span>
+          </div>
         </div>
       </div>
 
@@ -197,7 +251,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
               onClick={decrementQuantity}
               disabled={quantity <= 1 || isOutOfStock}
               aria-label="Decrease quantity"
-              className="p-2.5 text-[#1b1c1c] transition hover:bg-[#efeded] disabled:opacity-30 disabled:cursor-not-allowed"
+              className="p-2.5 text-[#1b1c1c] transition hover:bg-[#efeded] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
             >
               <Minus className="h-3.5 w-3.5" />
             </button>
@@ -208,7 +262,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
               onClick={incrementQuantity}
               disabled={quantity >= maxStock || isOutOfStock}
               aria-label="Increase quantity"
-              className="p-2.5 text-[#1b1c1c] transition hover:bg-[#efeded] disabled:opacity-30 disabled:cursor-not-allowed"
+              className="p-2.5 text-[#1b1c1c] transition hover:bg-[#efeded] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
             >
               <Plus className="h-3.5 w-3.5" />
             </button>
@@ -239,16 +293,14 @@ export function ProductInfo({ product }: ProductInfoProps) {
           <button
             onClick={() => setIsWishlisted(!isWishlisted)}
             aria-label="Add to Wishlist"
-            className={`flex h-12 w-12 shrink-0 items-center justify-center border border-[#e3e2e2] transition ${
-              isWishlisted
+            className={`flex h-12 w-12 shrink-0 items-center justify-center border border-[#e3e2e2] transition cursor-pointer ${isWishlisted
                 ? 'bg-rose-50 border-rose-200 text-rose-600'
                 : 'bg-white text-[#1b1c1c] hover:bg-[#efeded]'
-            }`}
+              }`}
           >
             <Heart
-              className={`h-5 w-5 stroke-[1.5] ${
-                isWishlisted ? 'fill-current' : ''
-              }`}
+              className={`h-5 w-5 stroke-[1.5] ${isWishlisted ? 'fill-current' : ''
+                }`}
             />
           </button>
         </div>

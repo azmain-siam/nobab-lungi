@@ -23,9 +23,9 @@ function mapProductToCardData(product: ProductWithImages): ProductCardData {
   else if (product.is_best_seller) badge = 'Best Seller';
   else if (product.is_featured) badge = 'Featured';
 
-  const priceStr = `৳${(product.discount_price ?? product.price).toLocaleString()}`;
+  const priceStr = `৳${(product.discount_price ?? product.price).toLocaleString('en-BD')}`;
   const originalPriceStr = product.discount_price
-    ? `৳${product.price.toLocaleString()}`
+    ? `৳${product.price.toLocaleString('en-BD')}`
     : undefined;
 
   return {
@@ -103,9 +103,9 @@ export default async function ProductDetailsPage({
   else if (product.is_best_seller) badge = 'Best Seller';
   else if (product.is_featured) badge = 'Featured';
 
-  const priceStr = `৳${(product.discount_price ?? product.price).toLocaleString()}`;
+  const priceStr = `৳${(product.discount_price ?? product.price).toLocaleString('en-BD')}`;
   const originalPriceStr = product.discount_price
-    ? `৳${product.price.toLocaleString()}`
+    ? `৳${product.price.toLocaleString('en-BD')}`
     : undefined;
 
   const discountPercent =
@@ -124,8 +124,6 @@ export default async function ProductDetailsPage({
     price: priceStr,
     originalPrice: originalPriceStr,
     discountPercent,
-    rating: '5.0',
-    reviewsCount: 128,
     badge,
     inStock: product.stock > 0 && product.is_active,
     stockCount: product.stock,
@@ -149,7 +147,12 @@ export default async function ProductDetailsPage({
             <ProductGallery images={images} productName={product.name} />
           </div>
           <div className="lg:col-span-6">
-            <ProductInfo product={productInfoData} />
+            <ProductInfo
+              product={productInfoData}
+              insideDhakaCharge={storeSettings.delivery.inside_dhaka_charge}
+              outsideDhakaCharge={storeSettings.delivery.outside_dhaka_charge}
+              estimatedDeliveryTime={storeSettings.delivery.estimated_delivery_time}
+            />
           </div>
         </div>
 

@@ -220,7 +220,7 @@ export async function getAdminProducts(options?: {
 export async function getProductBySlug(slug: string): Promise<ProductWithImages | null> {
   try {
     await connectToDatabase();
-    const product = await Product.findOne({ slug, is_active: true }).lean();
+    const product = await Product.findOne({ slug, is_active: { $ne: false }, status: 'published' }).lean();
 
     if (!product) return null;
     return mapProductToProductWithImages(product as unknown as Record<string, unknown>);
@@ -236,13 +236,13 @@ export async function getProductById(id: string): Promise<ProductWithImages | nu
     let product = null;
 
     if (id.match(/^[0-9a-fA-F]{24}$/)) {
-      product = await Product.findOne({ _id: id, is_active: true }).lean();
+      product = await Product.findOne({ _id: id, is_active: { $ne: false }, status: 'published' }).lean();
     }
     if (!product) {
-      product = await Product.findOne({ slug: id, is_active: true }).lean();
+      product = await Product.findOne({ slug: id, is_active: { $ne: false }, status: 'published' }).lean();
     }
     if (!product && !isNaN(Number(id))) {
-      product = await Product.findOne({ id: Number(id), is_active: true }).lean();
+      product = await Product.findOne({ id: Number(id), is_active: { $ne: false }, status: 'published' }).lean();
     }
 
     if (!product) return null;
@@ -261,7 +261,7 @@ export async function getRelatedProducts(
   try {
     await connectToDatabase();
     const query: Record<string, unknown> = {
-      is_active: true,
+      is_active: { $ne: false },
       status: 'published',
     };
 
@@ -284,7 +284,11 @@ export async function getRelatedProducts(
       const needed = limit - products.length;
       const existingIds = products.map((p) => String(p._id));
       if (existingIds.length > 0) {
-        query._id = { $nin: existingIds };
+        if (query._id) {
+          query._id = { ...query._id as object, $nin: existingIds };
+        } else {
+          query._id = { $nin: existingIds };
+        }
       }
       const additional = (await Product.find(query).limit(needed).lean()) as unknown as Record<string, unknown>[];
       products = [...products, ...additional];

@@ -48,13 +48,13 @@
 
 ## Product Catalog
 
-- [x] Product List
-- [x] Product Details
-- [x] Search
-- [x] Filter
-- [x] Sorting
-- [x] Pagination
-- [x] Related Products
+- [x] Product List (/shop & /products)
+- [x] Product Details (Full MongoDB integration & Lightbox gallery)
+- [x] Search (Server-side debounced)
+- [x] Filter (Category, Collection, Price Range, In-Stock)
+- [x] Sorting (Newest, Oldest, Price Low/High, Best Sellers, Featured)
+- [x] Pagination (Server-side & URL State Persisted)
+- [x] Related Products (Dynamic Category & Collection matching)
 
 ---
 

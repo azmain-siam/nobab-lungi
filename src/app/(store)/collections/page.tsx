@@ -63,54 +63,54 @@ export default function CollectionsPage() {
   return (
     <Section variant="default" className="py-12 lg:py-20">
       <Container>
-              {/* Section Header */}
-              <SectionHeading
-                title="Curated Collections"
-                subtitle="Discover our signature series, handcrafted for every occasion."
-                align="left"
+        {/* Section Header */}
+        <SectionHeading
+          title="Curated Collections"
+          subtitle="Discover our signature series, handcrafted for every occasion."
+          align="left"
+        />
+
+        {/* Bento Grid */}
+        <div className="grid grid-cols-12 gap-6 mt-8">
+          {COLLECTIONS.map((collection) => (
+            <Link
+              key={collection.slug}
+              href={`/collections/${collection.slug}`}
+              className={`group relative col-span-12 ${collection.colSpan} ${collection.height} overflow-hidden rounded-2xl cursor-pointer`}
+            >
+              {/* Image */}
+              <Image
+                src={collection.image}
+                alt={collection.title}
+                fill
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                sizes="(max-width: 1024px) 100vw, 50vw"
               />
 
-              {/* Bento Grid */}
-              <div className="grid grid-cols-12 gap-6 mt-8">
-                {COLLECTIONS.map((collection) => (
-                  <Link
-                    key={collection.slug}
-                    href={`/collections/${collection.slug}`}
-                    className={`group relative col-span-12 ${collection.colSpan} ${collection.height} overflow-hidden rounded-2xl cursor-pointer`}
-                  >
-                    {/* Image */}
-                    <Image
-                      src={collection.image}
-                      alt={collection.title}
-                      fill
-                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                      sizes="(max-width: 1024px) 100vw, 50vw"
-                    />
+              {/* Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent transition-opacity duration-300 group-hover:opacity-90" />
 
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent transition-opacity duration-300 group-hover:opacity-90" />
+              {/* Content */}
+              <div className="absolute bottom-0 left-0 p-8 text-white max-w-xl transition-transform duration-300 group-hover:-translate-y-1">
+                <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-white/80 mb-1">
+                  {collection.tag}
+                </span>
+                <h2 className="font-display text-2xl font-semibold text-white sm:text-3xl">
+                  {collection.title}
+                </h2>
+                <p className="mt-2 text-xs font-light text-white/85 sm:text-sm line-clamp-2">
+                  {collection.description}
+                </p>
 
-                    {/* Content */}
-                    <div className="absolute bottom-0 left-0 p-8 text-white max-w-xl transition-transform duration-300 group-hover:-translate-y-1">
-                      <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-white/80 mb-1">
-                        {collection.tag}
-                      </span>
-                      <h2 className="font-display text-2xl font-semibold text-white sm:text-3xl">
-                        {collection.title}
-                      </h2>
-                      <p className="mt-2 text-xs font-light text-white/85 sm:text-sm line-clamp-2">
-                        {collection.description}
-                      </p>
-
-                      <div className="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white group-hover:underline">
-                        <span>Explore Collection</span>
-                        <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-                      </div>
-                    </div>
-                  </Link>
-                ))}
+                <div className="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white group-hover:underline">
+                  <span>Explore Collection</span>
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                </div>
               </div>
-            </Container>
-          </Section>
+            </Link>
+          ))}
+        </div>
+      </Container>
+    </Section>
   );
 }

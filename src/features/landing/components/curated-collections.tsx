@@ -78,9 +78,9 @@ export function CuratedCollections({ collections = [] }: CuratedCollectionsProps
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent transition-opacity duration-300 group-hover:opacity-90" />
                   <div className="absolute bottom-0 left-0 p-8 text-white transition-transform duration-300 group-hover:-translate-y-1">
-                    <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-white/80 mb-1">
+                    {/* <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-white/80 mb-1">
                       {col.is_featured ? 'FEATURED COLLECTION' : 'HANDLOOM SERIES'}
-                    </span>
+                    </span> */}
                     <h3 className="font-display text-2xl font-semibold text-white sm:text-3xl">
                       {col.name}
                     </h3>
