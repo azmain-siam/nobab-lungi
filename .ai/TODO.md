@@ -73,8 +73,8 @@
 - [x] Shipping Address (BD 11-digit phone validation)
 - [x] Delivery Charge (Dynamic Store Settings)
 - [x] Payment Method (COD default, 2-step bKash/Nagad selection with official logos & 1-click Copy)
-- [x] Coupon Integration (Real-time discount calculation)
-- [x] Server-Side Order Validation (Prices, Stock decrement, Delivery charges, TrxID validation)
+- [x] Coupon Integration (Real-time discount calculation & atomic usage incrementing)
+- [x] Server-Side Order Validation (Prices, Stock decrement, Delivery charges, TrxID validation, Rapid request deduplication)
 - [x] Order Success (/order-success/[id] with explicit confirmation copy)
 
 ---
@@ -82,7 +82,7 @@
 ## User Dashboard
 
 - [x] Profile
-- [x] Order History
+- [x] Order History (Connected to real MongoDB user order queries)
 - [x] Wishlist
 - [x] Address Management
 - [x] Order Tracking

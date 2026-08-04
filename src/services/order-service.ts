@@ -202,6 +202,24 @@ export async function createOrder(
       }
     }
 
+    // Deduplication check: Check if an identical order was created in the last 5 seconds
+    const fiveSecondsAgo = new Date(Date.now() - 5000);
+    const existingRecentOrder = await Order.findOne({
+      'shipping_address.phone': params.phone.trim(),
+      total_amount: serverGrandTotal,
+      payment_method: params.paymentMethod,
+      transaction_id: params.paymentMethod === 'cod' ? null : (params.transactionId?.trim() || null),
+      created_at: { $gte: fiveSecondsAgo },
+    }).lean();
+
+    if (existingRecentOrder) {
+      return {
+        success: true,
+        orderId: String(existingRecentOrder._id),
+        orderNumber: existingRecentOrder.order_number,
+      };
+    }
+
     // 6. Generate Order Number & Create Order Document
     const orderNumber = `NL-${Math.floor(100000 + Math.random() * 900000)}`;
     const initialTimeline = [

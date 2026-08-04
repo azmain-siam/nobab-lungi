@@ -445,7 +445,8 @@ export default function AdminOrdersPage() {
                   <th className="p-4 font-semibold">Order #</th>
                   <th className="p-4 font-semibold">Customer</th>
                   <th className="p-4 font-semibold">Total</th>
-                  <th className="p-4 font-semibold">Payment</th>
+                  <th className="p-4 font-semibold">Payment Status</th>
+                  <th className="p-4 font-semibold">Payment Method</th>
                   <th className="p-4 font-semibold">Delivery Tracking</th>
                   <th className="p-4 font-semibold">Order Status</th>
                   <th className="p-4 font-semibold">Date</th>
@@ -486,7 +487,14 @@ export default function AdminOrdersPage() {
                         <span className={`text-[10px] font-semibold px-2 py-0.5 border uppercase ${paymentColors[o.payment_status] || 'bg-[#f5f3f3]'}`}>
                           {o.payment_status.replace('_', ' ')}
                         </span>
-                        <div className="text-[9px] text-[#5e5e5b] uppercase mt-0.5">{o.payment_method}</div>
+                      </td>
+                      <td className="p-4">
+                        <span className="font-mono text-xs font-semibold uppercase text-[#1b1c1c] bg-[#f5f3f3] px-2 py-0.5 border border-[#e3e2e2]">
+                          {o.payment_method}
+                        </span>
+                        {o.transaction_id && (
+                          <div className="text-[9px] text-[#5e5e5b] font-mono mt-0.5">Trx: {o.transaction_id}</div>
+                        )}
                       </td>
                       <td className="p-4">
                         {o.tracking_number ? (
