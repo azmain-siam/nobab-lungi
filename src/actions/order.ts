@@ -11,6 +11,7 @@ export async function placeOrderAction(params: CreateOrderParams) {
     fullAddress: params.fullAddress,
     paymentMethod: params.paymentMethod,
     transactionId: params.transactionId,
+    couponCode: params.couponCode,
   });
 
   if (!parsed.success) {

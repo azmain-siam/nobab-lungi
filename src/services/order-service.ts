@@ -94,23 +94,112 @@ function mapOrderToOrderWithItems(doc: Record<string, unknown>): OrderWithItems 
   };
 }
 
+export interface CreateOrderParams {
+  userId?: string;
+  fullName: string;
+  phone: string;
+  deliveryArea: 'dhaka' | 'outside';
+  fullAddress: string;
+  paymentMethod: 'cod' | 'bkash' | 'nagad';
+  transactionId?: string;
+  couponCode?: string;
+  subtotal: number;
+  deliveryCharge: number;
+  grandTotal: number;
+  items: {
+    productId: string;
+    productName: string;
+    productPrice: number;
+    quantity: number;
+    image: string;
+  }[];
+}
+
 export async function createOrder(
   params: CreateOrderParams
 ): Promise<{ success: boolean; orderId?: string; orderNumber?: string; error?: string }> {
   try {
     await connectToDatabase();
 
+    // 1. Fetch Store Settings for authoritative delivery charges
+    const { getStoreSettings } = await import('@/services/settings-service');
+    const { validateCoupon } = await import('@/services/coupon-service');
+    const storeSettings = await getStoreSettings();
+
+    const serverDeliveryCharge =
+      params.deliveryArea === 'dhaka'
+        ? storeSettings.delivery.inside_dhaka_charge
+        : storeSettings.delivery.outside_dhaka_charge;
+
+    // 2. Validate Items & Recalculate Subtotal + Check Stock
+    let serverSubtotal = 0;
+    const validatedOrderItems = [];
+
+    for (const item of params.items) {
+      let product = null;
+      if (item.productId.match(/^[0-9a-fA-F]{24}$/)) {
+        product = await Product.findById(item.productId).lean();
+      }
+      if (!product) {
+        product = await Product.findOne({ slug: item.productId }).lean();
+      }
+
+      if (!product || product.is_active === false || product.status !== 'published') {
+        return { success: false, error: `Product "${item.productName}" is currently unavailable.` };
+      }
+
+      if (product.stock < item.quantity) {
+        return {
+          success: false,
+          error: `Insufficient stock for "${product.name}". Only ${product.stock} available.`,
+        };
+      }
+
+      const unitPrice =
+        product.discount_price && product.discount_price > 0 && product.discount_price < product.price
+          ? product.discount_price
+          : product.price;
+
+      const itemTotal = unitPrice * item.quantity;
+      serverSubtotal += itemTotal;
+
+      validatedOrderItems.push({
+        product_id: String(product._id),
+        product_name: product.name,
+        product_image: product.product_images?.[0]?.url || item.image,
+        unit_price: unitPrice,
+        quantity: item.quantity,
+        total_price: itemTotal,
+      });
+    }
+
+    // 3. Validate Coupon (if provided)
+    let serverDiscountAmount = 0;
+    let validatedCouponCode: string | null = null;
+    if (params.couponCode) {
+      const couponRes = await validateCoupon(params.couponCode, serverSubtotal);
+      if (couponRes.success && couponRes.discountAmount) {
+        serverDiscountAmount = couponRes.discountAmount;
+        validatedCouponCode = couponRes.code || params.couponCode.toUpperCase();
+      }
+    }
+
+    // 4. Recalculate Final Grand Total
+    const serverGrandTotal = Math.max(0, serverSubtotal - serverDiscountAmount) + serverDeliveryCharge;
+
+    // 5. Validate Mobile Banking Transaction ID
+    if (params.paymentMethod === 'bkash' || params.paymentMethod === 'nagad') {
+      const trxId = params.transactionId?.trim();
+      if (!trxId || trxId.length < 3) {
+        return {
+          success: false,
+          error: `Please enter a valid Transaction ID for ${params.paymentMethod === 'bkash' ? 'bKash' : 'Nagad'} payment.`,
+        };
+      }
+    }
+
+    // 6. Generate Order Number & Create Order Document
     const orderNumber = `NL-${Math.floor(100000 + Math.random() * 900000)}`;
-
-    const orderItems = params.items.map((item) => ({
-      product_id: item.productId,
-      product_name: item.productName,
-      product_image: item.image,
-      unit_price: item.productPrice,
-      quantity: item.quantity,
-      total_price: item.productPrice * item.quantity,
-    }));
-
     const initialTimeline = [
       {
         status: 'pending',
@@ -126,21 +215,31 @@ export async function createOrder(
       status: 'pending',
       payment_method: params.paymentMethod,
       payment_status: params.paymentMethod === 'cod' ? 'unpaid' : 'pending_verification',
-      subtotal: params.subtotal,
-      delivery_charge: params.deliveryCharge,
-      discount_amount: 0,
-      total_amount: params.grandTotal,
+      subtotal: serverSubtotal,
+      delivery_charge: serverDeliveryCharge,
+      discount_amount: serverDiscountAmount,
+      total_amount: serverGrandTotal,
       shipping_address: {
-        fullName: params.fullName,
-        phone: params.phone,
+        fullName: params.fullName.trim(),
+        phone: params.phone.trim(),
         deliveryArea: params.deliveryArea,
-        fullAddress: params.fullAddress,
+        fullAddress: params.fullAddress.trim(),
       },
-      transaction_id: params.transactionId || null,
-      notes: params.transactionId ? `Payment TrxID: ${params.transactionId}` : null,
-      order_items: orderItems,
+      transaction_id: params.paymentMethod === 'cod' ? null : (params.transactionId?.trim() || null),
+      coupon_code: validatedCouponCode,
+      notes: params.transactionId ? `Payment TrxID: ${params.transactionId.trim()}` : null,
+      order_items: validatedOrderItems,
       timeline: initialTimeline,
     });
+
+    // 7. Decrement stock for ordered products
+    for (const item of params.items) {
+      if (item.productId.match(/^[0-9a-fA-F]{24}$/)) {
+        await Product.updateOne({ _id: item.productId }, { $inc: { stock: -item.quantity } });
+      } else {
+        await Product.updateOne({ slug: item.productId }, { $inc: { stock: -item.quantity } });
+      }
+    }
 
     return {
       success: true,

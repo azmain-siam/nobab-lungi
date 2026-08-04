@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { Container } from '@/components/ui/container';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, Package, Truck, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Package, Truck, ArrowRight, PhoneCall } from 'lucide-react';
+import { getOrderById } from '@/services/order-service';
 
 export const metadata: Metadata = {
   title: 'Order Confirmed — Nabab Lungi',
@@ -14,33 +15,53 @@ export default async function OrderSuccessPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const order = await getOrderById(id);
+
+  const orderNumber = order ? order.order_number : id;
+  const totalAmount = order ? `৳${order.total.toLocaleString('en-BD')}` : null;
+  const paymentMethod = order ? order.payment_method : null;
+  const transactionId = order ? order.transaction_id : null;
+  const customerPhone = order ? order.shipping_address.phone : null;
 
   return (
     <div className="py-16 lg:py-24">
       <Container>
-        <div className="mx-auto max-w-2xl text-center space-y-6 bg-white border border-[#e3e2e2] p-8 sm:p-12">
+        <div className="mx-auto max-w-2xl text-center space-y-6 bg-white border border-[#e3e2e2] p-8 sm:p-12 shadow-xs">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-800">
             <CheckCircle2 className="h-8 w-8 stroke-[2]" />
           </div>
 
           <div className="space-y-2">
-            <span className="text-xs font-semibold uppercase tracking-widest text-[#5e5e5b]">
-              Order Confirmed
+            <span className="text-xs font-bold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-3 py-1 border border-emerald-200 inline-block">
+              ✓ Order Confirmed
             </span>
             <h1 className="font-display text-3xl font-semibold tracking-tight text-[#1b1c1c] sm:text-4xl">
               Thank You for Your Order!
             </h1>
-            <p className="font-display text-sm font-semibold text-[#1b1c1c]">
-              Order Reference: <span className="text-black underline">{id}</span>
+            <p className="font-mono text-sm font-bold text-[#1b1c1c] pt-1">
+              Order Number: <span className="text-black underline">#{orderNumber}</span>
             </p>
           </div>
 
-          <p className="text-xs font-light leading-relaxed text-[#5e5e5b] sm:text-sm max-w-md mx-auto">
-            We have received your order details. Our master weavers are preparing your handcrafted lungi for packaging and dispatch.
-          </p>
+          {/* Dynamic Confirmation Message */}
+          <div className="bg-[#fbf9f8] border border-[#e3e2e2] p-4 text-xs text-[#5e5e5b] leading-relaxed max-w-lg mx-auto">
+            {paymentMethod === 'cod' || !paymentMethod ? (
+              <p>
+                We have received your order details.{' '}
+                <strong className="text-[#1b1c1c]">
+                  We&apos;ll call you{customerPhone ? ` at ${customerPhone}` : ''} to confirm your order before dispatch.
+                </strong>
+              </p>
+            ) : (
+              <p>
+                Your <strong className="uppercase text-[#1b1c1c]">{paymentMethod}</strong> payment
+                {transactionId ? ` (TrxID: ${transactionId})` : ''} has been recorded. Our team will verify your payment and contact you{customerPhone ? ` at ${customerPhone}` : ''} to confirm delivery.
+              </p>
+            )}
+          </div>
 
-          {/* Delivery Timeline Card */}
-          <div className="border-t border-b border-[#e3e2e2] py-6 my-6 grid grid-cols-1 gap-4 sm:grid-cols-2 text-left text-xs">
+          {/* Delivery & Total Summary Card */}
+          <div className="border-t border-b border-[#e3e2e2] py-6 my-6 grid grid-cols-1 gap-4 sm:grid-cols-3 text-left text-xs">
             <div className="flex items-start gap-3">
               <Truck className="h-5 w-5 text-[#1b1c1c] stroke-[1.5] shrink-0 mt-0.5" />
               <div>
@@ -50,10 +71,20 @@ export default async function OrderSuccessPage({
             </div>
 
             <div className="flex items-start gap-3">
+              <PhoneCall className="h-5 w-5 text-[#1b1c1c] stroke-[1.5] shrink-0 mt-0.5" />
+              <div>
+                <h4 className="font-semibold text-[#1b1c1c]">Phone Confirmation</h4>
+                <p className="text-[#5e5e5b] mt-0.5">Prior to dispatch</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
               <Package className="h-5 w-5 text-[#1b1c1c] stroke-[1.5] shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-semibold text-[#1b1c1c]">Order Tracking</h4>
-                <p className="text-[#5e5e5b] mt-0.5">SMS updates will be sent to your phone</p>
+                <h4 className="font-semibold text-[#1b1c1c]">Total Payable</h4>
+                <p className="font-display font-bold text-sm text-[#1b1c1c] mt-0.5">
+                  {totalAmount || 'As per invoice'}
+                </p>
               </div>
             </div>
           </div>
@@ -63,8 +94,8 @@ export default async function OrderSuccessPage({
               Continue Shopping
               <ArrowRight className="h-4 w-4" />
             </Button>
-            <Button href="/" variant="secondary" size="lg">
-              Return to Home
+            <Button href="/account/orders" variant="secondary" size="lg">
+              View Order History
             </Button>
           </div>
         </div>

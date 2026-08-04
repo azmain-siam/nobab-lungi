@@ -7,6 +7,7 @@ export const checkoutSchema = z.object({
   fullAddress: z.string().min(5, 'Full delivery address is required.'),
   paymentMethod: z.enum(['cod', 'bkash', 'nagad']),
   transactionId: z.string().optional().nullable(),
+  couponCode: z.string().optional().nullable(),
 });
 
 export const orderStatusSchema = z.object({
