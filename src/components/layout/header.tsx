@@ -23,6 +23,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface HeaderProps {
   variant?: 'transparent' | 'light';
@@ -189,9 +190,15 @@ export function Header({ variant }: HeaderProps) {
             >
               <Heart className="h-5 w-5 stroke-[1.5]" />
               {wishlistCount > 0 && (
-                <span className="absolute -top-1.5 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-rose-600 text-[9px] font-bold text-white ring-2 ring-[#fbf9f8]">
+                <motion.span
+                  key={`wishlist-badge-${wishlistCount}`}
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.25, ease: [0.34, 1.56, 0.64, 1] }}
+                  className="absolute -top-1.5 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-rose-600 text-[9px] font-bold text-white ring-2 ring-[#fbf9f8]"
+                >
                   {wishlistCount}
-                </span>
+                </motion.span>
               )}
             </Link>
 
@@ -203,9 +210,15 @@ export function Header({ variant }: HeaderProps) {
             >
               <ShoppingBag className="h-5 w-5 stroke-[1.5]" />
               {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[9px] font-bold text-white ring-2 ring-[#fbf9f8]">
+                <motion.span
+                  key={`cart-badge-${cartCount}`}
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.25, ease: [0.34, 1.56, 0.64, 1] }}
+                  className="absolute -top-1.5 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[9px] font-bold text-white ring-2 ring-[#fbf9f8]"
+                >
                   {cartCount}
-                </span>
+                </motion.span>
               )}
             </button>
 
@@ -239,8 +252,15 @@ export function Header({ variant }: HeaderProps) {
               </button>
 
               {/* User Dropdown Menu Card */}
-              {userDropdownOpen && (
-                <div className="absolute right-0 mt-3 w-60 bg-white border border-[#e3e2e2] shadow-2xl py-2 z-50 text-left animate-in fade-in slide-in-from-top-2 duration-150">
+              <AnimatePresence>
+                {userDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                    className="absolute right-0 mt-3 w-60 bg-white border border-[#e3e2e2] shadow-2xl py-2 z-50 text-left"
+                  >
                   {user ? (
                     <>
                       {/* Header snippet */}
@@ -362,8 +382,9 @@ export function Header({ variant }: HeaderProps) {
                       </Link>
                     </div>
                   )}
-                </div>
+                </motion.div>
               )}
+              </AnimatePresence>
             </div>
 
 
@@ -371,8 +392,15 @@ export function Header({ variant }: HeaderProps) {
         </Container>
 
         {/* Mobile Dropdown Drawer */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-b border-[#e3e2e2] bg-white p-6 space-y-4 shadow-xl">
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="md:hidden border-b border-[#e3e2e2] bg-white p-6 space-y-4 shadow-xl overflow-hidden"
+            >
             <div className="flex flex-col space-y-4 text-sm font-semibold uppercase tracking-wider">
               <Link
                 href="/collections"
@@ -495,8 +523,9 @@ export function Header({ variant }: HeaderProps) {
                 )}
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
+        </AnimatePresence>
       </nav>
     </header>
   );

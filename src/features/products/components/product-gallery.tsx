@@ -12,6 +12,7 @@ import 'yet-another-react-lightbox/styles.css';
 import 'yet-another-react-lightbox/plugins/thumbnails.css';
 import 'yet-another-react-lightbox/plugins/counter.css';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 
 interface ProductGalleryProps {
@@ -128,22 +129,34 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
           onClick={() => setIsLightboxOpen(true)}
           className="relative aspect-[3/4] w-full flex-1 overflow-hidden bg-[#efeded] group cursor-zoom-in border border-[#e3e2e2]"
         >
-          {/* Base Image */}
-          <Image
-            src={currentImage}
-            alt={productName}
-            fill
-            priority
-            className={`object-cover transition-opacity duration-300 ${isHovering ? 'opacity-0 sm:opacity-100' : 'opacity-100'
-              }`}
-            sizes="(max-width: 1024px) 100vw, 50vw"
-            onError={() =>
-              setImageErrorMap((prev) => ({
-                ...prev,
-                [selectedImageIndex]: true,
-              }))
-            }
-          />
+          {/* Base Image with Framer Motion Crossfade */}
+          <AnimatePresence mode="popLayout">
+            <motion.div
+              key={selectedImageIndex}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute inset-0"
+            >
+              <Image
+                src={currentImage}
+                alt={productName}
+                fill
+                priority
+                className={`object-cover transition-opacity duration-300 ${
+                  isHovering ? 'opacity-0 sm:opacity-100' : 'opacity-100'
+                }`}
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                onError={() =>
+                  setImageErrorMap((prev) => ({
+                    ...prev,
+                    [selectedImageIndex]: true,
+                  }))
+                }
+              />
+            </motion.div>
+          </AnimatePresence>
 
           {/* Desktop Lens Zoom Effect */}
           {isHovering && (
