@@ -41,6 +41,14 @@ function mapProductToCardData(product: ProductWithImages): ProductCardData {
   };
 }
 
+const DEFAULT_SHOP_CATEGORIES = [
+  { id: 'lungi-premium-cotton', label: 'Premium Cotton' },
+  { id: 'lungi-export-quality', label: 'Export Quality' },
+  { id: 'lungi-check', label: 'Check Pattern' },
+  { id: 'lungi-printed', label: 'Printed Lungi' },
+  { id: 'lungi-handloom', label: 'Handloom Series' },
+];
+
 export function ShopView() {
   const searchParams = useSearchParams();
   const initialCollectionParam = searchParams?.get('collection') || searchParams?.get('collections');
@@ -50,13 +58,13 @@ export function ShopView() {
   const [selectedCollections, setSelectedCollections] = useState<string[]>(() =>
     initialCollectionParam ? [initialCollectionParam] : []
   );
-  const [priceRange, setPriceRange] = useState<[number, number]>([1000, 10000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([100, 10000]);
   const [selectedSort, setSelectedSort] = useState('featured');
   const [currentPage, setCurrentPage] = useState(1);
 
   const [products, setProducts] = useState<ProductCardData[]>([]);
   const [totalPages, setTotalPages] = useState(1);
-  const [categoriesData, setCategoriesData] = useState<{ id: string; label: string }[]>([]);
+  const [categoriesData, setCategoriesData] = useState<{ id: string; label: string }[]>(DEFAULT_SHOP_CATEGORIES);
   const [collectionsData, setCollectionsData] = useState<{ id: string; label: string }[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -160,7 +168,7 @@ export function ShopView() {
           selectedCategories={selectedCategories}
           selectedCollections={selectedCollections}
           priceRange={priceRange}
-          minPriceLimit={1000}
+          minPriceLimit={100}
           maxPriceLimit={10000}
           onCategoryToggle={handleCategoryToggle}
           onCollectionToggle={handleCollectionToggle}
@@ -206,7 +214,7 @@ export function ShopView() {
                   setSearchQuery('');
                   setSelectedCategories([]);
                   setSelectedCollections([]);
-                  setPriceRange([1000, 10000]);
+                  setPriceRange([100, 10000]);
                   setSelectedSort('featured');
                   setCurrentPage(1);
                 }}

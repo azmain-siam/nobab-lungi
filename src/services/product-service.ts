@@ -432,18 +432,34 @@ export async function getShopFilterData() {
   try {
     await connectToDatabase();
     const [categories, collections] = await Promise.all([
-      CategoryModel.find({ is_active: true }).sort({ sort_order: 1, name: 1 }).lean(),
-      CollectionModel.find({ is_active: true }).sort({ sort_order: 1, name: 1 }).lean(),
+      CategoryModel.find({ is_active: { $ne: false } }).sort({ sort_order: 1, name: 1 }).lean(),
+      CollectionModel.find({ is_active: { $ne: false } }).sort({ sort_order: 1, name: 1 }).lean(),
     ]);
 
-    return {
-      categories: categories.map((c) => ({
+    const filteredCategories = categories
+      .filter((c) => {
+        const isSareeType = c.parent_type === 'saree';
+        const nameLower = (c.name || '').toLowerCase();
+        return !isSareeType && !nameLower.includes('saree');
+      })
+      .map((c) => ({
         id: c.slug || String(c.id),
         numeric_id: c.id,
-        name: c.name,
+        name: c.name.replace(/\s+Lungi$/i, ''),
         slug: c.slug,
         parent_type: c.parent_type,
-      })),
+      }));
+
+    const defaultFallbackCategories = [
+      { id: 'lungi-premium-cotton', numeric_id: 1, name: 'Premium Cotton', slug: 'lungi-premium-cotton', parent_type: 'lungi' },
+      { id: 'lungi-export-quality', numeric_id: 2, name: 'Export Quality', slug: 'lungi-export-quality', parent_type: 'lungi' },
+      { id: 'lungi-check', numeric_id: 3, name: 'Check Pattern', slug: 'lungi-check', parent_type: 'lungi' },
+      { id: 'lungi-printed', numeric_id: 4, name: 'Printed Lungi', slug: 'lungi-printed', parent_type: 'lungi' },
+      { id: 'lungi-handloom', numeric_id: 5, name: 'Handloom Series', slug: 'lungi-handloom', parent_type: 'lungi' },
+    ];
+
+    return {
+      categories: filteredCategories.length > 0 ? filteredCategories : defaultFallbackCategories,
       collections: collections.map((col) => ({
         id: col.slug || String(col.id),
         numeric_id: col.id,
@@ -454,7 +470,16 @@ export async function getShopFilterData() {
     };
   } catch (error) {
     console.error('Error fetching shop filter data:', error);
-    return { categories: [], collections: [] };
+    return {
+      categories: [
+        { id: 'lungi-premium-cotton', numeric_id: 1, name: 'Premium Cotton', slug: 'lungi-premium-cotton', parent_type: 'lungi' },
+        { id: 'lungi-export-quality', numeric_id: 2, name: 'Export Quality', slug: 'lungi-export-quality', parent_type: 'lungi' },
+        { id: 'lungi-check', numeric_id: 3, name: 'Check Pattern', slug: 'lungi-check', parent_type: 'lungi' },
+        { id: 'lungi-printed', numeric_id: 4, name: 'Printed Lungi', slug: 'lungi-printed', parent_type: 'lungi' },
+        { id: 'lungi-handloom', numeric_id: 5, name: 'Handloom Series', slug: 'lungi-handloom', parent_type: 'lungi' },
+      ],
+      collections: [],
+    };
   }
 }
 
