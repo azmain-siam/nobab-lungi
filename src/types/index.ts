@@ -22,6 +22,8 @@ export type {
   Coupon,
   Review,
   Wishlist,
+  MostWishlistedProductItem,
+  WishlistInsights,
   Banner,
   HomepageConfig,
   HomepageSection,

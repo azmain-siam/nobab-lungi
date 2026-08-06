@@ -6,6 +6,7 @@ import { Star, Heart, Check, Minus, Plus, ShoppingBag, XCircle, Truck, Banknote,
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/cart-context';
+import { useWishlist } from '@/providers/wishlist-provider';
 
 export interface ProductInfoData {
   id: string;
@@ -46,8 +47,9 @@ export function ProductInfo({
 }: ProductInfoProps) {
   const router = useRouter();
   const { addToCart } = useCart();
+  const { isWishlisted, toggleWishlist } = useWishlist();
+  const wishlisted = isWishlisted(product.id);
   const [quantity, setQuantity] = useState(1);
-  const [isWishlisted, setIsWishlisted] = useState(false);
 
   const maxStock = Math.max(0, product.stockCount);
   const isOutOfStock = !product.inStock || maxStock <= 0;
@@ -291,15 +293,16 @@ export function ProductInfo({
             Buy Now
           </Button>
           <button
-            onClick={() => setIsWishlisted(!isWishlisted)}
-            aria-label="Add to Wishlist"
-            className={`flex h-12 w-12 shrink-0 items-center justify-center border border-[#e3e2e2] transition cursor-pointer ${isWishlisted
+            onClick={() => toggleWishlist({ id: product.id, name: product.name })}
+            aria-label={wishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
+            title={wishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
+            className={`flex h-12 w-12 shrink-0 items-center justify-center border border-[#e3e2e2] transition cursor-pointer ${wishlisted
                 ? 'bg-rose-50 border-rose-200 text-rose-600'
                 : 'bg-white text-[#1b1c1c] hover:bg-[#efeded]'
               }`}
           >
             <Heart
-              className={`h-5 w-5 stroke-[1.5] ${isWishlisted ? 'fill-current' : ''
+              className={`h-5 w-5 stroke-[1.5] transition-transform active:scale-125 ${wishlisted ? 'fill-current' : ''
                 }`}
             />
           </button>

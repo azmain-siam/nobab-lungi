@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter, Hanken_Grotesk } from 'next/font/google';
 import { CartProvider } from '@/context/cart-context';
 import { ToastProvider } from '@/providers/toast-provider';
+import { WishlistProvider } from '@/providers/wishlist-provider';
 import { SessionProvider } from '@/providers/session-provider';
 import { CartDrawer } from '@/components/shared/cart-drawer';
 import './globals.css';
@@ -38,10 +39,12 @@ export default function RootLayout({
       <body className="min-h-full bg-[#fbf9f8] text-[#1b1c1c] font-sans antialiased">
         <SessionProvider>
           <ToastProvider>
-            <CartProvider>
-              {children}
-              <CartDrawer />
-            </CartProvider>
+            <WishlistProvider>
+              <CartProvider>
+                {children}
+                <CartDrawer />
+              </CartProvider>
+            </WishlistProvider>
           </ToastProvider>
         </SessionProvider>
       </body>

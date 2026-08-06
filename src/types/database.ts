@@ -191,6 +191,26 @@ export interface Wishlist {
   created_at: string;
 }
 
+export interface MostWishlistedProductItem {
+  id: string;
+  name: string;
+  slug: string;
+  image: string;
+  price: number;
+  stock: number;
+  status: 'published' | 'draft';
+  wishlist_count: number;
+  is_high_demand_low_stock: boolean;
+}
+
+export interface WishlistInsights {
+  total_saves: number;
+  unique_customers: number;
+  wishlisted_products_count: number;
+  high_demand_low_stock_count: number;
+  most_wishlisted_products: MostWishlistedProductItem[];
+}
+
 export interface Banner {
   id:                 number;
   title:              string;

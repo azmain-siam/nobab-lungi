@@ -2,6 +2,7 @@
 
 import { Container } from '@/components/ui/container';
 import { useCart } from '@/context/cart-context';
+import { useWishlist } from '@/providers/wishlist-provider';
 import { useUser } from '@/features/auth/hooks/use-user';
 import {
   Heart,
@@ -38,6 +39,7 @@ export function Header({ variant }: HeaderProps) {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { openCart, cartCount } = useCart();
+  const { wishlistCount } = useWishlist();
   const { user, profile, signOut } = useUser();
 
   useEffect(() => {
@@ -179,9 +181,14 @@ export function Header({ variant }: HeaderProps) {
             <Link
               href="/account/wishlist"
               aria-label="Wishlist"
-              className="transition hover:opacity-75 focus:outline-none cursor-pointer"
+              className="relative transition hover:opacity-75 focus:outline-none cursor-pointer"
             >
               <Heart className="h-5 w-5 stroke-[1.5]" />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1.5 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-rose-600 text-[9px] font-bold text-white ring-2 ring-[#fbf9f8]">
+                  {wishlistCount}
+                </span>
+              )}
             </Link>
 
             {/* 3. Shopping Bag Drawer Button */}

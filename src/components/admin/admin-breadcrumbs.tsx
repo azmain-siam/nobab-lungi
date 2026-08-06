@@ -12,6 +12,7 @@ const PATH_LABELS: Record<string, string> = {
   orders: 'Orders',
   customers: 'Customers',
   coupons: 'Coupons',
+  wishlist: 'Wishlist Insights',
   settings: 'Settings',
   new: 'Create New',
   edit: 'Edit',
