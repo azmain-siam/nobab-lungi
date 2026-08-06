@@ -292,10 +292,10 @@ Refine empty states, loading skeletons, order success confirmation sequences, an
 - Order Success Card (`src/app/(store)/order-success/[id]/page.tsx`)
 
 **Tasks:**
-- [ ] Add sequenced entrance animation for Order Success page (Checkmark scale-in → Badge fade → Heading → Summary details).
-- [ ] Add smooth crossfade between loading skeleton and populated grid on Shop page filter change.
-- [ ] Add smooth fade transition when toggling between Empty state and populated list on Wishlist & Orders pages.
-- [ ] Add subtle hover elevation to Account overview dashboard metric cards.
+- [x] Add sequenced entrance animation for Order Success page (Checkmark scale-in → Badge fade → Heading → Summary details).
+- [x] Add smooth crossfade between loading skeleton and populated grid on Shop page filter change.
+- [x] Add smooth fade transition when toggling between Empty state and populated list on Wishlist & Orders pages.
+- [x] Add subtle hover elevation to Account overview dashboard metric cards.
 
 **UX Goal:**
 Provide a polished, complete end-to-end feeling across post-purchase and edge-case UI states.
@@ -310,7 +310,7 @@ Order success information must be immediately available to assistive tech.
 - Order success page feels calm, trustworthy, and premium.
 - Filter switching on Shop page transitions smoothly without harsh content flickering.
 
-**Status:** ⏳ Not Started
+**Status:** 🟢 Completed
 
 ---
 
@@ -442,11 +442,44 @@ If work is implemented but pending verification, mark as **⚠️ Needs Review**
 - [x] Zero hydration errors
 - [x] Existing functionality intact
 
+## Phase 4 — Optional Polish & State Transitions
+**Status:** 🟢 Completed
+**Completed Date:** 2026-08-06
+
+#### Implemented Features
+- Order Success Page (`/order-success/[id]`) calm sequenced entrance animation (`OrderSuccessCard`).
+- Shop Page (`/products`) catalog area opacity crossfade between loading skeleton, product grid, and empty state (`AnimatePresence mode="wait"` + `motion.div`).
+- Account Overview (`/account`) dashboard metric cards entrance stagger and hover elevation (`<StaggerContainer>` + `<StaggerItem>`).
+- Order History (`/account/orders`) order item list entrance stagger (`<StaggerContainer>` + `<StaggerItem>`).
+- Wishlist Page (`/account/wishlist`) smooth `AnimatePresence mode="wait"` crossfade between populated card grid and empty state view.
+
+#### Files & Components Changed
+- `src/components/shared/order-success-card.tsx`
+- `src/app/(store)/order-success/[id]/page.tsx`
+- `src/features/products/components/shop-view.tsx`
+- `src/app/(store)/account/page.tsx`
+- `src/app/(store)/account/orders/page.tsx`
+- `src/app/(store)/account/wishlist/page.tsx`
+
+#### Verification Checklist
+- [x] Desktop verified
+- [x] Mobile verified
+- [x] Responsive verified
+- [x] Reduced motion verified
+- [x] Zero console errors
+- [x] Zero hydration errors
+- [x] Existing functionality intact
+
 ---
 
 ## 13. Roadmap Change Log
 
 Any architectural adjustments or scope modifications to this roadmap must be logged here:
+
+### 2026-08-06
+- **Change**: Phase 4 implementation complete.
+- **Reason**: All Phase 4 tasks implemented, tested, and verified.
+- **Affected Phase**: Phase 4 — Optional Polish & State Transitions.
 
 ### 2026-08-06
 - **Change**: Phase 3 implementation complete.
@@ -495,11 +528,9 @@ PHASE 2 (Completed 🟢)
   ↓
 PHASE 3 (Completed 🟢)
   ↓
-IMPLEMENT → VERIFY → UPDATE ROADMAP & HISTORY
+PHASE 4 (Completed 🟢)
   ↓
-PHASE 4 (Next Step ⏳)
-  ↓
-IMPLEMENT → VERIFY → UPDATE ROADMAP & HISTORY
+ALL ROADMAP PHASES COMPLETED & VERIFIED 🟢
 ```
 
 **Rule**: Do NOT automatically start the next phase immediately. Each phase must be explicitly reviewed, implemented, tested, verified, and documented before moving forward.
@@ -508,9 +539,9 @@ IMPLEMENT → VERIFY → UPDATE ROADMAP & HISTORY
 
 ## 16. Current Project State
 
-- **Current Active Phase**: Phase 4 — Optional Polish & State Transitions
-- **Status**: ⏳ Not Started
-- **Next Action**: Review Phase 4 objectives, then begin Phase 4 implementation when requested.
+- **Current Active Phase**: All Phases Completed (Phases 1–4 🟢)
+- **Status**: 🟢 Fully Completed
+- **Summary**: All storefront animation roadmap phases are 100% implemented, tested, and verified with zero build/type/lint errors.
 
 ---
 *End of Storefront Animation Roadmap.*

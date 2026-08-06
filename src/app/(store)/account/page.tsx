@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { StaggerContainer, StaggerItem } from '@/components/ui/motion-wrappers';
 import { getUserOrders, getUserOrderStats } from '@/services/order-service';
 import {
   Package,
@@ -56,9 +57,9 @@ export default async function AccountPage() {
         </p>
       </div>
 
-      {/* Compact Real Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white border border-[#e3e2e2] p-5 space-y-1">
+      {/* Metric Cards Grid */}
+      <StaggerContainer className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <StaggerItem className="bg-white border border-[#e3e2e2] p-5 space-y-1 hover:border-[#1b1c1c]/40 transition">
           <div className="flex items-center justify-between text-[#5e5e5b]">
             <span className="text-[11px] font-semibold uppercase tracking-wider">Total Orders</span>
             <Package className="h-4 w-4 stroke-[1.5]" />
@@ -66,9 +67,9 @@ export default async function AccountPage() {
           <div className="font-display text-2xl font-bold text-[#1b1c1c]">
             {stats.totalOrders}
           </div>
-        </div>
+        </StaggerItem>
 
-        <div className="bg-white border border-[#e3e2e2] p-5 space-y-1">
+        <StaggerItem className="bg-white border border-[#e3e2e2] p-5 space-y-1 hover:border-[#1b1c1c]/40 transition">
           <div className="flex items-center justify-between text-[#5e5e5b]">
             <span className="text-[11px] font-semibold uppercase tracking-wider">Processing</span>
             <Clock className="h-4 w-4 stroke-[1.5] text-amber-700" />
@@ -76,9 +77,9 @@ export default async function AccountPage() {
           <div className="font-display text-2xl font-bold text-[#1b1c1c]">
             {stats.processingOrders}
           </div>
-        </div>
+        </StaggerItem>
 
-        <div className="bg-white border border-[#e3e2e2] p-5 space-y-1">
+        <StaggerItem className="bg-white border border-[#e3e2e2] p-5 space-y-1 hover:border-[#1b1c1c]/40 transition">
           <div className="flex items-center justify-between text-[#5e5e5b]">
             <span className="text-[11px] font-semibold uppercase tracking-wider">Delivered</span>
             <CheckCircle2 className="h-4 w-4 stroke-[1.5] text-emerald-700" />
@@ -86,9 +87,9 @@ export default async function AccountPage() {
           <div className="font-display text-2xl font-bold text-[#1b1c1c]">
             {stats.deliveredOrders}
           </div>
-        </div>
+        </StaggerItem>
 
-        <div className="bg-white border border-[#e3e2e2] p-5 space-y-1">
+        <StaggerItem className="bg-white border border-[#e3e2e2] p-5 space-y-1 hover:border-[#1b1c1c]/40 transition">
           <div className="flex items-center justify-between text-[#5e5e5b]">
             <span className="text-[11px] font-semibold uppercase tracking-wider">Wishlist</span>
             <Heart className="h-4 w-4 stroke-[1.5] text-rose-700" />
@@ -96,8 +97,8 @@ export default async function AccountPage() {
           <div className="font-display text-2xl font-bold text-[#1b1c1c]">
             3
           </div>
-        </div>
-      </div>
+        </StaggerItem>
+      </StaggerContainer>
 
       {/* Recent Orders Section */}
       <div className="bg-white border border-[#e3e2e2] p-6 sm:p-8 space-y-6">

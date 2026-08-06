@@ -9,6 +9,7 @@ import { ShopPagination } from './shop-pagination';
 import { MobileFilterDrawer } from './mobile-filter-drawer';
 import { MobileSortModal } from './mobile-sort-modal';
 import { PackageX } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { StaggerContainer, StaggerItem } from '@/components/ui/motion-wrappers';
 import { fetchPublicProductsAction } from '@/features/products/actions/shop-actions';
 import type { ProductWithImages } from '@/types';
@@ -370,46 +371,70 @@ export function ShopView() {
 
         {/* Product Grid Area (2 Columns on Mobile, 3 Columns on Desktop) */}
         <div className="flex-1 space-y-8">
-          {loading ? (
-            /* Loading Skeleton Grid */
-            <div className="grid grid-cols-2 gap-4 sm:gap-8 lg:grid-cols-3">
-              {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
-                <div key={i} className="animate-pulse space-y-3">
-                  <div className="aspect-[3/4] w-full bg-[#efeded]" />
-                  <div className="h-3 w-1/3 bg-[#efeded]" />
-                  <div className="h-4 w-2/3 bg-[#efeded]" />
-                  <div className="h-3 w-full bg-[#efeded]" />
-                  <div className="h-4 w-1/4 bg-[#efeded]" />
-                </div>
-              ))}
-            </div>
-          ) : products.length > 0 ? (
-            <StaggerContainer className="grid grid-cols-2 gap-4 sm:gap-8 lg:grid-cols-3">
-              {products.map((product) => (
-                <StaggerItem key={product.id}>
-                  <ProductCard product={product} />
-                </StaggerItem>
-              ))}
-            </StaggerContainer>
-          ) : (
-            /* Empty State */
-            <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl border border-dashed border-[#e3e2e2] bg-[#f5f3f3]/40">
-              <PackageX className="h-10 w-10 text-[#5e5e5b] stroke-[1.2]" />
-              <h3 className="mt-4 font-display text-base font-semibold text-[#1b1c1c]">
-                No matching products found
-              </h3>
-              <p className="mt-1 text-xs text-[#5e5e5b] max-w-xs">
-                Try adjusting your search query, fabric, pattern, color, or price range filter.
-              </p>
-              <button
-                onClick={handleClearAll}
-                aria-label="Clear all filters"
-                className="mt-6 bg-black text-white px-5 py-2.5 text-xs font-semibold uppercase tracking-wider rounded-none hover:bg-black/90 transition cursor-pointer"
+          <AnimatePresence mode="wait">
+            {loading ? (
+              /* Loading Skeleton Grid */
+              <motion.div
+                key="skeleton"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="grid grid-cols-2 gap-4 sm:gap-8 lg:grid-cols-3"
               >
-                Clear All Filters
-              </button>
-            </div>
-          )}
+                {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+                  <div key={i} className="animate-pulse space-y-3">
+                    <div className="aspect-[3/4] w-full bg-[#efeded]" />
+                    <div className="h-3 w-1/3 bg-[#efeded]" />
+                    <div className="h-4 w-2/3 bg-[#efeded]" />
+                    <div className="h-3 w-full bg-[#efeded]" />
+                    <div className="h-4 w-1/4 bg-[#efeded]" />
+                  </div>
+                ))}
+              </motion.div>
+            ) : products.length > 0 ? (
+              <motion.div
+                key="grid"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+              >
+                <StaggerContainer className="grid grid-cols-2 gap-4 sm:gap-8 lg:grid-cols-3">
+                  {products.map((product) => (
+                    <StaggerItem key={product.id}>
+                      <ProductCard product={product} />
+                    </StaggerItem>
+                  ))}
+                </StaggerContainer>
+              </motion.div>
+            ) : (
+              /* Empty State */
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-col items-center justify-center py-20 text-center rounded-2xl border border-dashed border-[#e3e2e2] bg-[#f5f3f3]/40"
+              >
+                <PackageX className="h-10 w-10 text-[#5e5e5b] stroke-[1.2]" />
+                <h3 className="mt-4 font-display text-base font-semibold text-[#1b1c1c]">
+                  No matching products found
+                </h3>
+                <p className="mt-1 text-xs text-[#5e5e5b] max-w-xs">
+                  Try adjusting your search query, fabric, pattern, color, or price range filter.
+                </p>
+                <button
+                  onClick={handleClearAll}
+                  aria-label="Clear all filters"
+                  className="mt-6 bg-black text-white px-5 py-2.5 text-xs font-semibold uppercase tracking-wider rounded-none hover:bg-black/90 active:scale-95 transition cursor-pointer"
+                >
+                  Clear All Filters
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Pagination */}
           {!loading && (

@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getUserOrders } from '@/services/order-service';
 import { Badge } from '@/components/ui/badge';
+import { StaggerContainer, StaggerItem } from '@/components/ui/motion-wrappers';
 import { Package, ChevronRight, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -32,7 +33,7 @@ export default async function OrderHistoryPage() {
       </div>
 
       {orders.length > 0 ? (
-        <div className="space-y-4">
+        <StaggerContainer className="space-y-4">
           {orders.map((order) => {
             const itemsSummary = order.order_items
               .map((item) => `${item.product_name} x ${item.quantity}`)
@@ -45,7 +46,7 @@ export default async function OrderHistoryPage() {
             });
 
             return (
-              <div
+              <StaggerItem
                 key={order.id}
                 className="border border-[#e3e2e2] p-5 space-y-3 bg-[#fbf9f8]/60 hover:bg-white transition"
               >
@@ -101,10 +102,10 @@ export default async function OrderHistoryPage() {
                     </Link>
                   </div>
                 </div>
-              </div>
+              </StaggerItem>
             );
           })}
-        </div>
+        </StaggerContainer>
       ) : (
         <div className="p-12 text-center space-y-3 bg-[#fbf9f8]/40 border border-dashed border-[#e3e2e2]">
           <div className="p-3 bg-white border border-[#e3e2e2] w-fit mx-auto text-[#5e5e5b]">
