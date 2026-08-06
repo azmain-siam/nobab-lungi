@@ -2,6 +2,7 @@
 
 import { Container } from '@/components/ui/container';
 import { useCart } from '@/context/cart-context';
+import { useWishlist } from '@/providers/wishlist-provider';
 import { useUser } from '@/features/auth/hooks/use-user';
 import {
   Heart,
@@ -22,6 +23,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface HeaderProps {
   variant?: 'transparent' | 'light';
@@ -38,6 +40,7 @@ export function Header({ variant }: HeaderProps) {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { openCart, cartCount } = useCart();
+  const { wishlistCount } = useWishlist();
   const { user, profile, signOut } = useUser();
 
   useEffect(() => {
@@ -80,7 +83,7 @@ export function Header({ variant }: HeaderProps) {
       }
       return 'absolute top-0 left-0 right-0 z-50 w-full bg-transparent transition-all duration-300';
     }
-    return 'sticky top-0 z-50 w-full border-b border-[#e3e2e2] bg-[#fbf9f8]/95 backdrop-blur-md transition-all duration-300';
+    return 'sticky top-0 z-50 w-full bg-[#fbf9f8]/95 backdrop-blur-md transition-all duration-300 shadow';
   };
 
   const isDarkText = !isTransparentVariant;
@@ -151,10 +154,14 @@ export function Header({ variant }: HeaderProps) {
               SHOP
             </Link>
             <Link
-              href="/#about"
-              className={`text-xs font-semibold uppercase tracking-[0.15em] transition ${isDarkText
-                ? 'text-[#5e5e5b] hover:text-[#1b1c1c]'
-                : 'text-white/80 hover:text-white'
+              href="/about"
+              className={`relative text-xs font-semibold uppercase tracking-[0.15em] transition ${pathname.startsWith('/about')
+                ? isDarkText
+                  ? 'text-[#1b1c1c] after:absolute after:-bottom-1 after:left-0 after:h-[1.5px] after:w-full after:bg-[#1b1c1c]'
+                  : 'text-white after:absolute after:-bottom-1 after:left-0 after:h-[1px] after:w-full after:bg-white'
+                : isDarkText
+                  ? 'text-[#5e5e5b] hover:text-[#1b1c1c]'
+                  : 'text-white/80 hover:text-white'
                 }`}
             >
               ABOUT
@@ -179,9 +186,20 @@ export function Header({ variant }: HeaderProps) {
             <Link
               href="/account/wishlist"
               aria-label="Wishlist"
-              className="transition hover:opacity-75 focus:outline-none cursor-pointer"
+              className="relative transition hover:opacity-75 focus:outline-none cursor-pointer"
             >
               <Heart className="h-5 w-5 stroke-[1.5]" />
+              {wishlistCount > 0 && (
+                <motion.span
+                  key={`wishlist-badge-${wishlistCount}`}
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.25, ease: [0.34, 1.56, 0.64, 1] }}
+                  className="absolute -top-1.5 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-rose-600 text-[9px] font-bold text-white ring-2 ring-[#fbf9f8]"
+                >
+                  {wishlistCount}
+                </motion.span>
+              )}
             </Link>
 
             {/* 3. Shopping Bag Drawer Button */}
@@ -192,9 +210,15 @@ export function Header({ variant }: HeaderProps) {
             >
               <ShoppingBag className="h-5 w-5 stroke-[1.5]" />
               {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[9px] font-bold text-white ring-2 ring-[#fbf9f8]">
+                <motion.span
+                  key={`cart-badge-${cartCount}`}
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.25, ease: [0.34, 1.56, 0.64, 1] }}
+                  className="absolute -top-1.5 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[9px] font-bold text-white ring-2 ring-[#fbf9f8]"
+                >
                   {cartCount}
-                </span>
+                </motion.span>
               )}
             </button>
 
@@ -228,8 +252,15 @@ export function Header({ variant }: HeaderProps) {
               </button>
 
               {/* User Dropdown Menu Card */}
-              {userDropdownOpen && (
-                <div className="absolute right-0 mt-3 w-60 bg-white border border-[#e3e2e2] shadow-2xl py-2 z-50 text-left animate-in fade-in slide-in-from-top-2 duration-150">
+              <AnimatePresence>
+                {userDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                    className="absolute right-0 mt-3 w-60 bg-white border border-[#e3e2e2] shadow-2xl py-2 z-50 text-left"
+                  >
                   {user ? (
                     <>
                       {/* Header snippet */}
@@ -351,8 +382,9 @@ export function Header({ variant }: HeaderProps) {
                       </Link>
                     </div>
                   )}
-                </div>
+                </motion.div>
               )}
+              </AnimatePresence>
             </div>
 
 
@@ -360,8 +392,15 @@ export function Header({ variant }: HeaderProps) {
         </Container>
 
         {/* Mobile Dropdown Drawer */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-b border-[#e3e2e2] bg-white p-6 space-y-4 shadow-xl">
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="md:hidden border-b border-[#e3e2e2] bg-white p-6 space-y-4 shadow-xl overflow-hidden"
+            >
             <div className="flex flex-col space-y-4 text-sm font-semibold uppercase tracking-wider">
               <Link
                 href="/collections"
@@ -378,7 +417,7 @@ export function Header({ variant }: HeaderProps) {
                 Shop
               </Link>
               <Link
-                href="/#about"
+                href="/about"
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-[#1b1c1c] hover:text-[#5e5e5b]"
               >
@@ -484,8 +523,9 @@ export function Header({ variant }: HeaderProps) {
                 )}
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
+        </AnimatePresence>
       </nav>
     </header>
   );

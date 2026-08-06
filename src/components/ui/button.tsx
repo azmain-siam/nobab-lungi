@@ -19,7 +19,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    'inline-flex items-center justify-center font-semibold uppercase tracking-[0.15em] rounded-none transition focus:outline-none cursor-pointer';
+    'inline-flex items-center justify-center font-semibold uppercase tracking-[0.15em] rounded-none transition-all duration-150 active:scale-[0.97] focus:outline-none cursor-pointer motion-reduce:transform-none';
 
   const variantStyles = {
     primary: 'bg-[#1b1c1c] text-white hover:bg-black/90',

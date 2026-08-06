@@ -42,18 +42,19 @@
 - [x] Product Catalog Sections (New Arrivals & Best Sellers)
 - [x] Brand Heritage Spotlight
 - [x] Trust Badges & Footer Header Layouts
+- [x] Full Homepage MongoDB CMS Integration
 
 ---
 
 ## Product Catalog
 
-- [x] Product List
-- [x] Product Details
-- [x] Search
-- [x] Filter
-- [x] Sorting
-- [x] Pagination
-- [x] Related Products
+- [x] Product List (/shop & /products)
+- [x] Product Details (Full MongoDB integration & Lightbox gallery)
+- [x] Search (Server-side debounced)
+- [x] Filter (Category, Collection, Price Range, In-Stock)
+- [x] Sorting (Newest, Oldest, Price Low/High, Best Sellers, Featured)
+- [x] Pagination (Server-side & URL State Persisted)
+- [x] Related Products (Dynamic Category & Collection matching)
 
 ---
 
@@ -69,19 +70,19 @@
 
 ## Checkout
 
-- [x] Shipping Address
-- [x] Delivery Charge
-- [x] Payment Method
-- [x] Order Review
-- [x] Place Order
-- [x] Order Success
+- [x] Shipping Address (BD 11-digit phone validation)
+- [x] Delivery Charge (Dynamic Store Settings)
+- [x] Payment Method (COD default, 2-step bKash/Nagad selection with official logos & 1-click Copy)
+- [x] Coupon Integration (Real-time discount calculation & atomic usage incrementing)
+- [x] Server-Side Order Validation (Prices, Stock decrement, Delivery charges, TrxID validation, Rapid request deduplication)
+- [x] Order Success (/order-success/[id] with explicit confirmation copy)
 
 ---
 
 ## User Dashboard
 
 - [x] Profile
-- [x] Order History
+- [x] Order History (Connected to real MongoDB user order queries)
 - [x] Wishlist
 - [x] Address Management
 - [x] Order Tracking
@@ -98,7 +99,7 @@
 - [x] Banner Management
 - [x] Homepage Management (CMS)
 - [x] Customer Management
-- [x] Coupon Management
+- [x] Coupon Management (Full MongoDB CRUD, percentage/fixed discounts, usage tracking, start/expiry dates, search & status filters)
 - [x] Store Settings
 
 ---

@@ -1,6 +1,18 @@
 import { Truck, ShieldCheck, RefreshCw, Banknote } from 'lucide-react';
 
-export function DeliveryInfo() {
+interface DeliveryInfoProps {
+  insideDhakaCharge?: number;
+  outsideDhakaCharge?: number;
+  estimatedDeliveryTime?: string;
+  returnPolicyDays?: number;
+}
+
+export function DeliveryInfo({
+  insideDhakaCharge = 70,
+  outsideDhakaCharge = 130,
+  estimatedDeliveryTime = '2-3 business days in Dhaka, 3-5 days outside Dhaka',
+  returnPolicyDays = 7,
+}: DeliveryInfoProps) {
   return (
     <div className="rounded-none border border-[#e3e2e2] bg-[#f5f3f3]/50 p-6 space-y-5">
       <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-[#1b1c1c]">
@@ -14,8 +26,9 @@ export function DeliveryInfo() {
           <div>
             <h4 className="font-semibold text-[#1b1c1c]">Nationwide Delivery</h4>
             <p className="mt-0.5 text-[11px]">
-              Inside Dhaka: ৳60 (2-3 Days)<br />
-              Outside Dhaka: ৳120 (3-5 Days)
+              Inside Dhaka: ৳{insideDhakaCharge}<br />
+              Outside Dhaka: ৳{outsideDhakaCharge}<br />
+              <span className="text-[10px] text-[#5e5e5b]/80">({estimatedDeliveryTime})</span>
             </p>
           </div>
         </div>
@@ -35,9 +48,9 @@ export function DeliveryInfo() {
         <div className="flex items-start gap-3">
           <RefreshCw className="h-5 w-5 text-[#1b1c1c] stroke-[1.5] shrink-0 mt-0.5" />
           <div>
-            <h4 className="font-semibold text-[#1b1c1c]">7-Day Easy Returns</h4>
+            <h4 className="font-semibold text-[#1b1c1c]">{returnPolicyDays}-Day Easy Returns</h4>
             <p className="mt-0.5 text-[11px]">
-              Return or exchange unwashed items within 7 days of receiving.
+              Return or exchange unwashed items within {returnPolicyDays} days of receiving.
             </p>
           </div>
         </div>

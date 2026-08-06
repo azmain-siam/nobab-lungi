@@ -6,6 +6,7 @@ import { Heart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/cart-context';
+import { useWishlist } from '@/providers/wishlist-provider';
 
 export interface ProductCardData {
   id: string;
@@ -28,6 +29,9 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
+  const { isWishlisted, toggleWishlist } = useWishlist();
+  const wishlisted = isWishlisted(product.id);
+
   const collectionTag = product.collectionTag ?? 'Heritage';
   const description =
     product.description ?? 'Hand-woven fine cotton with traditional Bangladeshi techniques.';
@@ -37,6 +41,12 @@ export function ProductCard({ product }: ProductCardProps) {
     e.preventDefault();
     e.stopPropagation();
     addToCart(product);
+  };
+
+  const handleWishlistToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleWishlist({ id: product.id, name: product.name });
   };
 
   return (
@@ -64,14 +74,20 @@ export function ProductCard({ product }: ProductCardProps) {
 
         {/* Top-Right Wishlist Heart */}
         <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-          aria-label="Wishlist"
-          className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#1b1c1c] shadow-sm transition hover:bg-white focus:outline-none z-10"
+          onClick={handleWishlistToggle}
+          aria-label={wishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
+          title={wishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
+          className={`absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full shadow-sm transition focus:outline-none z-10 cursor-pointer ${
+            wishlisted
+              ? 'bg-rose-50 text-red-600 hover:bg-rose-100 ring-1 ring-rose-200'
+              : 'bg-white/90 text-[#1b1c1c] hover:bg-white'
+          }`}
         >
-          <Heart className="h-4 w-4 stroke-[1.5]" />
+          <Heart
+            className={`h-4 w-4 stroke-[1.5] transition-transform active:scale-125 ${
+              wishlisted ? 'fill-current' : ''
+            }`}
+          />
         </button>
 
         {/* Animated Quick Add Button */}

@@ -16,6 +16,8 @@ import {
   ChevronRight,
   Sliders,
   X,
+  Ticket,
+  Heart,
 } from 'lucide-react';
 
 const ADMIN_NAV = [
@@ -26,7 +28,8 @@ const ADMIN_NAV = [
   { href: '/dashboard/homepage', label: 'Homepage CMS', icon: Sliders },
   { href: '/dashboard/orders', label: 'Orders', icon: ShoppingCart },
   { href: '/dashboard/customers', label: 'Customers', icon: Users },
-  // { href: '/dashboard/coupons', label: 'Coupons', icon: Ticket },
+  { href: '/dashboard/coupons', label: 'Coupons', icon: Ticket },
+  { href: '/dashboard/wishlist', label: 'Wishlist Insights', icon: Heart },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ];
 

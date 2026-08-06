@@ -2,73 +2,68 @@ import { ProductCard, type ProductCardData } from '@/components/shared/product-c
 import { Section } from '@/components/ui/section';
 import { Container } from '@/components/ui/container';
 import { SectionHeading } from '@/components/ui/section-heading';
+import { RevealOnScroll, StaggerContainer, StaggerItem } from '@/components/ui/motion-wrappers';
+import type { ProductWithImages } from '@/types';
 
-const PRODUCTS: ProductCardData[] = [
-  {
-    id: '1',
-    name: 'Heritage Check Lungi',
-    collectionTag: 'Heritage',
-    description: '100% fine cotton yarn with traditional Bengali check pattern.',
-    image: 'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?q=80&w=600&auto=format&fit=crop',
-    rating: '5.0',
-    reviewsCount: 128,
-    price: '৳1,250',
-    badge: 'New Arrival',
-  },
-  {
-    id: '2',
-    name: 'Silk Cotton Blend',
-    collectionTag: 'Executive',
-    description: 'Premium silk blend for executive comfort and occasion wear.',
-    image: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?q=80&w=600&auto=format&fit=crop',
-    rating: '5.0',
-    reviewsCount: 95,
-    price: '৳2,850',
-    originalPrice: '৳3,200',
-    badge: 'Premium',
-  },
-  {
-    id: '3',
-    name: 'Midnight Indigo',
-    collectionTag: 'Heritage',
-    description: 'Hand-woven fine cotton with traditional pattern borders.',
-    image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=600&auto=format&fit=crop',
-    rating: '5.0',
-    reviewsCount: 210,
-    price: '৳1,450',
-    badge: null,
-  },
-  {
-    id: '4',
-    name: 'Classic White Cotton',
-    collectionTag: 'Luxury',
-    description: 'Breathable everyday cotton comfort designed for easy lounge.',
-    image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=600&auto=format&fit=crop',
-    rating: '5.0',
-    reviewsCount: 58,
-    price: '৳950',
-    badge: null,
-    subTag: 'Limited Edition',
-  },
-];
+function mapProductToCardData(product: ProductWithImages): ProductCardData {
+  const coverImage =
+    product.product_images.find((img) => img.is_cover)?.url ||
+    product.product_images[0]?.url ||
+    'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?q=80&w=600&auto=format&fit=crop';
 
-export function BestSellers() {
+  const hasDiscount = product.discount_price && product.discount_price > 0 && product.discount_price < product.price;
+
+  return {
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    description: product.short_description || product.description || 'Authentic handloom cotton lungi.',
+    image: coverImage,
+    price: hasDiscount
+      ? `৳${product.discount_price?.toLocaleString('en-BD')}`
+      : `৳${product.price.toLocaleString('en-BD')}`,
+    originalPrice: hasDiscount ? `৳${product.price.toLocaleString('en-BD')}` : undefined,
+    badge: product.is_best_seller
+      ? 'Best Seller'
+      : product.is_new_arrival
+      ? 'New Arrival'
+      : product.is_featured
+      ? 'Featured'
+      : null,
+  };
+}
+
+interface BestSellersProps {
+  products?: ProductWithImages[];
+}
+
+export function BestSellers({ products = [] }: BestSellersProps) {
+  const displayProducts = products.map(mapProductToCardData);
+
+  if (displayProducts.length === 0) return null;
+
   return (
     <Section id="shop" variant="default" className="py-20 lg:py-28">
       <Container>
         {/* Section Header */}
-        <SectionHeading
-          title="Best Sellers"
-          subtitle="Discover the pieces our community loves most."
-          align="center"
-        />
+        <RevealOnScroll>
+          <SectionHeading
+            title="Best Sellers"
+            subtitle="Discover the handloom pieces our community loves most."
+            actionHref="/products"
+            actionLabel="VIEW ALL"
+            align="center"
+          />
+        </RevealOnScroll>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {PRODUCTS.map((product) => (
-            <ProductCard key={product.id} product={product} />
+        <StaggerContainer className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {displayProducts.map((product) => (
+            <StaggerItem key={product.id}>
+              <ProductCard product={product} />
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </Container>
     </Section>
   );

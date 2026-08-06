@@ -1,6 +1,7 @@
 import { connectToDatabase } from '@/lib/db';
 import { Product } from '@/models/Product';
 import { Category as CategoryModel } from '@/models/Category';
+import { Collection as CollectionModel } from '@/models/Collection';
 import type { ProductWithImages } from '@/types';
 
 export interface AdminProductListItem extends ProductWithImages {
@@ -219,7 +220,7 @@ export async function getAdminProducts(options?: {
 export async function getProductBySlug(slug: string): Promise<ProductWithImages | null> {
   try {
     await connectToDatabase();
-    const product = await Product.findOne({ slug, is_active: true }).lean();
+    const product = await Product.findOne({ slug, is_active: { $ne: false }, status: 'published' }).lean();
 
     if (!product) return null;
     return mapProductToProductWithImages(product as unknown as Record<string, unknown>);
@@ -232,7 +233,17 @@ export async function getProductBySlug(slug: string): Promise<ProductWithImages 
 export async function getProductById(id: string): Promise<ProductWithImages | null> {
   try {
     await connectToDatabase();
-    const product = await Product.findById(id).lean();
+    let product = null;
+
+    if (id.match(/^[0-9a-fA-F]{24}$/)) {
+      product = await Product.findOne({ _id: id, is_active: { $ne: false }, status: 'published' }).lean();
+    }
+    if (!product) {
+      product = await Product.findOne({ slug: id, is_active: { $ne: false }, status: 'published' }).lean();
+    }
+    if (!product && !isNaN(Number(id))) {
+      product = await Product.findOne({ id: Number(id), is_active: { $ne: false }, status: 'published' }).lean();
+    }
 
     if (!product) return null;
     return mapProductToProductWithImages(product as unknown as Record<string, unknown>);
@@ -241,3 +252,275 @@ export async function getProductById(id: string): Promise<ProductWithImages | nu
     return null;
   }
 }
+
+export async function getRelatedProducts(
+  categoryId?: number | null,
+  currentProductId?: string,
+  limit = 4
+): Promise<ProductWithImages[]> {
+  try {
+    await connectToDatabase();
+    const query: Record<string, unknown> = {
+      is_active: { $ne: false },
+      status: 'published',
+    };
+
+    if (currentProductId) {
+      if (currentProductId.match(/^[0-9a-fA-F]{24}$/)) {
+        query._id = { $ne: currentProductId };
+      } else {
+        query.slug = { $ne: currentProductId };
+      }
+    }
+
+    let products: Record<string, unknown>[] = [];
+    if (categoryId && categoryId > 0) {
+      query.category_id = categoryId;
+      products = (await Product.find(query).limit(limit).lean()) as unknown as Record<string, unknown>[];
+    }
+
+    if (products.length < limit) {
+      delete query.category_id;
+      const needed = limit - products.length;
+      const existingIds = products.map((p) => String(p._id));
+      if (existingIds.length > 0) {
+        if (query._id) {
+          query._id = { ...query._id as object, $nin: existingIds };
+        } else {
+          query._id = { $nin: existingIds };
+        }
+      }
+      const additional = (await Product.find(query).limit(needed).lean()) as unknown as Record<string, unknown>[];
+      products = [...products, ...additional];
+    }
+
+    return products.map((p) => mapProductToProductWithImages(p));
+  } catch (error) {
+    console.error('Error fetching related products:', error);
+    return [];
+  }
+}
+
+export interface PublicProductsQueryOptions {
+  search?: string;
+  categoryId?: number;
+  collectionId?: number;
+  categories?: string[];
+  collections?: string[];
+  fabrics?: string[];
+  patterns?: string[];
+  colors?: string[];
+  inStockOnly?: boolean;
+  minPrice?: number;
+  maxPrice?: number;
+  sort?: string;
+  page?: number;
+  limit?: number;
+}
+
+export async function getPublicProducts(options?: PublicProductsQueryOptions): Promise<{
+  products: ProductWithImages[];
+  total: number;
+  pages: number;
+  currentPage: number;
+}> {
+  try {
+    await connectToDatabase();
+
+    const search = options?.search?.trim();
+    const categoryId = options?.categoryId;
+    const collectionId = options?.collectionId;
+    const categories = options?.categories;
+    const collections = options?.collections;
+    const fabrics = options?.fabrics;
+    const patterns = options?.patterns;
+    const colors = options?.colors;
+    const inStockOnly = options?.inStockOnly;
+    const minPrice = options?.minPrice;
+    const maxPrice = options?.maxPrice;
+    const sort = options?.sort || 'featured';
+    const page = Math.max(1, options?.page || 1);
+    const limit = Math.max(1, options?.limit || 6);
+
+    const query: Record<string, unknown> = {
+      is_active: true,
+      status: 'published',
+    };
+
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { sku: { $regex: search, $options: 'i' } },
+        { slug: { $regex: search, $options: 'i' } },
+        { short_description: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    if (categoryId && categoryId > 0) {
+      query.category_id = Number(categoryId);
+    } else if (categories && categories.length > 0) {
+      const categoryDocIds: number[] = [];
+      const categoryDocs = await CategoryModel.find({
+        $or: [
+          { slug: { $in: categories } },
+          { id: { $in: categories.map((c) => Number(c)).filter((n) => !isNaN(n)) } },
+        ],
+      }).lean();
+      categoryDocs.forEach((c) => categoryDocIds.push(c.id));
+
+      if (categoryDocIds.length > 0) {
+        query.category_id = { $in: categoryDocIds };
+      }
+    }
+
+    if (collectionId && collectionId > 0) {
+      query.collection_ids = Number(collectionId);
+    } else if (collections && collections.length > 0) {
+      const collectionDocIds: number[] = [];
+      const collectionDocs = await CollectionModel.find({
+        $or: [
+          { slug: { $in: collections } },
+          { id: { $in: collections.map((c) => Number(c)).filter((n) => !isNaN(n)) } },
+        ],
+      }).lean();
+      collectionDocs.forEach((col) => collectionDocIds.push(col.id));
+
+      if (collectionDocIds.length > 0) {
+        query.collection_ids = { $in: collectionDocIds };
+      }
+    }
+
+    if (fabrics && fabrics.length > 0) {
+      query.fabric = { $in: fabrics.map((f) => new RegExp(f, 'i')) };
+    }
+
+    if (patterns && patterns.length > 0) {
+      query.pattern = { $in: patterns.map((p) => new RegExp(p, 'i')) };
+    }
+
+    if (colors && colors.length > 0) {
+      query.color = { $in: colors.map((c) => new RegExp(c, 'i')) };
+    }
+
+    if (inStockOnly) {
+      query.stock = { $gt: 0 };
+    }
+
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      const priceQuery: Record<string, number> = {};
+      if (minPrice !== undefined) priceQuery.$gte = minPrice;
+      if (maxPrice !== undefined) priceQuery.$lte = maxPrice;
+      query.price = priceQuery;
+    }
+
+    let sortOption: Record<string, 1 | -1> = { created_at: -1 };
+
+    switch (sort) {
+      case 'price-low':
+      case 'price_asc':
+        sortOption = { price: 1 };
+        break;
+      case 'price-high':
+      case 'price_desc':
+        sortOption = { price: -1 };
+        break;
+      case 'newest':
+        sortOption = { created_at: -1 };
+        break;
+      case 'featured':
+      default:
+        sortOption = { is_featured: -1, created_at: -1 };
+    }
+
+    const total = await Product.countDocuments(query);
+    const pages = Math.ceil(total / limit) || 1;
+
+    const docs = await Product.find(query)
+      .sort(sortOption)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean();
+
+    const products = docs.map((doc) =>
+      mapProductToProductWithImages(doc as unknown as Record<string, unknown>)
+    );
+
+    return { products, total, pages, currentPage: page };
+  } catch (error) {
+    console.error('Error fetching public products:', error);
+    return { products: [], total: 0, pages: 1, currentPage: 1 };
+  }
+}
+
+export async function getShopFilterData() {
+  try {
+    await connectToDatabase();
+    const [categories, collections, dbFabrics, dbPatterns, dbColors] = await Promise.all([
+      CategoryModel.find({ is_active: { $ne: false } }).sort({ sort_order: 1, name: 1 }).lean(),
+      CollectionModel.find({ is_active: { $ne: false } }).sort({ sort_order: 1, name: 1 }).lean(),
+      Product.distinct('fabric', { status: 'published', is_active: true }),
+      Product.distinct('pattern', { status: 'published', is_active: true }),
+      Product.distinct('color', { status: 'published', is_active: true }),
+    ]);
+
+    const filteredCategories = categories
+      .filter((c) => {
+        const isSareeType = c.parent_type === 'saree';
+        const nameLower = (c.name || '').toLowerCase();
+        return !isSareeType && !nameLower.includes('saree');
+      })
+      .map((c) => ({
+        id: c.slug || String(c.id),
+        numeric_id: c.id,
+        name: c.name.replace(/\s+Lungi$/i, ''),
+        slug: c.slug,
+        parent_type: c.parent_type,
+      }));
+
+    const defaultFallbackCategories = [
+      { id: 'lungi-premium-cotton', numeric_id: 1, name: 'Premium Cotton', slug: 'lungi-premium-cotton', parent_type: 'lungi' },
+      { id: 'lungi-export-quality', numeric_id: 2, name: 'Export Quality', slug: 'lungi-export-quality', parent_type: 'lungi' },
+      { id: 'lungi-check', numeric_id: 3, name: 'Check Pattern', slug: 'lungi-check', parent_type: 'lungi' },
+      { id: 'lungi-printed', numeric_id: 4, name: 'Printed Lungi', slug: 'lungi-printed', parent_type: 'lungi' },
+      { id: 'lungi-handloom', numeric_id: 5, name: 'Handloom Series', slug: 'lungi-handloom', parent_type: 'lungi' },
+    ];
+
+    const cleanDbFabrics = (dbFabrics as string[]).filter((f) => f && typeof f === 'string' && f.trim() !== '');
+    const cleanDbPatterns = (dbPatterns as string[]).filter((p) => p && typeof p === 'string' && p.trim() !== '');
+    const cleanDbColors = (dbColors as string[]).filter((c) => c && typeof c === 'string' && c.trim() !== '');
+
+    const fallbackFabrics = ['100% Combed Cotton', 'Fine Organic Linen', 'Mercerized Cotton', 'Traditional Handloom'];
+    const fallbackPatterns = ['Classic Check', 'Elegance Stripe', 'Solid Tone', 'Printed Motif', 'Border Weave'];
+    const fallbackColors = ['Navy Blue', 'Deep Maroon', 'Forest Green', 'Charcoal Black', 'Off White'];
+
+    return {
+      categories: filteredCategories.length > 0 ? filteredCategories : defaultFallbackCategories,
+      collections: collections.map((col) => ({
+        id: col.slug || String(col.id),
+        numeric_id: col.id,
+        name: col.name,
+        slug: col.slug,
+        is_featured: col.is_featured,
+      })),
+      fabrics: cleanDbFabrics.length > 0 ? cleanDbFabrics : fallbackFabrics,
+      patterns: cleanDbPatterns.length > 0 ? cleanDbPatterns : fallbackPatterns,
+      colors: cleanDbColors.length > 0 ? cleanDbColors : fallbackColors,
+    };
+  } catch (error) {
+    console.error('Error fetching shop filter data:', error);
+    return {
+      categories: [
+        { id: 'lungi-premium-cotton', numeric_id: 1, name: 'Premium Cotton', slug: 'lungi-premium-cotton', parent_type: 'lungi' },
+        { id: 'lungi-export-quality', numeric_id: 2, name: 'Export Quality', slug: 'lungi-export-quality', parent_type: 'lungi' },
+        { id: 'lungi-check', numeric_id: 3, name: 'Check Pattern', slug: 'lungi-check', parent_type: 'lungi' },
+        { id: 'lungi-printed', numeric_id: 4, name: 'Printed Lungi', slug: 'lungi-printed', parent_type: 'lungi' },
+        { id: 'lungi-handloom', numeric_id: 5, name: 'Handloom Series', slug: 'lungi-handloom', parent_type: 'lungi' },
+      ],
+      collections: [],
+      fabrics: ['100% Combed Cotton', 'Fine Organic Linen', 'Mercerized Cotton', 'Traditional Handloom'],
+      patterns: ['Classic Check', 'Elegance Stripe', 'Solid Tone', 'Printed Motif', 'Border Weave'],
+      colors: ['Navy Blue', 'Deep Maroon', 'Forest Green', 'Charcoal Black', 'Off White'],
+    };
+  }
+}
+

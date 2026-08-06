@@ -1,84 +1,45 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { Container } from '@/components/ui/container';
 import { ProductGallery } from '@/features/products/components/product-gallery';
-import { ProductInfo } from '@/features/products/components/product-info';
+import { ProductInfo, type ProductInfoData } from '@/features/products/components/product-info';
 import { DeliveryInfo } from '@/features/products/components/delivery-info';
 import { ProductReviews } from '@/features/products/components/product-reviews';
 import { RelatedProducts } from '@/features/products/components/related-products';
+import { getProductById, getRelatedProducts } from '@/services/product-service';
+import { getCategoryById } from '@/services/category-service';
+import { getStoreSettings } from '@/services/settings-service';
+import type { ProductCardData } from '@/components/shared/product-card';
+import type { ProductWithImages } from '@/types';
 
-const PRODUCT_DATABASE: Record<string, {
-  id: string;
-  name: string;
-  collectionTag: string;
-  categoryTag: string;
-  description: string;
-  price: string;
-  originalPrice?: string;
-  rating: string;
-  reviewsCount: number;
-  badge?: string | null;
-  inStock: boolean;
-  fabricDetails: string;
-  images: string[];
-}> = {
-  '1': {
-    id: '1',
-    name: 'Midnight Indigo Lungi',
-    collectionTag: 'Heritage Collection',
-    categoryTag: 'Lungi',
-    description:
-      'Hand-woven fine cotton lungi crafted using traditional Bangladeshi dyeing and weaving techniques. Breathable, durable, and styled for effortless luxury.',
-    price: '৳2,450',
-    originalPrice: '৳3,200',
-    rating: '5.0',
-    reviewsCount: 128,
-    badge: 'New Arrival',
-    inStock: true,
-    fabricDetails: '100% Organic Superfine Combed Cotton (60s count)',
-    images: [
-      'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?q=80&w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?q=80&w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=800&auto=format&fit=crop',
-    ],
-  },
-  '2': {
-    id: '2',
-    name: 'Charcoal Silk Weave',
-    collectionTag: 'Executive Series',
-    categoryTag: 'Lungi',
-    description:
-      'Premium silk-cotton blend designed for special occasions and executive loungewear. Features subtle lustrous metallic thread borders.',
-    price: '৳4,800',
-    originalPrice: '৳5,500',
-    rating: '5.0',
-    reviewsCount: 95,
-    badge: 'Premium',
-    inStock: true,
-    fabricDetails: '50% Mulberry Silk / 50% Fine Egyptian Cotton',
-    images: [
-      'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?q=80&w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800&auto=format&fit=crop',
-    ],
-  },
-  '3': {
-    id: '3',
-    name: 'Earth Tone Essential',
-    collectionTag: 'Luxury Cotton',
-    categoryTag: 'Lungi',
-    description:
-      'Ultra-soft everyday lounge lungi made with breathable fine yarn weave. Perfect for warm Bangladeshi climates.',
-    price: '৳1,850',
-    rating: '5.0',
-    reviewsCount: 210,
-    badge: null,
-    inStock: true,
-    fabricDetails: '100% Breathable Fine Handloom Cotton',
-    images: [
-      'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?q=80&w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=800&auto=format&fit=crop',
-    ],
-  },
-};
+function mapProductToCardData(product: ProductWithImages): ProductCardData {
+  const coverImage =
+    product.product_images?.find((img) => img.is_cover)?.url ||
+    product.product_images?.[0]?.url ||
+    'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?q=80&w=600&auto=format&fit=crop';
+
+  let badge: string | null = null;
+  if (product.is_new_arrival) badge = 'New Arrival';
+  else if (product.is_best_seller) badge = 'Best Seller';
+  else if (product.is_featured) badge = 'Featured';
+
+  const priceStr = `৳${(product.discount_price ?? product.price).toLocaleString('en-BD')}`;
+  const originalPriceStr = product.discount_price
+    ? `৳${product.price.toLocaleString('en-BD')}`
+    : undefined;
+
+  return {
+    id: product.id,
+    slug: product.slug,
+    name: product.name,
+    collectionTag: product.fabric || 'Heritage',
+    description: product.short_description || product.description || undefined,
+    image: coverImage,
+    price: priceStr,
+    originalPrice: originalPriceStr,
+    badge,
+  };
+}
 
 export async function generateMetadata({
   params,
@@ -86,10 +47,27 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const product = PRODUCT_DATABASE[id] || PRODUCT_DATABASE['1'];
+  const product = await getProductById(id);
+
+  if (!product) {
+    return {
+      title: 'Product Not Found — Nabab Lungi',
+      description: 'The requested product could not be found.',
+    };
+  }
+
   return {
     title: `${product.name} — Nabab Lungi`,
-    description: product.description,
+    description:
+      product.seo_description ||
+      product.short_description ||
+      product.description ||
+      `Buy authentic ${product.name} handcrafted in Bangladesh.`,
+    openGraph: {
+      title: product.name,
+      description: product.short_description || product.description || '',
+      images: product.product_images?.[0]?.url ? [product.product_images[0].url] : [],
+    },
   };
 }
 
@@ -99,7 +77,66 @@ export default async function ProductDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product = PRODUCT_DATABASE[id] || PRODUCT_DATABASE['1'];
+  const [product, storeSettings] = await Promise.all([
+    getProductById(id),
+    getStoreSettings(),
+  ]);
+
+  if (!product) {
+    notFound();
+  }
+
+  const [category, relatedDocs] = await Promise.all([
+    product.category_id ? getCategoryById(product.category_id) : Promise.resolve(null),
+    getRelatedProducts(product.category_id, product.id, 4),
+  ]);
+
+  const images =
+    product.product_images && product.product_images.length > 0
+      ? product.product_images.map((img) => img.url)
+      : [
+          'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?q=80&w=800&auto=format&fit=crop',
+        ];
+
+  let badge: string | null = null;
+  if (product.is_new_arrival) badge = 'New Arrival';
+  else if (product.is_best_seller) badge = 'Best Seller';
+  else if (product.is_featured) badge = 'Featured';
+
+  const priceStr = `৳${(product.discount_price ?? product.price).toLocaleString('en-BD')}`;
+  const originalPriceStr = product.discount_price
+    ? `৳${product.price.toLocaleString('en-BD')}`
+    : undefined;
+
+  const discountPercent =
+    product.discount_price && product.discount_price < product.price
+      ? Math.round(((product.price - product.discount_price) / product.price) * 100)
+      : null;
+
+  const productInfoData: ProductInfoData = {
+    id: product.id,
+    slug: product.slug,
+    sku: product.sku,
+    name: product.name,
+    collectionTag: product.fabric || category?.name || 'Heritage Collection',
+    categoryTag: category?.name || 'Lungi',
+    description: product.description || product.short_description || '',
+    price: priceStr,
+    originalPrice: originalPriceStr,
+    discountPercent,
+    badge,
+    inStock: product.stock > 0 && product.is_active,
+    stockCount: product.stock,
+    fabricDetails: product.fabric || '100% Organic Superfine Combed Cotton',
+    color: product.color,
+    pattern: product.pattern,
+    weight: product.weight,
+    craftsmanship: 'Traditional Handloom Weave',
+    origin: product.country_of_origin || 'Bangladesh',
+    images,
+  };
+
+  const relatedProducts: ProductCardData[] = relatedDocs.map(mapProductToCardData);
 
   return (
     <div className="py-12 lg:py-16">
@@ -107,24 +144,30 @@ export default async function ProductDetailsPage({
         {/* Upper Product Stage: Gallery (Left) & Information (Right) */}
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-6">
-            <ProductGallery
-              images={product.images}
-              productName={product.name}
-            />
+            <ProductGallery images={images} productName={product.name} />
           </div>
           <div className="lg:col-span-6">
-            <ProductInfo product={product} />
+            <ProductInfo
+              product={productInfoData}
+              insideDhakaCharge={storeSettings.delivery.inside_dhaka_charge}
+              outsideDhakaCharge={storeSettings.delivery.outside_dhaka_charge}
+              estimatedDeliveryTime={storeSettings.delivery.estimated_delivery_time}
+            />
           </div>
         </div>
 
-        {/* Delivery & Policy Card */}
-        <DeliveryInfo />
+        {/* Delivery & Policy Card (Dynamic Store Settings) */}
+        <DeliveryInfo
+          insideDhakaCharge={storeSettings.delivery.inside_dhaka_charge}
+          outsideDhakaCharge={storeSettings.delivery.outside_dhaka_charge}
+          estimatedDeliveryTime={storeSettings.delivery.estimated_delivery_time}
+        />
 
         {/* Product Reviews */}
         <ProductReviews />
 
         {/* Related Products */}
-        <RelatedProducts />
+        <RelatedProducts products={relatedProducts} />
       </Container>
     </div>
   );
