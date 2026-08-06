@@ -2,6 +2,7 @@ import { ProductCard, type ProductCardData } from '@/components/shared/product-c
 import { Section } from '@/components/ui/section';
 import { Container } from '@/components/ui/container';
 import { SectionHeading } from '@/components/ui/section-heading';
+import { RevealOnScroll, StaggerContainer, StaggerItem } from '@/components/ui/motion-wrappers';
 import type { ProductWithImages } from '@/types';
 
 function mapProductToCardData(product: ProductWithImages): ProductCardData {
@@ -39,19 +40,23 @@ export function NewArrivals({ products = [] }: NewArrivalsProps) {
     <Section id="new-arrivals" variant="default" className="py-20 lg:py-28 bg-[#f5f3f3]/50">
       <Container>
         {/* Section Header */}
-        <SectionHeading
-          title="New Arrivals Showcase"
-          subtitle="Explore the latest handcrafted drops straight from the loom."
-          actionHref="/products"
-          actionLabel="EXPLORE ALL"
-        />
+        <RevealOnScroll>
+          <SectionHeading
+            title="New Arrivals Showcase"
+            subtitle="Explore the latest handcrafted drops straight from the loom."
+            actionHref="/products"
+            actionLabel="EXPLORE ALL"
+          />
+        </RevealOnScroll>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <StaggerContainer className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {displayProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <StaggerItem key={product.id}>
+              <ProductCard product={product} />
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </Container>
     </Section>
   );

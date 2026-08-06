@@ -39,6 +39,80 @@ export function RevealOnScroll({
   );
 }
 
+interface StaggerContainerProps {
+  children: React.ReactNode;
+  className?: string;
+  staggerDelay?: number;
+}
+
+export function StaggerContainer({
+  children,
+  className = '',
+  staggerDelay = 0.08,
+}: StaggerContainerProps) {
+  const shouldReduceMotion = useReducedMotion();
+
+  if (shouldReduceMotion) {
+    return <div className={className}>{children}</div>;
+  }
+
+  return (
+    <motion.div
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, margin: '-30px' }}
+      variants={{
+        hidden: {},
+        show: {
+          transition: {
+            staggerChildren: staggerDelay,
+          },
+        },
+      }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+interface StaggerItemProps {
+  children: React.ReactNode;
+  className?: string;
+  distance?: number;
+}
+
+export function StaggerItem({
+  children,
+  className = '',
+  distance = 16,
+}: StaggerItemProps) {
+  const shouldReduceMotion = useReducedMotion();
+
+  if (shouldReduceMotion) {
+    return <div className={className}>{children}</div>;
+  }
+
+  return (
+    <motion.div
+      variants={{
+        hidden: { opacity: 0, y: distance },
+        show: {
+          opacity: 1,
+          y: 0,
+          transition: {
+            duration: 0.45,
+            ease: [0.16, 1, 0.3, 1],
+          },
+        },
+      }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 // Common Motion Design Tokens & Variants
 export const easeOutExpo = [0.16, 1, 0.3, 1] as const;
 

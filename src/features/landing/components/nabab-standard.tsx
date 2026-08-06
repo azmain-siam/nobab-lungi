@@ -1,6 +1,7 @@
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { SectionHeading } from "@/components/ui/section-heading";
+import { RevealOnScroll, StaggerContainer, StaggerItem } from "@/components/ui/motion-wrappers";
 import type { HomepageConfig } from "@/types";
 import {
   Award,
@@ -75,13 +76,15 @@ export function NababStandard({ items = [] }: NababStandardProps) {
   return (
     <Section variant="default" className="py-20 lg:py-28">
       <Container>
-        <SectionHeading title="The Nabab Standard" align="center" />
+        <RevealOnScroll>
+          <SectionHeading title="The Nabab Standard" align="center" />
+        </RevealOnScroll>
 
-        <div className="mt-16 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <StaggerContainer className="mt-16 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {cards.map((item) => {
             const IconComponent = ICON_MAP[item.icon] || Sparkles;
             return (
-              <div
+              <StaggerItem
                 key={item.id || item.title}
                 className="group text-center space-y-4 cursor-default"
               >
@@ -94,10 +97,10 @@ export function NababStandard({ items = [] }: NababStandardProps) {
                 <p className="mx-auto max-w-xs text-xs leading-relaxed text-[#5e5e5b]">
                   {item.description}
                 </p>
-              </div>
+              </StaggerItem>
             );
           })}
-        </div>
+        </StaggerContainer>
       </Container>
     </Section>
   );

@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Section } from '@/components/ui/section';
 import { Container } from '@/components/ui/container';
+import { RevealOnScroll } from '@/components/ui/motion-wrappers';
 import type { HomepageConfig } from '@/types';
 
 interface BrandStoryProps {
@@ -26,18 +27,20 @@ export function HeritageBrandStory({ story }: BrandStoryProps) {
       <Container>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Image (Left) */}
-          <div className="lg:col-span-6 relative h-[380px] sm:h-[450px] overflow-hidden rounded-2xl border border-white/10">
-            <Image
-              src={imageUrl}
-              alt={title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-          </div>
+          <RevealOnScroll distance={30} className="lg:col-span-6">
+            <div className="relative h-[380px] sm:h-[450px] overflow-hidden rounded-2xl border border-white/10">
+              <Image
+                src={imageUrl}
+                alt={title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+            </div>
+          </RevealOnScroll>
 
           {/* Text Content (Right) */}
-          <div className="lg:col-span-6 space-y-6">
+          <RevealOnScroll delay={0.15} className="lg:col-span-6 space-y-6">
             <span className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-amber-400">
               OUR HERITAGE & CRAFT
             </span>
@@ -54,7 +57,7 @@ export function HeritageBrandStory({ story }: BrandStoryProps) {
                 </Button>
               </div>
             )}
-          </div>
+          </RevealOnScroll>
         </div>
       </Container>
     </Section>

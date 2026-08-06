@@ -9,6 +9,7 @@ import { ShopPagination } from './shop-pagination';
 import { MobileFilterDrawer } from './mobile-filter-drawer';
 import { MobileSortModal } from './mobile-sort-modal';
 import { PackageX } from 'lucide-react';
+import { StaggerContainer, StaggerItem } from '@/components/ui/motion-wrappers';
 import { fetchPublicProductsAction } from '@/features/products/actions/shop-actions';
 import type { ProductWithImages } from '@/types';
 
@@ -383,11 +384,13 @@ export function ShopView() {
               ))}
             </div>
           ) : products.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4 sm:gap-8 lg:grid-cols-3">
+            <StaggerContainer className="grid grid-cols-2 gap-4 sm:gap-8 lg:grid-cols-3">
               {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <StaggerItem key={product.id}>
+                  <ProductCard product={product} />
+                </StaggerItem>
               ))}
-            </div>
+            </StaggerContainer>
           ) : (
             /* Empty State */
             <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl border border-dashed border-[#e3e2e2] bg-[#f5f3f3]/40">

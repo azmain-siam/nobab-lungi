@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 import { Container } from '@/components/ui/container';
 import { Section } from '@/components/ui/section';
 import { SectionHeading } from '@/components/ui/section-heading';
+import { RevealOnScroll, StaggerContainer, StaggerItem } from '@/components/ui/motion-wrappers';
 import { getPublicCollections } from '@/services/collection-service';
 import { ArrowRight, PackageX } from 'lucide-react';
 
@@ -92,7 +93,7 @@ async function DynamicCollectionsGrid() {
   }
 
   return (
-    <div className="grid grid-cols-12 gap-6 mt-8">
+    <StaggerContainer className="grid grid-cols-12 gap-6 mt-8">
       {collections.map((collection, idx) => {
         // Bento grid column span logic
         let colSpan = 'lg:col-span-6';
@@ -119,47 +120,48 @@ async function DynamicCollectionsGrid() {
             : 'Handcrafted Series';
 
         return (
-          <Link
-            key={collection.slug}
-            href={`/collections/${collection.slug}`}
-            className={`group relative col-span-12 ${colSpan} ${height} overflow-hidden rounded-2xl cursor-pointer bg-stone-900 shadow-xs border border-[#e3e2e2]/40 transition-transform duration-500 hover:-translate-y-0.5 motion-reduce:transform-none`}
-          >
-            {/* Optimized Background Image */}
-            <Image
-              src={imageUrl}
-              alt={`${collection.name} premium handloom lungi`}
-              fill
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105 motion-reduce:transform-none"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              priority={idx < 2}
-            />
+          <StaggerItem key={collection.slug} className={`col-span-12 ${colSpan}`}>
+            <Link
+              href={`/collections/${collection.slug}`}
+              className={`group relative block w-full ${height} overflow-hidden rounded-2xl cursor-pointer bg-stone-900 shadow-xs border border-[#e3e2e2]/40 transition-transform duration-500 hover:-translate-y-0.5 motion-reduce:transform-none`}
+            >
+              {/* Optimized Background Image */}
+              <Image
+                src={imageUrl}
+                alt={`${collection.name} premium handloom lungi`}
+                fill
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105 motion-reduce:transform-none"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                priority={idx < 2}
+              />
 
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent transition-opacity duration-300 group-hover:opacity-90" />
+              {/* Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent transition-opacity duration-300 group-hover:opacity-90" />
 
-            {/* Content Card Overlay */}
-            <div className="absolute bottom-0 left-0 p-6 sm:p-8 text-white max-w-xl transition-transform duration-300 group-hover:-translate-y-1 motion-reduce:transform-none">
-              <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-amber-300/90 mb-1.5">
-                {countText}
-              </span>
-              <h2 className="font-display text-2xl font-semibold text-white sm:text-3xl tracking-tight">
-                {collection.name}
-              </h2>
-              {collection.description && (
-                <p className="mt-2 text-xs font-light text-white/85 sm:text-sm line-clamp-2 leading-relaxed">
-                  {collection.description}
-                </p>
-              )}
+              {/* Content Card Overlay */}
+              <div className="absolute bottom-0 left-0 p-6 sm:p-8 text-white max-w-xl transition-transform duration-300 group-hover:-translate-y-1 motion-reduce:transform-none">
+                <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-amber-300/90 mb-1.5">
+                  {countText}
+                </span>
+                <h2 className="font-display text-2xl font-semibold text-white sm:text-3xl tracking-tight">
+                  {collection.name}
+                </h2>
+                {collection.description && (
+                  <p className="mt-2 text-xs font-light text-white/85 sm:text-sm line-clamp-2 leading-relaxed">
+                    {collection.description}
+                  </p>
+                )}
 
-              <div className="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white group-hover:underline">
-                <span>Explore Collection</span>
-                <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1.5 motion-reduce:transform-none" />
+                <div className="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white group-hover:underline">
+                  <span>Explore Collection</span>
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1.5 motion-reduce:transform-none" />
+                </div>
               </div>
-            </div>
-          </Link>
+            </Link>
+          </StaggerItem>
         );
       })}
-    </div>
+    </StaggerContainer>
   );
 }
 
@@ -179,11 +181,13 @@ export default function CollectionsPage() {
     <Section variant="default" className="py-12 lg:py-20">
       <Container>
         {/* Section Header */}
-        <SectionHeading
-          title="Curated Collections"
-          subtitle="Discover our signature handloom series, handcrafted for every occasion."
-          align="left"
-        />
+        <RevealOnScroll>
+          <SectionHeading
+            title="Curated Collections"
+            subtitle="Discover our signature handloom series, handcrafted for every occasion."
+            align="left"
+          />
+        </RevealOnScroll>
 
         {/* Dynamic Collections Grid */}
         <Suspense fallback={<CollectionsSkeleton />}>

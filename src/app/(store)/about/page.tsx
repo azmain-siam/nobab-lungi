@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Container } from '@/components/ui/container';
 import { Section } from '@/components/ui/section';
+import { RevealOnScroll, StaggerContainer, StaggerItem } from '@/components/ui/motion-wrappers';
 import { getHomepageConfig } from '@/services/homepage-service';
 import {
   ArrowRight,
@@ -128,7 +129,7 @@ export default async function AboutPage() {
 
         <div className="relative z-10 w-full">
           <Container>
-            <div className="max-w-3xl text-white space-y-4">
+            <RevealOnScroll className="max-w-3xl text-white space-y-4">
               <span className="inline-block text-[10px] font-extrabold uppercase tracking-[0.25em] text-amber-300 bg-white/10 px-3 py-1 border border-white/20">
                 HERITAGE & CRAFTSMANSHIP
               </span>
@@ -152,7 +153,7 @@ export default async function AboutPage() {
                   <ArrowRight className="h-4 w-4 stroke-[2]" />
                 </Link>
               </div>
-            </div>
+            </RevealOnScroll>
           </Container>
         </div>
       </section>
@@ -162,7 +163,7 @@ export default async function AboutPage() {
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             {/* Story Text */}
-            <div className="lg:col-span-6 space-y-6">
+            <RevealOnScroll className="lg:col-span-6 space-y-6">
               <div className="space-y-2">
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#5e5e5b]">
                   OUR ORIGIN & PHILOSOPHY
@@ -196,10 +197,10 @@ export default async function AboutPage() {
                   <span className="block text-[11px] text-[#5e5e5b] font-light">Authentic Loom Hubs</span>
                 </div>
               </div>
-            </div>
+            </RevealOnScroll>
 
             {/* Editorial Image */}
-            <div className="lg:col-span-6">
+            <RevealOnScroll delay={0.15} distance={30} className="lg:col-span-6">
               <div className="relative aspect-[4/5] w-full overflow-hidden bg-stone-900 border border-[#e3e2e2] shadow-sm">
                 <Image
                   src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=1200&auto=format&fit=crop"
@@ -215,7 +216,7 @@ export default async function AboutPage() {
                   </p>
                 </div>
               </div>
-            </div>
+            </RevealOnScroll>
           </div>
         </Container>
       </Section>
@@ -223,7 +224,7 @@ export default async function AboutPage() {
       {/* 3. THE ART OF LUNGI MAKING */}
       <Section variant="muted" className="py-16 lg:py-24 bg-[#f5f3f3]/60 border-y border-[#e3e2e2]">
         <Container>
-          <div className="max-w-2xl text-left space-y-2 mb-12">
+          <RevealOnScroll className="max-w-2xl text-left space-y-2 mb-12">
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#5e5e5b]">
               CRAFTSMANSHIP JOURNEY
             </span>
@@ -233,11 +234,11 @@ export default async function AboutPage() {
             <p className="text-xs sm:text-sm font-light text-[#5e5e5b]">
               From raw combed yarn to your doorstep — every stage of our handloom process represents care and tradition.
             </p>
-          </div>
+          </RevealOnScroll>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {CRAFTSMANSHIP_STAGES.map((stage) => (
-              <div
+              <StaggerItem
                 key={stage.step}
                 className="bg-white border border-[#e3e2e2] p-6 space-y-3 flex flex-col justify-between hover:shadow-sm transition"
               >
@@ -252,9 +253,9 @@ export default async function AboutPage() {
                     {stage.description}
                   </p>
                 </div>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </Container>
       </Section>
 
@@ -263,7 +264,7 @@ export default async function AboutPage() {
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             {/* Image Left */}
-            <div className="lg:col-span-6 order-2 lg:order-1">
+            <RevealOnScroll distance={30} className="lg:col-span-6 order-2 lg:order-1">
               <div className="relative aspect-[4/3] sm:aspect-[16/10] w-full overflow-hidden bg-stone-900 border border-[#e3e2e2] shadow-sm">
                 <Image
                   src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200&auto=format&fit=crop"
@@ -273,10 +274,10 @@ export default async function AboutPage() {
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
               </div>
-            </div>
+            </RevealOnScroll>
 
             {/* Content Right */}
-            <div className="lg:col-span-6 space-y-6 order-1 lg:order-2">
+            <RevealOnScroll delay={0.15} className="lg:col-span-6 space-y-6 order-1 lg:order-2">
               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#5e5e5b]">
                 THE HUMAN TOUCH
               </span>
@@ -292,7 +293,7 @@ export default async function AboutPage() {
                   &ldquo;A authentic handloom lungi carries weight, breathability, and character. It is an art form worn every day.&rdquo;
                 </p>
               </div>
-            </div>
+            </RevealOnScroll>
           </div>
         </Container>
       </Section>
@@ -300,7 +301,7 @@ export default async function AboutPage() {
       {/* 5. WHY NABAB LUNGI */}
       <Section variant="muted" className="py-16 lg:py-24 bg-[#f5f3f3]/40 border-t border-[#e3e2e2]">
         <Container>
-          <div className="text-center max-w-xl mx-auto space-y-2 mb-12">
+          <RevealOnScroll className="text-center max-w-xl mx-auto space-y-2 mb-12">
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#5e5e5b]">
               OUR COMMITMENT
             </span>
@@ -310,13 +311,13 @@ export default async function AboutPage() {
             <p className="text-xs sm:text-sm font-light text-[#5e5e5b]">
               Five reasons our customers trust us for their everyday comfort and gift needs.
             </p>
-          </div>
+          </RevealOnScroll>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {BRAND_PILLARS.map((pillar) => {
               const Icon = pillar.icon;
               return (
-                <div
+                <StaggerItem
                   key={pillar.title}
                   className="bg-white border border-[#e3e2e2] p-6 space-y-3 hover:border-[#1b1c1c]/40 transition"
                 >
@@ -329,44 +330,44 @@ export default async function AboutPage() {
                   <p className="text-xs font-light text-[#5e5e5b] leading-relaxed">
                     {pillar.description}
                   </p>
-                </div>
+                </StaggerItem>
               );
             })}
-          </div>
+          </StaggerContainer>
         </Container>
       </Section>
 
       {/* 6. OUR VALUES */}
       <Section variant="default" className="py-16 lg:py-24 border-t border-[#e3e2e2]">
         <Container>
-          <div className="text-left max-w-md space-y-2 mb-12">
+          <RevealOnScroll className="text-left max-w-md space-y-2 mb-12">
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#5e5e5b]">
               THE STANDARDS WE HOLD
             </span>
             <h2 className="font-display text-3xl sm:text-4xl font-semibold text-[#1b1c1c] tracking-tight">
               Our Core Values
             </h2>
-          </div>
+          </RevealOnScroll>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {BRAND_VALUES.map((val) => (
-              <div key={val.title} className="space-y-2 border-t border-[#1b1c1c] pt-4">
+              <StaggerItem key={val.title} className="space-y-2 border-t border-[#1b1c1c] pt-4">
                 <span className="block text-xs font-bold uppercase tracking-[0.15em] text-[#1b1c1c]">
                   {val.title}
                 </span>
                 <p className="text-xs font-light text-[#5e5e5b] leading-relaxed">
                   {val.description}
                 </p>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </Container>
       </Section>
 
       {/* 7. TRADITION MEETS TODAY */}
       <section aria-label="Tradition Meets Today" className="relative py-20 bg-stone-900 text-white overflow-hidden">
         <Container>
-          <div className="max-w-3xl space-y-4">
+          <RevealOnScroll className="max-w-3xl space-y-4">
             <span className="block text-[10px] font-extrabold uppercase tracking-[0.25em] text-amber-300">
               HERITAGE FOR MODERN LIVING
             </span>
@@ -376,14 +377,14 @@ export default async function AboutPage() {
             <p className="text-xs sm:text-sm font-light text-white/85 leading-relaxed max-w-xl">
               Nabab Lungi respects the legacy of traditional Bengali handlooms while presenting it through a clean, transparent, and refined modern e-commerce experience.
             </p>
-          </div>
+          </RevealOnScroll>
         </Container>
       </section>
 
       {/* 8. BRAND STATEMENT / CLOSING */}
       <Section variant="default" className="py-16 lg:py-24 text-center">
         <Container>
-          <div className="max-w-2xl mx-auto space-y-4">
+          <RevealOnScroll className="max-w-2xl mx-auto space-y-4">
             <Heart className="h-6 w-6 text-rose-600 mx-auto stroke-[1.5]" />
             <h2 className="font-display text-2xl sm:text-3xl font-semibold text-[#1b1c1c] tracking-tight">
               More than a lungi. A tradition woven into everyday life.
@@ -391,14 +392,14 @@ export default async function AboutPage() {
             <p className="text-xs sm:text-sm font-light text-[#5e5e5b] leading-relaxed">
               Whether you are relaxing at home after a long day or gifting someone a piece of authentic Bangladeshi heritage, Nabab Lungi is made to accompany your everyday moments with pride.
             </p>
-          </div>
+          </RevealOnScroll>
         </Container>
       </Section>
 
       {/* 9. FINAL CTA */}
       <section aria-label="Call to Action" className="py-16 bg-[#fbf9f8] border-t border-[#e3e2e2] text-center">
         <Container>
-          <div className="max-w-md mx-auto space-y-4">
+          <RevealOnScroll className="max-w-md mx-auto space-y-4">
             <h2 className="font-display text-2xl sm:text-3xl font-semibold text-[#1b1c1c] tracking-tight">
               Find Your Everyday Comfort.
             </h2>
@@ -414,7 +415,7 @@ export default async function AboutPage() {
                 <ArrowRight className="h-4 w-4 stroke-[1.5]" />
               </Link>
             </div>
-          </div>
+          </RevealOnScroll>
         </Container>
       </section>
     </>

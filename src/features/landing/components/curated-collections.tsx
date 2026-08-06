@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Section } from '@/components/ui/section';
 import { Container } from '@/components/ui/container';
 import { SectionHeading } from '@/components/ui/section-heading';
+import { RevealOnScroll, StaggerContainer, StaggerItem } from '@/components/ui/motion-wrappers';
 import type { Collection, Category } from '@/types';
 
 const FALLBACK_COLLECTIONS = [
@@ -47,10 +48,12 @@ export function CuratedCollections({ collections = [] }: CuratedCollectionsProps
     <Section id="collections" variant="default" className="py-16 lg:py-24">
       <Container>
         {/* Section Header */}
-        <SectionHeading title="Curated Collections" actionHref="/collections" actionLabel="VIEW ALL" />
+        <RevealOnScroll>
+          <SectionHeading title="Curated Collections" actionHref="/collections" actionLabel="VIEW ALL" />
+        </RevealOnScroll>
 
         {/* Bento Grid */}
-        <div className="grid grid-cols-12 gap-6">
+        <StaggerContainer className="grid grid-cols-12 gap-6">
           {activeCollections.length > 0 ? (
             activeCollections.map((col, idx) => {
               const isLarge = idx % 3 === 0;
@@ -64,68 +67,67 @@ export function CuratedCollections({ collections = [] }: CuratedCollectionsProps
                   : 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=1000&auto=format&fit=crop');
 
               return (
+                <StaggerItem key={col.id} className={`col-span-12 ${spanClass}`}>
+                  <Link
+                    href={`/collections/${col.slug}`}
+                    className="group relative block h-[360px] w-full overflow-hidden rounded-2xl sm:h-[400px] cursor-pointer"
+                  >
+                    <Image
+                      src={coverImg}
+                      alt={col.name}
+                      fill
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                      sizes="(max-width: 1024px) 100vw, 60vw"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent transition-opacity duration-300 group-hover:opacity-90" />
+                    <div className="absolute bottom-0 left-0 p-8 text-white transition-transform duration-300 group-hover:-translate-y-1">
+                      <h3 className="font-display text-2xl font-semibold text-white sm:text-3xl">
+                        {col.name}
+                      </h3>
+                      {col.description && (
+                        <p className="mt-2 text-xs font-light text-white/85 line-clamp-2 max-w-lg">
+                          {col.description}
+                        </p>
+                      )}
+                    </div>
+                  </Link>
+                </StaggerItem>
+              );
+            })
+          ) : (
+            /* Approved Fallback Bento Grid */
+            FALLBACK_COLLECTIONS.map((item) => (
+              <StaggerItem key={item.id} className={`col-span-12 ${item.span}`}>
                 <Link
-                  key={col.id}
-                  href={`/collections/${col.slug}`}
-                  className={`group relative col-span-12 h-[360px] overflow-hidden rounded-2xl sm:h-[400px] cursor-pointer ${spanClass}`}
+                  href={`/collections/${item.slug}`}
+                  className="group relative block h-[360px] w-full overflow-hidden rounded-2xl sm:h-[400px] cursor-pointer"
                 >
                   <Image
-                    src={coverImg}
-                    alt={col.name}
+                    src={item.image}
+                    alt={item.name}
                     fill
                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                     sizes="(max-width: 1024px) 100vw, 60vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent transition-opacity duration-300 group-hover:opacity-90" />
                   <div className="absolute bottom-0 left-0 p-8 text-white transition-transform duration-300 group-hover:-translate-y-1">
-                    {/* <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-white/80 mb-1">
-                      {col.is_featured ? 'FEATURED COLLECTION' : 'HANDLOOM SERIES'}
-                    </span> */}
+                    <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-white/80 mb-1">
+                      {item.tag}
+                    </span>
                     <h3 className="font-display text-2xl font-semibold text-white sm:text-3xl">
-                      {col.name}
+                      {item.name}
                     </h3>
-                    {col.description && (
-                      <p className="mt-2 text-xs font-light text-white/85 line-clamp-2 max-w-lg">
-                        {col.description}
+                    {item.description && (
+                      <p className="mt-2 text-xs font-light text-white/85 sm:text-sm">
+                        {item.description}
                       </p>
                     )}
                   </div>
                 </Link>
-              );
-            })
-          ) : (
-            /* Approved Fallback Bento Grid */
-            FALLBACK_COLLECTIONS.map((item) => (
-              <Link
-                key={item.id}
-                href={`/collections/${item.slug}`}
-                className={`group relative col-span-12 h-[360px] overflow-hidden rounded-2xl sm:h-[400px] cursor-pointer ${item.span}`}
-              >
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  fill
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                  sizes="(max-width: 1024px) 100vw, 60vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent transition-opacity duration-300 group-hover:opacity-90" />
-                <div className="absolute bottom-0 left-0 p-8 text-white transition-transform duration-300 group-hover:-translate-y-1">
-                  <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-white/80 mb-1">
-                    {item.tag}
-                  </span>
-                  <h3 className="font-display text-2xl font-semibold text-white sm:text-3xl">
-                    {item.name}
-                  </h3>
-                  {item.description && (
-                    <p className="mt-2 text-xs font-light text-white/85 sm:text-sm">
-                      {item.description}
-                    </p>
-                  )}
-                </div>
-              </Link>
+              </StaggerItem>
             ))
           )}
-        </div>
+        </StaggerContainer>
       </Container>
     </Section>
   );
