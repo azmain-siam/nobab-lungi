@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { ProductCard, type ProductCardData } from '@/components/shared/product-card';
 import { ShopHeader } from './shop-header';
 import { ShopSidebar } from './shop-sidebar';
@@ -22,9 +23,9 @@ function mapProductToCardData(product: ProductWithImages): ProductCardData {
   else if (product.is_best_seller) badge = 'Best Seller';
   else if (product.is_featured) badge = 'Featured';
 
-  const priceStr = `৳${(product.discount_price ?? product.price).toLocaleString()}`;
+  const priceStr = `৳${(product.discount_price ?? product.price).toLocaleString('en-BD')}`;
   const originalPriceStr = product.discount_price
-    ? `৳${product.price.toLocaleString()}`
+    ? `৳${product.price.toLocaleString('en-BD')}`
     : undefined;
 
   return {
@@ -41,9 +42,14 @@ function mapProductToCardData(product: ProductWithImages): ProductCardData {
 }
 
 export function ShopView() {
+  const searchParams = useSearchParams();
+  const initialCollectionParam = searchParams?.get('collection') || searchParams?.get('collections');
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
+  const [selectedCollections, setSelectedCollections] = useState<string[]>(() =>
+    initialCollectionParam ? [initialCollectionParam] : []
+  );
   const [priceRange, setPriceRange] = useState<[number, number]>([1000, 10000]);
   const [selectedSort, setSelectedSort] = useState('featured');
   const [currentPage, setCurrentPage] = useState(1);
@@ -205,7 +211,7 @@ export function ShopView() {
                   setCurrentPage(1);
                 }}
                 aria-label="Clear all filters"
-                className="mt-6 bg-black text-white px-5 py-2.5 text-xs font-semibold uppercase tracking-wider rounded-none hover:bg-black/90 transition"
+                className="mt-6 bg-black text-white px-5 py-2.5 text-xs font-semibold uppercase tracking-wider rounded-none hover:bg-black/90 transition cursor-pointer"
               >
                 Clear All Filters
               </button>

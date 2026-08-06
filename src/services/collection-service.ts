@@ -21,6 +21,47 @@ function mapDocToCollection(doc: Record<string, unknown>, productCount = 0): Col
   };
 }
 
+export async function getPublicCollections(): Promise<Collection[]> {
+  try {
+    await connectToDatabase();
+    const { Product } = await import('@/models/Product');
+
+    const docs = await CollectionModel.find({ is_active: true })
+      .sort({ sort_order: 1, created_at: -1 })
+      .lean();
+
+    // Aggregation query to count active products per collection
+    const counts = await Product.aggregate([
+      { $match: { is_active: true, status: 'published' } },
+      { $unwind: '$collection_ids' },
+      { $group: { _id: '$collection_ids', count: { $sum: 1 } } },
+    ]);
+
+    const countMap = new Map<number, number>();
+    counts.forEach((item) => {
+      countMap.set(Number(item._id), item.count);
+    });
+
+    const collections = docs
+      .map((doc) => {
+        const idNum = Number(doc.id);
+        const productCount = countMap.get(idNum) || 0;
+        return mapDocToCollection(doc as unknown as Record<string, unknown>, productCount);
+      })
+      // Filter out any saree-related collections (Brand Requirement: LUNGI focused)
+      .filter((c) => {
+        const nameLower = c.name.toLowerCase();
+        const descLower = (c.description || '').toLowerCase();
+        return !nameLower.includes('saree') && !descLower.includes('saree');
+      });
+
+    return collections;
+  } catch (error) {
+    console.error('Error fetching public collections:', error);
+    return [];
+  }
+}
+
 export async function getFeaturedCollections(): Promise<Collection[]> {
   try {
     await connectToDatabase();
@@ -28,7 +69,13 @@ export async function getFeaturedCollections(): Promise<Collection[]> {
       .sort({ sort_order: 1 })
       .lean();
 
-    return collections.map((c) => mapDocToCollection(c as unknown as Record<string, unknown>));
+    return collections
+      .map((c) => mapDocToCollection(c as unknown as Record<string, unknown>))
+      .filter((c) => {
+        const nameLower = c.name.toLowerCase();
+        const descLower = (c.description || '').toLowerCase();
+        return !nameLower.includes('saree') && !descLower.includes('saree');
+      });
   } catch (error) {
     console.error('Error fetching featured collections:', error);
     return [];
@@ -97,7 +144,7 @@ export async function getAdminCollections(options?: {
 export async function getCollectionBySlug(slug: string): Promise<Collection | null> {
   try {
     await connectToDatabase();
-    const collection = await CollectionModel.findOne({ slug }).lean();
+    const collection = await CollectionModel.findOne({ slug, is_active: true }).lean();
 
     if (!collection) return null;
     return mapDocToCollection(collection as unknown as Record<string, unknown>);
