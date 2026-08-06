@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, ChevronDown, RotateCcw } from 'lucide-react';
 
 interface MobileFilterDrawerProps {
@@ -70,12 +70,41 @@ export function MobileFilterDrawer({
   onClearAll,
   activeFilterCount,
 }: MobileFilterDrawerProps) {
+  const [shouldRender, setShouldRender] = useState(false);
+  const [animateIn, setAnimateIn] = useState(false);
+
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     category: true,
     price: true,
   });
 
-  if (!isOpen) return null;
+  // Smooth Opening and Closing Transitions
+  useEffect(() => {
+    let timer1: NodeJS.Timeout;
+    let timer2: NodeJS.Timeout;
+
+    if (isOpen) {
+      timer1 = setTimeout(() => setShouldRender(true), 0);
+      timer2 = setTimeout(() => setAnimateIn(true), 20);
+    } else {
+      timer1 = setTimeout(() => setAnimateIn(false), 0);
+      timer2 = setTimeout(() => setShouldRender(false), 300);
+    }
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, [isOpen]);
+
+  if (!shouldRender) return null;
+
+  const handleClose = () => {
+    setAnimateIn(false);
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
 
   const toggleSection = (key: string) => {
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -104,49 +133,62 @@ export function MobileFilterDrawer({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/60 backdrop-blur-xs transition-opacity duration-300 lg:hidden">
-      {/* Backdrop overlay click handler */}
-      <div className="absolute inset-0" onClick={onClose} />
+    <div className="fixed inset-0 z-50 flex flex-col justify-end lg:hidden">
+      {/* Backdrop overlay fade transition */}
+      <div
+        className={`absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-300 ease-out motion-reduce:transition-none ${
+          animateIn ? 'opacity-100' : 'opacity-0'
+        }`}
+        onClick={handleClose}
+      />
 
       {/* Slide-Up Bottom Sheet / Full Height Drawer */}
-      <div className="relative z-10 flex flex-col w-full max-h-[85vh] bg-[#fbf9f8] rounded-t-2xl shadow-2xl overflow-hidden border-t border-[#e3e2e2]">
+      <div
+        className={`relative z-10 flex flex-col w-full max-h-[85vh] bg-[#fbf9f8] rounded-t-2xl shadow-2xl overflow-hidden border-t border-[#e3e2e2] transition-transform duration-300 ease-out transform motion-reduce:transition-none motion-reduce:transform-none ${
+          animateIn ? 'translate-y-0' : 'translate-y-full'
+        }`}
+      >
         {/* Drawer Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#e3e2e2] bg-white">
           <div className="flex items-center gap-2">
             <h2 className="font-display text-lg font-semibold text-[#1b1c1c]">Filters</h2>
             {activeFilterCount > 0 && (
-              <span className="bg-[#1b1c1c] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+              <span className="bg-[#1b1c1c] text-white text-[10px] font-bold px-2 py-0.5 rounded-full transition-transform duration-200">
                 {activeFilterCount} Active
               </span>
             )}
           </div>
 
           <button
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="Close Filter Drawer"
-            className="p-1 text-[#5e5e5b] hover:text-[#1b1c1c] transition cursor-pointer"
+            className="p-1 text-[#5e5e5b] hover:text-[#1b1c1c] active:scale-90 transition-transform duration-150 cursor-pointer"
           >
             <X className="h-5 w-5 stroke-[1.8]" />
           </button>
         </div>
 
         {/* Scrollable Filter Groups */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 divider-y divide-[#e3e2e2]">
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3 divider-y divide-[#e3e2e2]">
           {/* 1. Category */}
-          <div className="py-2 border-b border-[#e3e2e2] pb-4">
+          <div className="py-2 border-b border-[#e3e2e2] pb-3">
             <button
               onClick={() => toggleSection('category')}
               className="w-full flex items-center justify-between py-1 text-left text-sm font-semibold text-[#1b1c1c] cursor-pointer"
             >
               <span>Category</span>
               <ChevronDown
-                className={`h-4 w-4 transition-transform duration-200 ${
-                  openSections.category ? 'rotate-180' : ''
+                className={`h-4 w-4 transition-transform duration-300 ease-in-out motion-reduce:transition-none ${
+                  openSections.category ? 'rotate-180' : 'rotate-0'
                 }`}
               />
             </button>
-            {openSections.category && (
-              <div className="mt-3 space-y-2.5 pl-1">
+            <div
+              className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${
+                openSections.category ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0 mt-0'
+              }`}
+            >
+              <div className="overflow-hidden space-y-2.5 pl-1">
                 {categories.map((cat) => {
                   const isChecked = selectedCategories.includes(cat.id);
                   return (
@@ -167,24 +209,28 @@ export function MobileFilterDrawer({
                   );
                 })}
               </div>
-            )}
+            </div>
           </div>
 
           {/* 2. Collection */}
-          <div className="py-2 border-b border-[#e3e2e2] pb-4">
+          <div className="py-2 border-b border-[#e3e2e2] pb-3">
             <button
               onClick={() => toggleSection('collection')}
               className="w-full flex items-center justify-between py-1 text-left text-sm font-semibold text-[#1b1c1c] cursor-pointer"
             >
               <span>Collection</span>
               <ChevronDown
-                className={`h-4 w-4 transition-transform duration-200 ${
-                  openSections.collection ? 'rotate-180' : ''
+                className={`h-4 w-4 transition-transform duration-300 ease-in-out motion-reduce:transition-none ${
+                  openSections.collection ? 'rotate-180' : 'rotate-0'
                 }`}
               />
             </button>
-            {openSections.collection && (
-              <div className="mt-3 space-y-2.5 pl-1">
+            <div
+              className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${
+                openSections.collection ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0 mt-0'
+              }`}
+            >
+              <div className="overflow-hidden space-y-2.5 pl-1">
                 {collections.map((col) => {
                   const isChecked = selectedCollections.includes(col.id);
                   return (
@@ -205,25 +251,29 @@ export function MobileFilterDrawer({
                   );
                 })}
               </div>
-            )}
+            </div>
           </div>
 
           {/* 3. Fabric */}
           {fabrics.length > 0 && (
-            <div className="py-2 border-b border-[#e3e2e2] pb-4">
+            <div className="py-2 border-b border-[#e3e2e2] pb-3">
               <button
                 onClick={() => toggleSection('fabric')}
                 className="w-full flex items-center justify-between py-1 text-left text-sm font-semibold text-[#1b1c1c] cursor-pointer"
               >
                 <span>Fabric</span>
                 <ChevronDown
-                  className={`h-4 w-4 transition-transform duration-200 ${
-                    openSections.fabric ? 'rotate-180' : ''
+                  className={`h-4 w-4 transition-transform duration-300 ease-in-out motion-reduce:transition-none ${
+                    openSections.fabric ? 'rotate-180' : 'rotate-0'
                   }`}
                 />
               </button>
-              {openSections.fabric && (
-                <div className="mt-3 space-y-2.5 pl-1">
+              <div
+                className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${
+                  openSections.fabric ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0 mt-0'
+                }`}
+              >
+                <div className="overflow-hidden space-y-2.5 pl-1">
                   {fabrics.map((fabric) => {
                     const isChecked = selectedFabrics.includes(fabric);
                     return (
@@ -244,26 +294,30 @@ export function MobileFilterDrawer({
                     );
                   })}
                 </div>
-              )}
+              </div>
             </div>
           )}
 
           {/* 4. Pattern */}
           {patterns.length > 0 && (
-            <div className="py-2 border-b border-[#e3e2e2] pb-4">
+            <div className="py-2 border-b border-[#e3e2e2] pb-3">
               <button
                 onClick={() => toggleSection('pattern')}
                 className="w-full flex items-center justify-between py-1 text-left text-sm font-semibold text-[#1b1c1c] cursor-pointer"
               >
                 <span>Pattern</span>
                 <ChevronDown
-                  className={`h-4 w-4 transition-transform duration-200 ${
-                    openSections.pattern ? 'rotate-180' : ''
+                  className={`h-4 w-4 transition-transform duration-300 ease-in-out motion-reduce:transition-none ${
+                    openSections.pattern ? 'rotate-180' : 'rotate-0'
                   }`}
                 />
               </button>
-              {openSections.pattern && (
-                <div className="mt-3 space-y-2.5 pl-1">
+              <div
+                className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${
+                  openSections.pattern ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0 mt-0'
+                }`}
+              >
+                <div className="overflow-hidden space-y-2.5 pl-1">
                   {patterns.map((pattern) => {
                     const isChecked = selectedPatterns.includes(pattern);
                     return (
@@ -284,26 +338,30 @@ export function MobileFilterDrawer({
                     );
                   })}
                 </div>
-              )}
+              </div>
             </div>
           )}
 
           {/* 5. Color */}
           {colors.length > 0 && (
-            <div className="py-2 border-b border-[#e3e2e2] pb-4">
+            <div className="py-2 border-b border-[#e3e2e2] pb-3">
               <button
                 onClick={() => toggleSection('color')}
                 className="w-full flex items-center justify-between py-1 text-left text-sm font-semibold text-[#1b1c1c] cursor-pointer"
               >
                 <span>Color</span>
                 <ChevronDown
-                  className={`h-4 w-4 transition-transform duration-200 ${
-                    openSections.color ? 'rotate-180' : ''
+                  className={`h-4 w-4 transition-transform duration-300 ease-in-out motion-reduce:transition-none ${
+                    openSections.color ? 'rotate-180' : 'rotate-0'
                   }`}
                 />
               </button>
-              {openSections.color && (
-                <div className="mt-3 space-y-2.5 pl-1">
+              <div
+                className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${
+                  openSections.color ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0 mt-0'
+                }`}
+              >
+                <div className="overflow-hidden space-y-2.5 pl-1">
                   {colors.map((color) => {
                     const isChecked = selectedColors.includes(color);
                     const hex = getColorHex(color);
@@ -319,7 +377,7 @@ export function MobileFilterDrawer({
                           className="h-4 w-4 border-[#e3e2e2] rounded-none text-black focus:ring-0 cursor-pointer"
                         />
                         <span
-                          className="h-3.5 w-3.5 rounded-full border border-stone-300 inline-block shrink-0"
+                          className="h-3.5 w-3.5 rounded-full border border-stone-300 inline-block shrink-0 transition-transform duration-150 hover:scale-110"
                           style={{ backgroundColor: hex }}
                         />
                         <span className={isChecked ? 'font-semibold text-[#1b1c1c]' : ''}>
@@ -329,25 +387,29 @@ export function MobileFilterDrawer({
                     );
                   })}
                 </div>
-              )}
+              </div>
             </div>
           )}
 
           {/* 6. Availability */}
-          <div className="py-2 border-b border-[#e3e2e2] pb-4">
+          <div className="py-2 border-b border-[#e3e2e2] pb-3">
             <button
               onClick={() => toggleSection('availability')}
               className="w-full flex items-center justify-between py-1 text-left text-sm font-semibold text-[#1b1c1c] cursor-pointer"
             >
               <span>Availability</span>
               <ChevronDown
-                className={`h-4 w-4 transition-transform duration-200 ${
-                  openSections.availability ? 'rotate-180' : ''
+                className={`h-4 w-4 transition-transform duration-300 ease-in-out motion-reduce:transition-none ${
+                  openSections.availability ? 'rotate-180' : 'rotate-0'
                 }`}
               />
             </button>
-            {openSections.availability && (
-              <div className="mt-3 pl-1">
+            <div
+              className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${
+                openSections.availability ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0 mt-0'
+              }`}
+            >
+              <div className="overflow-hidden pl-1">
                 <label className="flex items-center gap-3 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] cursor-pointer">
                   <input
                     type="checkbox"
@@ -360,28 +422,32 @@ export function MobileFilterDrawer({
                   </span>
                 </label>
               </div>
-            )}
+            </div>
           </div>
 
           {/* 7. Price Range */}
-          <div className="py-2 pb-6">
+          <div className="py-2 pb-4">
             <button
               onClick={() => toggleSection('price')}
               className="w-full flex items-center justify-between py-1 text-left text-sm font-semibold text-[#1b1c1c] cursor-pointer"
             >
               <span>Price Range</span>
               <ChevronDown
-                className={`h-4 w-4 transition-transform duration-200 ${
-                  openSections.price ? 'rotate-180' : ''
+                className={`h-4 w-4 transition-transform duration-300 ease-in-out motion-reduce:transition-none ${
+                  openSections.price ? 'rotate-180' : 'rotate-0'
                 }`}
               />
             </button>
-            {openSections.price && (
-              <div className="mt-4 pt-2 space-y-4 px-1">
+            <div
+              className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${
+                openSections.price ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'
+              }`}
+            >
+              <div className="overflow-hidden pt-1 space-y-4 px-1">
                 <div className="relative py-2">
                   <div className="h-1.5 w-full bg-[#e3e2e2] rounded-full relative">
                     <div
-                      className="absolute top-0 bottom-0 bg-[#1b1c1c] rounded-full"
+                      className="absolute top-0 bottom-0 bg-[#1b1c1c] rounded-full transition-all duration-75"
                       style={{
                         left: `${minPercent}%`,
                         width: `${Math.max(0, maxPercent - minPercent)}%`,
@@ -411,11 +477,11 @@ export function MobileFilterDrawer({
                   />
 
                   <div
-                    className="absolute top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-[#1b1c1c] border-2 border-white shadow-xs pointer-events-none z-20"
+                    className="absolute top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-[#1b1c1c] border-2 border-white shadow-xs pointer-events-none z-20 transition-all duration-75"
                     style={{ left: `calc(${minPercent}% - 8px)` }}
                   />
                   <div
-                    className="absolute top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-[#1b1c1c] border-2 border-white shadow-xs pointer-events-none z-20"
+                    className="absolute top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-[#1b1c1c] border-2 border-white shadow-xs pointer-events-none z-20 transition-all duration-75"
                     style={{ left: `calc(${maxPercent}% - 8px)` }}
                   />
                 </div>
@@ -425,7 +491,7 @@ export function MobileFilterDrawer({
                   <span>৳{maxVal.toLocaleString('en-BD')}</span>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
 
@@ -434,16 +500,16 @@ export function MobileFilterDrawer({
           <button
             onClick={onClearAll}
             aria-label="Clear All Filters"
-            className="flex-1 py-3 px-4 bg-white border border-[#e3e2e2] text-[#1b1c1c] text-xs font-semibold uppercase tracking-wider hover:bg-stone-50 transition flex items-center justify-center gap-1.5 cursor-pointer"
+            className="flex-1 py-3 px-4 bg-white border border-[#e3e2e2] text-[#1b1c1c] text-xs font-semibold uppercase tracking-wider hover:bg-stone-50 active:scale-[0.97] transition-transform duration-150 flex items-center justify-center gap-1.5 cursor-pointer motion-reduce:transform-none"
           >
             <RotateCcw className="h-3.5 w-3.5" />
             <span>Clear All</span>
           </button>
 
           <button
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="Apply Filters"
-            className="flex-1 py-3 px-4 bg-[#1b1c1c] text-white text-xs font-semibold uppercase tracking-wider hover:bg-black transition shadow-xs cursor-pointer"
+            className="flex-1 py-3 px-4 bg-[#1b1c1c] text-white text-xs font-semibold uppercase tracking-wider hover:bg-black active:scale-[0.97] transition-all duration-150 shadow-xs cursor-pointer motion-reduce:transform-none"
           >
             APPLY FILTERS
           </button>

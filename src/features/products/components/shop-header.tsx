@@ -119,13 +119,13 @@ export function ShopHeader({
           {activeChips.map((chip) => (
             <span
               key={chip.id}
-              className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#f5f3f3] border border-[#e3e2e2] text-[11px] font-medium text-[#1b1c1c] whitespace-nowrap rounded-full shrink-0"
+              className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#f5f3f3] border border-[#e3e2e2] text-[11px] font-medium text-[#1b1c1c] whitespace-nowrap rounded-full shrink-0 transition-all duration-200 ease-out hover:border-[#1b1c1c]/40 motion-reduce:transition-none"
             >
               <span>{chip.label}</span>
               <button
                 onClick={chip.onRemove}
                 aria-label={`Remove filter ${chip.label}`}
-                className="hover:text-red-600 transition p-0.5 cursor-pointer"
+                className="hover:text-red-600 active:scale-90 transition-all duration-150 p-0.5 cursor-pointer motion-reduce:transform-none"
               >
                 <X className="h-3 w-3 stroke-[2]" />
               </button>
