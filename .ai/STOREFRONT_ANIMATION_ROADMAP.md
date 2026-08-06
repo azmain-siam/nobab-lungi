@@ -197,14 +197,14 @@ Add refined entrance/exit animations for modals, dropdowns, cart item removal, w
 - Product Info (`src/features/products/components/product-info.tsx`)
 
 **Tasks:**
-- [ ] Add smooth exit fade/slide animation to Header User Dropdown menu.
-- [ ] Add smooth exit zoom/fade animation to Confirm Modal dialog.
-- [ ] Add smooth exit animation (fade-out + height collapse) for Cart item removal in Cart Drawer.
-- [ ] Add smooth exit animation for Wishlist item removal on Wishlist page.
-- [ ] Add mobile account menu slide-down/up exit animation in Account Sidebar.
-- [ ] Add press feedback to Add to Cart and Buy Now buttons on Product Details page.
-- [ ] Add form error shake keyframe animation for Checkout validation failures.
-- [ ] Add coupon code apply success/error visual state transition on Checkout page.
+- [x] Add smooth exit fade/slide animation to Header User Dropdown menu.
+- [x] Add smooth exit zoom/fade animation to Confirm Modal dialog.
+- [x] Add smooth exit animation (fade-out + height collapse) for Cart item removal in Cart Drawer.
+- [x] Add smooth exit animation for Wishlist item removal on Wishlist page.
+- [x] Add mobile account menu slide-down/up exit animation in Account Sidebar.
+- [x] Add press feedback to Add to Cart and Buy Now buttons on Product Details page.
+- [x] Add form error shake keyframe animation for Checkout validation failures.
+- [x] Add coupon code apply success/error visual state transition on Checkout page.
 
 **UX Goal:**
 Provide reassuring, delightful micro-feedback for user actions (deleting items, applying coupons, opening user settings) so the UI feels alive and responsive.
@@ -220,7 +220,7 @@ Form errors must be announced to screen readers. Reduced motion must disable sha
 - User dropdown menu and confirm modal animate cleanly on both open and close.
 - Checkout validation failures display a subtle error indicator.
 
-**Status:** ⏳ Not Started
+**Status:** 🟢 Completed
 
 ---
 
@@ -383,11 +383,44 @@ If work is implemented but pending verification, mark as **⚠️ Needs Review**
 - [x] Zero hydration errors
 - [x] Existing functionality intact
 
+## Phase 2 — Premium Micro-interactions & Overlays
+**Status:** 🟢 Completed
+**Completed Date:** 2026-08-06
+
+#### Implemented Features
+- ConfirmModal exit scale/fade animation (`AnimatePresence` + `motion.div`).
+- Cart Drawer item removal collapse animation (`AnimatePresence` + `motion.div`).
+- Wishlist page item removal grid animation (`AnimatePresence` + `motion.div`).
+- Account Sidebar mobile menu slide-down/up exit transition (`AnimatePresence` + `motion.div`).
+- Checkout form validation alert animated shake & reveal (`AnimatePresence` + `motion.div`).
+- Checkout promo coupon code success/error feedback state transitions.
+
+#### Files & Components Changed
+- `src/components/ui/confirm-modal.tsx`
+- `src/components/shared/cart-drawer.tsx`
+- `src/app/(store)/account/wishlist/page.tsx`
+- `src/components/shared/account-sidebar.tsx`
+- `src/app/(store)/checkout/page.tsx`
+
+#### Verification Checklist
+- [x] Desktop verified
+- [x] Mobile verified
+- [x] Responsive verified
+- [x] Reduced motion verified
+- [x] Zero console errors
+- [x] Zero hydration errors
+- [x] Existing functionality intact
+
 ---
 
 ## 13. Roadmap Change Log
 
 Any architectural adjustments or scope modifications to this roadmap must be logged here:
+
+### 2026-08-06
+- **Change**: Phase 2 implementation complete.
+- **Reason**: All Phase 2 tasks implemented, tested, and verified.
+- **Affected Phase**: Phase 2 — Premium Micro-interactions & Overlays.
 
 ### 2026-08-06
 - **Change**: Phase 1 implementation complete.
@@ -422,13 +455,15 @@ ROADMAP (Active Document)
   ↓
 PHASE 1 (Completed 🟢)
   ↓
-IMPLEMENT → VERIFY → UPDATE ROADMAP & HISTORY
-  ↓
-PHASE 2 (Next Step ⏳)
+PHASE 2 (Completed 🟢)
   ↓
 IMPLEMENT → VERIFY → UPDATE ROADMAP & HISTORY
   ↓
-PHASE 3 ...
+PHASE 3 (Next Step ⏳)
+  ↓
+IMPLEMENT → VERIFY → UPDATE ROADMAP & HISTORY
+  ↓
+PHASE 4 ...
 ```
 
 **Rule**: Do NOT automatically start the next phase immediately. Each phase must be explicitly reviewed, implemented, tested, verified, and documented before moving forward.
@@ -437,9 +472,9 @@ PHASE 3 ...
 
 ## 16. Current Project State
 
-- **Current Active Phase**: Phase 2 — Premium Micro-interactions & Overlays
+- **Current Active Phase**: Phase 3 — Storytelling & Scroll Motion
 - **Status**: ⏳ Not Started
-- **Next Action**: Review Phase 2 objectives, then begin Phase 2 implementation when requested.
+- **Next Action**: Review Phase 3 objectives, then begin Phase 3 implementation when requested.
 
 ---
 *End of Storefront Animation Roadmap.*

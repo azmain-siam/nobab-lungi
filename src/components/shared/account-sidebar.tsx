@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard,
   Package,
@@ -76,9 +77,6 @@ export function AccountSidebar() {
         </div>
 
         <div className="space-y-0.5">
-          {/* <span className="text-[10px] font-semibold uppercase tracking-widest text-[#5e5e5b] flex items-center justify-center gap-1">
-            <Sparkles className="h-3 w-3 text-amber-600 inline" /> Welcome Back
-          </span> */}
           <h2 className="font-display text-base font-bold text-[#1b1c1c] truncate px-2">
             {displayName}
           </h2>
@@ -180,7 +178,7 @@ export function AccountSidebar() {
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="flex items-center gap-1.5 px-3 py-2 bg-[#fbf9f8] border border-[#e3e2e2] text-xs font-semibold uppercase tracking-wider text-[#1b1c1c] hover:bg-[#f5f3f3] transition cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 bg-[#fbf9f8] border border-[#e3e2e2] text-xs font-semibold uppercase tracking-wider text-[#1b1c1c] hover:bg-[#f5f3f3] active:scale-95 transition cursor-pointer"
           >
             <span>Menu</span>
             {isMobileMenuOpen ? (
@@ -191,12 +189,20 @@ export function AccountSidebar() {
           </button>
         </div>
 
-        {/* Collapsible Mobile Menu Content */}
-        {isMobileMenuOpen && (
-          <div className="pt-3 border-t border-[#e3e2e2] animate-in slide-in-from-top-2 duration-150">
-            {sidebarNavContent}
-          </div>
-        )}
+        {/* Collapsible Mobile Menu Content with Framer Motion Exit */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="pt-3 border-t border-[#e3e2e2] overflow-hidden"
+            >
+              {sidebarNavContent}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Desktop Sticky Light/Warm Sidebar */}
