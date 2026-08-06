@@ -82,7 +82,7 @@ export function Header({ variant }: HeaderProps) {
       }
       return 'absolute top-0 left-0 right-0 z-50 w-full bg-transparent transition-all duration-300';
     }
-    return 'sticky top-0 z-50 w-full border-b border-[#e3e2e2] bg-[#fbf9f8]/95 backdrop-blur-md transition-all duration-300';
+    return 'sticky top-0 z-50 w-full bg-[#fbf9f8]/95 backdrop-blur-md transition-all duration-300 shadow';
   };
 
   const isDarkText = !isTransparentVariant;
@@ -153,10 +153,14 @@ export function Header({ variant }: HeaderProps) {
               SHOP
             </Link>
             <Link
-              href="/#about"
-              className={`text-xs font-semibold uppercase tracking-[0.15em] transition ${isDarkText
-                ? 'text-[#5e5e5b] hover:text-[#1b1c1c]'
-                : 'text-white/80 hover:text-white'
+              href="/about"
+              className={`relative text-xs font-semibold uppercase tracking-[0.15em] transition ${pathname.startsWith('/about')
+                ? isDarkText
+                  ? 'text-[#1b1c1c] after:absolute after:-bottom-1 after:left-0 after:h-[1.5px] after:w-full after:bg-[#1b1c1c]'
+                  : 'text-white after:absolute after:-bottom-1 after:left-0 after:h-[1px] after:w-full after:bg-white'
+                : isDarkText
+                  ? 'text-[#5e5e5b] hover:text-[#1b1c1c]'
+                  : 'text-white/80 hover:text-white'
                 }`}
             >
               ABOUT
@@ -385,7 +389,7 @@ export function Header({ variant }: HeaderProps) {
                 Shop
               </Link>
               <Link
-                href="/#about"
+                href="/about"
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-[#1b1c1c] hover:text-[#5e5e5b]"
               >
