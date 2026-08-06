@@ -15,5 +15,8 @@ export async function fetchPublicProductsAction(options?: PublicProductsQueryOpt
     currentPage: productsData.currentPage,
     categories: filtersData.categories,
     collections: filtersData.collections,
+    fabrics: filtersData.fabrics,
+    patterns: filtersData.patterns,
+    colors: filtersData.colors,
   };
 }

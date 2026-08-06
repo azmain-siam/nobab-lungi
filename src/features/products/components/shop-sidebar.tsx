@@ -5,26 +5,60 @@ import React from 'react';
 interface ShopSidebarProps {
   categories: { id: string; label: string }[];
   collections: { id: string; label: string }[];
+  fabrics: string[];
+  patterns: string[];
+  colors: string[];
   selectedCategories: string[];
   selectedCollections: string[];
+  selectedFabrics: string[];
+  selectedPatterns: string[];
+  selectedColors: string[];
+  inStockOnly: boolean;
   priceRange: [number, number];
   minPriceLimit: number;
   maxPriceLimit: number;
   onCategoryToggle: (categoryId: string) => void;
   onCollectionToggle: (collectionId: string) => void;
+  onFabricToggle: (fabric: string) => void;
+  onPatternToggle: (pattern: string) => void;
+  onColorToggle: (color: string) => void;
+  onInStockToggle: (inStock: boolean) => void;
   onPriceChange: (newRange: [number, number]) => void;
+}
+
+function getColorHex(colorName: string): string {
+  const name = colorName.toLowerCase();
+  if (name.includes('navy') || name.includes('blue')) return '#1e293b';
+  if (name.includes('maroon') || name.includes('red') || name.includes('crimson')) return '#7f1d1d';
+  if (name.includes('green') || name.includes('emerald')) return '#14532d';
+  if (name.includes('black') || name.includes('charcoal')) return '#18181b';
+  if (name.includes('white') || name.includes('cream') || name.includes('off')) return '#f8fafc';
+  if (name.includes('grey') || name.includes('gray')) return '#64748b';
+  if (name.includes('amber') || name.includes('yellow') || name.includes('gold')) return '#b45309';
+  return '#475569';
 }
 
 export function ShopSidebar({
   categories,
   collections,
+  fabrics,
+  patterns,
+  colors,
   selectedCategories,
   selectedCollections,
+  selectedFabrics,
+  selectedPatterns,
+  selectedColors,
+  inStockOnly,
   priceRange,
   minPriceLimit,
   maxPriceLimit,
   onCategoryToggle,
   onCollectionToggle,
+  onFabricToggle,
+  onPatternToggle,
+  onColorToggle,
+  onInStockToggle,
   onPriceChange,
 }: ShopSidebarProps) {
   const [minVal, maxVal] = priceRange;
@@ -107,8 +141,121 @@ export function ShopSidebar({
         </div>
       </div>
 
+      {/* Fabric Section */}
+      {fabrics.length > 0 && (
+        <div className="space-y-3 border-t border-[#e3e2e2] pt-6">
+          <h3 className="font-display text-sm font-semibold text-[#1b1c1c]">
+            Fabric
+          </h3>
+          <div className="space-y-2">
+            {fabrics.map((fabric) => {
+              const isChecked = selectedFabrics.includes(fabric);
+              return (
+                <label
+                  key={fabric}
+                  className="flex items-center gap-3 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => onFabricToggle(fabric)}
+                    className="h-4 w-4 border-[#e3e2e2] rounded-none text-black focus:ring-0 cursor-pointer"
+                  />
+                  <span className={isChecked ? 'font-medium text-[#1b1c1c]' : ''}>
+                    {fabric}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Pattern Section */}
+      {patterns.length > 0 && (
+        <div className="space-y-3 border-t border-[#e3e2e2] pt-6">
+          <h3 className="font-display text-sm font-semibold text-[#1b1c1c]">
+            Pattern
+          </h3>
+          <div className="space-y-2">
+            {patterns.map((pattern) => {
+              const isChecked = selectedPatterns.includes(pattern);
+              return (
+                <label
+                  key={pattern}
+                  className="flex items-center gap-3 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => onPatternToggle(pattern)}
+                    className="h-4 w-4 border-[#e3e2e2] rounded-none text-black focus:ring-0 cursor-pointer"
+                  />
+                  <span className={isChecked ? 'font-medium text-[#1b1c1c]' : ''}>
+                    {pattern}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Color Section */}
+      {colors.length > 0 && (
+        <div className="space-y-3 border-t border-[#e3e2e2] pt-6">
+          <h3 className="font-display text-sm font-semibold text-[#1b1c1c]">
+            Color
+          </h3>
+          <div className="space-y-2">
+            {colors.map((color) => {
+              const isChecked = selectedColors.includes(color);
+              const hex = getColorHex(color);
+              return (
+                <label
+                  key={color}
+                  className="flex items-center gap-3 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => onColorToggle(color)}
+                    className="h-4 w-4 border-[#e3e2e2] rounded-none text-black focus:ring-0 cursor-pointer"
+                  />
+                  <span
+                    className="h-3 w-3 rounded-full border border-stone-300 inline-block shrink-0"
+                    style={{ backgroundColor: hex }}
+                  />
+                  <span className={isChecked ? 'font-medium text-[#1b1c1c]' : ''}>
+                    {color}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Availability Section */}
+      <div className="space-y-3 border-t border-[#e3e2e2] pt-6">
+        <h3 className="font-display text-sm font-semibold text-[#1b1c1c]">
+          Availability
+        </h3>
+        <label className="flex items-center gap-3 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] cursor-pointer">
+          <input
+            type="checkbox"
+            checked={inStockOnly}
+            onChange={(e) => onInStockToggle(e.target.checked)}
+            className="h-4 w-4 border-[#e3e2e2] rounded-none text-black focus:ring-0 cursor-pointer"
+          />
+          <span className={inStockOnly ? 'font-medium text-[#1b1c1c]' : ''}>
+            In Stock Only
+          </span>
+        </label>
+      </div>
+
       {/* Both-Sided Dual Range Price Slider */}
-      <div className="space-y-3">
+      <div className="space-y-3 border-t border-[#e3e2e2] pt-6">
         <h3 className="font-display text-sm font-semibold text-[#1b1c1c]">
           Price Range
         </h3>

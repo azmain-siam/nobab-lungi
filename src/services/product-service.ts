@@ -307,6 +307,10 @@ export interface PublicProductsQueryOptions {
   collectionId?: number;
   categories?: string[];
   collections?: string[];
+  fabrics?: string[];
+  patterns?: string[];
+  colors?: string[];
+  inStockOnly?: boolean;
   minPrice?: number;
   maxPrice?: number;
   sort?: string;
@@ -328,6 +332,10 @@ export async function getPublicProducts(options?: PublicProductsQueryOptions): P
     const collectionId = options?.collectionId;
     const categories = options?.categories;
     const collections = options?.collections;
+    const fabrics = options?.fabrics;
+    const patterns = options?.patterns;
+    const colors = options?.colors;
+    const inStockOnly = options?.inStockOnly;
     const minPrice = options?.minPrice;
     const maxPrice = options?.maxPrice;
     const sort = options?.sort || 'featured';
@@ -382,6 +390,22 @@ export async function getPublicProducts(options?: PublicProductsQueryOptions): P
       }
     }
 
+    if (fabrics && fabrics.length > 0) {
+      query.fabric = { $in: fabrics.map((f) => new RegExp(f, 'i')) };
+    }
+
+    if (patterns && patterns.length > 0) {
+      query.pattern = { $in: patterns.map((p) => new RegExp(p, 'i')) };
+    }
+
+    if (colors && colors.length > 0) {
+      query.color = { $in: colors.map((c) => new RegExp(c, 'i')) };
+    }
+
+    if (inStockOnly) {
+      query.stock = { $gt: 0 };
+    }
+
     if (minPrice !== undefined || maxPrice !== undefined) {
       const priceQuery: Record<string, number> = {};
       if (minPrice !== undefined) priceQuery.$gte = minPrice;
@@ -431,9 +455,12 @@ export async function getPublicProducts(options?: PublicProductsQueryOptions): P
 export async function getShopFilterData() {
   try {
     await connectToDatabase();
-    const [categories, collections] = await Promise.all([
+    const [categories, collections, dbFabrics, dbPatterns, dbColors] = await Promise.all([
       CategoryModel.find({ is_active: { $ne: false } }).sort({ sort_order: 1, name: 1 }).lean(),
       CollectionModel.find({ is_active: { $ne: false } }).sort({ sort_order: 1, name: 1 }).lean(),
+      Product.distinct('fabric', { status: 'published', is_active: true }),
+      Product.distinct('pattern', { status: 'published', is_active: true }),
+      Product.distinct('color', { status: 'published', is_active: true }),
     ]);
 
     const filteredCategories = categories
@@ -458,6 +485,14 @@ export async function getShopFilterData() {
       { id: 'lungi-handloom', numeric_id: 5, name: 'Handloom Series', slug: 'lungi-handloom', parent_type: 'lungi' },
     ];
 
+    const cleanDbFabrics = (dbFabrics as string[]).filter((f) => f && typeof f === 'string' && f.trim() !== '');
+    const cleanDbPatterns = (dbPatterns as string[]).filter((p) => p && typeof p === 'string' && p.trim() !== '');
+    const cleanDbColors = (dbColors as string[]).filter((c) => c && typeof c === 'string' && c.trim() !== '');
+
+    const fallbackFabrics = ['100% Combed Cotton', 'Fine Organic Linen', 'Mercerized Cotton', 'Traditional Handloom'];
+    const fallbackPatterns = ['Classic Check', 'Elegance Stripe', 'Solid Tone', 'Printed Motif', 'Border Weave'];
+    const fallbackColors = ['Navy Blue', 'Deep Maroon', 'Forest Green', 'Charcoal Black', 'Off White'];
+
     return {
       categories: filteredCategories.length > 0 ? filteredCategories : defaultFallbackCategories,
       collections: collections.map((col) => ({
@@ -467,6 +502,9 @@ export async function getShopFilterData() {
         slug: col.slug,
         is_featured: col.is_featured,
       })),
+      fabrics: cleanDbFabrics.length > 0 ? cleanDbFabrics : fallbackFabrics,
+      patterns: cleanDbPatterns.length > 0 ? cleanDbPatterns : fallbackPatterns,
+      colors: cleanDbColors.length > 0 ? cleanDbColors : fallbackColors,
     };
   } catch (error) {
     console.error('Error fetching shop filter data:', error);
@@ -479,6 +517,9 @@ export async function getShopFilterData() {
         { id: 'lungi-handloom', numeric_id: 5, name: 'Handloom Series', slug: 'lungi-handloom', parent_type: 'lungi' },
       ],
       collections: [],
+      fabrics: ['100% Combed Cotton', 'Fine Organic Linen', 'Mercerized Cotton', 'Traditional Handloom'],
+      patterns: ['Classic Check', 'Elegance Stripe', 'Solid Tone', 'Printed Motif', 'Border Weave'],
+      colors: ['Navy Blue', 'Deep Maroon', 'Forest Green', 'Charcoal Black', 'Off White'],
     };
   }
 }

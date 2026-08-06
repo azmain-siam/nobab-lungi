@@ -49,6 +49,10 @@ const DEFAULT_SHOP_CATEGORIES = [
   { id: 'lungi-handloom', label: 'Handloom Series' },
 ];
 
+const DEFAULT_FABRICS = ['100% Combed Cotton', 'Fine Organic Linen', 'Mercerized Cotton', 'Traditional Handloom'];
+const DEFAULT_PATTERNS = ['Classic Check', 'Elegance Stripe', 'Solid Tone', 'Printed Motif', 'Border Weave'];
+const DEFAULT_COLORS = ['Navy Blue', 'Deep Maroon', 'Forest Green', 'Charcoal Black', 'Off White'];
+
 export function ShopView() {
   const searchParams = useSearchParams();
   const initialCollectionParam = searchParams?.get('collection') || searchParams?.get('collections');
@@ -58,6 +62,10 @@ export function ShopView() {
   const [selectedCollections, setSelectedCollections] = useState<string[]>(() =>
     initialCollectionParam ? [initialCollectionParam] : []
   );
+  const [selectedFabrics, setSelectedFabrics] = useState<string[]>([]);
+  const [selectedPatterns, setSelectedPatterns] = useState<string[]>([]);
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const [inStockOnly, setInStockOnly] = useState<boolean>(false);
   const [priceRange, setPriceRange] = useState<[number, number]>([100, 10000]);
   const [selectedSort, setSelectedSort] = useState('featured');
   const [currentPage, setCurrentPage] = useState(1);
@@ -66,6 +74,9 @@ export function ShopView() {
   const [totalPages, setTotalPages] = useState(1);
   const [categoriesData, setCategoriesData] = useState<{ id: string; label: string }[]>(DEFAULT_SHOP_CATEGORIES);
   const [collectionsData, setCollectionsData] = useState<{ id: string; label: string }[]>([]);
+  const [fabricsData, setFabricsData] = useState<string[]>(DEFAULT_FABRICS);
+  const [patternsData, setPatternsData] = useState<string[]>(DEFAULT_PATTERNS);
+  const [colorsData, setColorsData] = useState<string[]>(DEFAULT_COLORS);
   const [loading, setLoading] = useState(true);
 
   const handleCategoryToggle = (id: string) => {
@@ -79,6 +90,32 @@ export function ShopView() {
     setSelectedCollections((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
+    setCurrentPage(1);
+  };
+
+  const handleFabricToggle = (fabric: string) => {
+    setSelectedFabrics((prev) =>
+      prev.includes(fabric) ? prev.filter((f) => f !== fabric) : [...prev, fabric]
+    );
+    setCurrentPage(1);
+  };
+
+  const handlePatternToggle = (pattern: string) => {
+    setSelectedPatterns((prev) =>
+      prev.includes(pattern) ? prev.filter((p) => p !== pattern) : [...prev, pattern]
+    );
+    setCurrentPage(1);
+  };
+
+  const handleColorToggle = (color: string) => {
+    setSelectedColors((prev) =>
+      prev.includes(color) ? prev.filter((c) => c !== color) : [...prev, color]
+    );
+    setCurrentPage(1);
+  };
+
+  const handleInStockToggle = (inStock: boolean) => {
+    setInStockOnly(inStock);
     setCurrentPage(1);
   };
 
@@ -96,6 +133,10 @@ export function ShopView() {
         search: searchQuery,
         categories: selectedCategories,
         collections: selectedCollections,
+        fabrics: selectedFabrics,
+        patterns: selectedPatterns,
+        colors: selectedColors,
+        inStockOnly,
         minPrice: priceRange[0],
         maxPrice: priceRange[1],
         sort: selectedSort,
@@ -124,6 +165,15 @@ export function ShopView() {
               }))
             );
           }
+          if (res.fabrics && res.fabrics.length > 0) {
+            setFabricsData(res.fabrics);
+          }
+          if (res.patterns && res.patterns.length > 0) {
+            setPatternsData(res.patterns);
+          }
+          if (res.colors && res.colors.length > 0) {
+            setColorsData(res.colors);
+          }
         })
         .catch((err) => {
           console.error('Error fetching dynamic products:', err);
@@ -141,6 +191,10 @@ export function ShopView() {
     searchQuery,
     selectedCategories,
     selectedCollections,
+    selectedFabrics,
+    selectedPatterns,
+    selectedColors,
+    inStockOnly,
     priceRange,
     selectedSort,
     currentPage,
@@ -165,13 +219,24 @@ export function ShopView() {
         <ShopSidebar
           categories={categoriesData}
           collections={collectionsData}
+          fabrics={fabricsData}
+          patterns={patternsData}
+          colors={colorsData}
           selectedCategories={selectedCategories}
           selectedCollections={selectedCollections}
+          selectedFabrics={selectedFabrics}
+          selectedPatterns={selectedPatterns}
+          selectedColors={selectedColors}
+          inStockOnly={inStockOnly}
           priceRange={priceRange}
           minPriceLimit={100}
           maxPriceLimit={10000}
           onCategoryToggle={handleCategoryToggle}
           onCollectionToggle={handleCollectionToggle}
+          onFabricToggle={handleFabricToggle}
+          onPatternToggle={handlePatternToggle}
+          onColorToggle={handleColorToggle}
+          onInStockToggle={handleInStockToggle}
           onPriceChange={(newRange) => {
             setPriceRange(newRange);
             setCurrentPage(1);
@@ -207,13 +272,17 @@ export function ShopView() {
                 No matching products found
               </h3>
               <p className="mt-1 text-xs text-[#5e5e5b] max-w-xs">
-                Try adjusting your search query, category, collection, or price range filter.
+                Try adjusting your search query, fabric, pattern, color, or price range filter.
               </p>
               <button
                 onClick={() => {
                   setSearchQuery('');
                   setSelectedCategories([]);
                   setSelectedCollections([]);
+                  setSelectedFabrics([]);
+                  setSelectedPatterns([]);
+                  setSelectedColors([]);
+                  setInStockOnly(false);
                   setPriceRange([100, 10000]);
                   setSelectedSort('featured');
                   setCurrentPage(1);
