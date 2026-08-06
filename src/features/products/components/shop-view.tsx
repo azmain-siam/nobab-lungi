@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ProductCard, type ProductCardData } from '@/components/shared/product-card';
-import { ShopHeader } from './shop-header';
+import { ShopHeader, type ActiveChip } from './shop-header';
 import { ShopSidebar } from './shop-sidebar';
 import { ShopPagination } from './shop-pagination';
+import { MobileFilterDrawer } from './mobile-filter-drawer';
+import { MobileSortModal } from './mobile-sort-modal';
 import { PackageX } from 'lucide-react';
 import { fetchPublicProductsAction } from '@/features/products/actions/shop-actions';
 import type { ProductWithImages } from '@/types';
@@ -70,8 +72,13 @@ export function ShopView() {
   const [selectedSort, setSelectedSort] = useState('featured');
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Mobile Drawer & Modal States
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [isMobileSortOpen, setIsMobileSortOpen] = useState(false);
+
   const [products, setProducts] = useState<ProductCardData[]>([]);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [categoriesData, setCategoriesData] = useState<{ id: string; label: string }[]>(DEFAULT_SHOP_CATEGORIES);
   const [collectionsData, setCollectionsData] = useState<{ id: string; label: string }[]>([]);
   const [fabricsData, setFabricsData] = useState<string[]>(DEFAULT_FABRICS);
@@ -124,6 +131,115 @@ export function ShopView() {
     setCurrentPage(1);
   };
 
+  const handleClearAll = () => {
+    setSearchQuery('');
+    setSelectedCategories([]);
+    setSelectedCollections([]);
+    setSelectedFabrics([]);
+    setSelectedPatterns([]);
+    setSelectedColors([]);
+    setInStockOnly(false);
+    setPriceRange([100, 10000]);
+    setSelectedSort('featured');
+    setCurrentPage(1);
+  };
+
+  // Compute active filter count
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    count += selectedCategories.length;
+    count += selectedCollections.length;
+    count += selectedFabrics.length;
+    count += selectedPatterns.length;
+    count += selectedColors.length;
+    if (inStockOnly) count += 1;
+    if (priceRange[0] !== 100 || priceRange[1] !== 10000) count += 1;
+    return count;
+  }, [
+    selectedCategories,
+    selectedCollections,
+    selectedFabrics,
+    selectedPatterns,
+    selectedColors,
+    inStockOnly,
+    priceRange,
+  ]);
+
+  // Compute active filter removable chips
+  const activeChips = useMemo(() => {
+    const chips: ActiveChip[] = [];
+
+    selectedCategories.forEach((catId) => {
+      const label = categoriesData.find((c) => c.id === catId)?.label || catId;
+      chips.push({
+        id: `cat-${catId}`,
+        label,
+        onRemove: () => handleCategoryToggle(catId),
+      });
+    });
+
+    selectedCollections.forEach((colId) => {
+      const label = collectionsData.find((c) => c.id === colId)?.label || colId;
+      chips.push({
+        id: `col-${colId}`,
+        label,
+        onRemove: () => handleCollectionToggle(colId),
+      });
+    });
+
+    selectedFabrics.forEach((fabric) => {
+      chips.push({
+        id: `fab-${fabric}`,
+        label: fabric,
+        onRemove: () => handleFabricToggle(fabric),
+      });
+    });
+
+    selectedPatterns.forEach((pattern) => {
+      chips.push({
+        id: `pat-${pattern}`,
+        label: pattern,
+        onRemove: () => handlePatternToggle(pattern),
+      });
+    });
+
+    selectedColors.forEach((color) => {
+      chips.push({
+        id: `clr-${color}`,
+        label: color,
+        onRemove: () => handleColorToggle(color),
+      });
+    });
+
+    if (inStockOnly) {
+      chips.push({
+        id: 'in-stock',
+        label: 'In Stock Only',
+        onRemove: () => handleInStockToggle(false),
+      });
+    }
+
+    if (priceRange[0] !== 100 || priceRange[1] !== 10000) {
+      chips.push({
+        id: 'price-range',
+        label: `৳${priceRange[0].toLocaleString()} - ৳${priceRange[1].toLocaleString()}`,
+        onRemove: () => setPriceRange([100, 10000]),
+      });
+    }
+
+    return chips;
+  }, [
+    selectedCategories,
+    selectedCollections,
+    selectedFabrics,
+    selectedPatterns,
+    selectedColors,
+    inStockOnly,
+    priceRange,
+    categoriesData,
+    collectionsData,
+  ]);
+
   // Fetch dynamic product and filter data from MongoDB
   useEffect(() => {
     let isMounted = true;
@@ -148,6 +264,7 @@ export function ShopView() {
           const cardProducts = res.products.map(mapProductToCardData);
           setProducts(cardProducts);
           setTotalPages(res.pages || 1);
+          setTotalCount(res.total || cardProducts.length);
 
           if (res.categories && res.categories.length > 0) {
             setCategoriesData(
@@ -206,48 +323,55 @@ export function ShopView() {
       <ShopHeader
         searchQuery={searchQuery}
         selectedSort={selectedSort}
+        activeFilterCount={activeFilterCount}
+        activeChips={activeChips}
+        totalProducts={totalCount}
         onSearchChange={handleSearchChange}
         onSortChange={(sort) => {
           setSelectedSort(sort);
           setCurrentPage(1);
         }}
+        onOpenFilter={() => setIsMobileFilterOpen(true)}
+        onOpenSort={() => setIsMobileSortOpen(true)}
       />
 
-      {/* Main Split Layout: Left Sidebar + Right Product Grid */}
+      {/* Main Split Layout: Left Sidebar (Desktop Only) + Right Product Grid */}
       <div className="flex flex-col gap-12 lg:flex-row lg:items-start">
-        {/* Left Sidebar Filters */}
-        <ShopSidebar
-          categories={categoriesData}
-          collections={collectionsData}
-          fabrics={fabricsData}
-          patterns={patternsData}
-          colors={colorsData}
-          selectedCategories={selectedCategories}
-          selectedCollections={selectedCollections}
-          selectedFabrics={selectedFabrics}
-          selectedPatterns={selectedPatterns}
-          selectedColors={selectedColors}
-          inStockOnly={inStockOnly}
-          priceRange={priceRange}
-          minPriceLimit={100}
-          maxPriceLimit={10000}
-          onCategoryToggle={handleCategoryToggle}
-          onCollectionToggle={handleCollectionToggle}
-          onFabricToggle={handleFabricToggle}
-          onPatternToggle={handlePatternToggle}
-          onColorToggle={handleColorToggle}
-          onInStockToggle={handleInStockToggle}
-          onPriceChange={(newRange) => {
-            setPriceRange(newRange);
-            setCurrentPage(1);
-          }}
-        />
+        {/* Desktop-Only Left Sidebar Filters (Hidden on Mobile) */}
+        <div className="hidden lg:block w-64 shrink-0">
+          <ShopSidebar
+            categories={categoriesData}
+            collections={collectionsData}
+            fabrics={fabricsData}
+            patterns={patternsData}
+            colors={colorsData}
+            selectedCategories={selectedCategories}
+            selectedCollections={selectedCollections}
+            selectedFabrics={selectedFabrics}
+            selectedPatterns={selectedPatterns}
+            selectedColors={selectedColors}
+            inStockOnly={inStockOnly}
+            priceRange={priceRange}
+            minPriceLimit={100}
+            maxPriceLimit={10000}
+            onCategoryToggle={handleCategoryToggle}
+            onCollectionToggle={handleCollectionToggle}
+            onFabricToggle={handleFabricToggle}
+            onPatternToggle={handlePatternToggle}
+            onColorToggle={handleColorToggle}
+            onInStockToggle={handleInStockToggle}
+            onPriceChange={(newRange) => {
+              setPriceRange(newRange);
+              setCurrentPage(1);
+            }}
+          />
+        </div>
 
-        {/* Right Product Grid Area */}
+        {/* Product Grid Area (2 Columns on Mobile, 3 Columns on Desktop) */}
         <div className="flex-1 space-y-8">
           {loading ? (
             /* Loading Skeleton Grid */
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-2 gap-4 sm:gap-8 lg:grid-cols-3">
               {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
                 <div key={i} className="animate-pulse space-y-3">
                   <div className="aspect-[3/4] w-full bg-[#efeded]" />
@@ -259,7 +383,7 @@ export function ShopView() {
               ))}
             </div>
           ) : products.length > 0 ? (
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-2 gap-4 sm:gap-8 lg:grid-cols-3">
               {products.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -275,18 +399,7 @@ export function ShopView() {
                 Try adjusting your search query, fabric, pattern, color, or price range filter.
               </p>
               <button
-                onClick={() => {
-                  setSearchQuery('');
-                  setSelectedCategories([]);
-                  setSelectedCollections([]);
-                  setSelectedFabrics([]);
-                  setSelectedPatterns([]);
-                  setSelectedColors([]);
-                  setInStockOnly(false);
-                  setPriceRange([100, 10000]);
-                  setSelectedSort('featured');
-                  setCurrentPage(1);
-                }}
+                onClick={handleClearAll}
                 aria-label="Clear all filters"
                 className="mt-6 bg-black text-white px-5 py-2.5 text-xs font-semibold uppercase tracking-wider rounded-none hover:bg-black/90 transition cursor-pointer"
               >
@@ -305,6 +418,49 @@ export function ShopView() {
           )}
         </div>
       </div>
+
+      {/* Mobile Filter Drawer */}
+      <MobileFilterDrawer
+        isOpen={isMobileFilterOpen}
+        onClose={() => setIsMobileFilterOpen(false)}
+        categories={categoriesData}
+        collections={collectionsData}
+        fabrics={fabricsData}
+        patterns={patternsData}
+        colors={colorsData}
+        selectedCategories={selectedCategories}
+        selectedCollections={selectedCollections}
+        selectedFabrics={selectedFabrics}
+        selectedPatterns={selectedPatterns}
+        selectedColors={selectedColors}
+        inStockOnly={inStockOnly}
+        priceRange={priceRange}
+        minPriceLimit={100}
+        maxPriceLimit={10000}
+        onCategoryToggle={handleCategoryToggle}
+        onCollectionToggle={handleCollectionToggle}
+        onFabricToggle={handleFabricToggle}
+        onPatternToggle={handlePatternToggle}
+        onColorToggle={handleColorToggle}
+        onInStockToggle={handleInStockToggle}
+        onPriceChange={(newRange) => {
+          setPriceRange(newRange);
+          setCurrentPage(1);
+        }}
+        onClearAll={handleClearAll}
+        activeFilterCount={activeFilterCount}
+      />
+
+      {/* Mobile Sort Modal */}
+      <MobileSortModal
+        isOpen={isMobileSortOpen}
+        onClose={() => setIsMobileSortOpen(false)}
+        selectedSort={selectedSort}
+        onSortChange={(sort) => {
+          setSelectedSort(sort);
+          setCurrentPage(1);
+        }}
+      />
     </div>
   );
 }
