@@ -24,12 +24,16 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { MobileNavDrawer } from './mobile-nav-drawer';
+import type { Collection } from '@/types';
 
 interface HeaderProps {
   variant?: 'transparent' | 'light';
+  collections?: Collection[];
+  whatsappNumber?: string;
 }
 
-export function Header({ variant }: HeaderProps) {
+export function Header({ variant, collections = [], whatsappNumber }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
   const activeVariant = variant ?? (pathname === '/' ? 'transparent' : 'light');
@@ -109,7 +113,7 @@ export function Header({ variant }: HeaderProps) {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className={`md:hidden p-1 focus:outline-none ${isDarkText ? 'text-[#1b1c1c]' : 'text-white'
+            className={`md:hidden p-1 focus:outline-none cursor-pointer ${isDarkText ? 'text-[#1b1c1c]' : 'text-white'
               }`}
             aria-label="Toggle mobile menu"
           >
@@ -386,146 +390,16 @@ export function Header({ variant }: HeaderProps) {
               )}
               </AnimatePresence>
             </div>
-
-
           </div>
         </Container>
 
-        {/* Mobile Dropdown Drawer */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-              className="md:hidden border-b border-[#e3e2e2] bg-white p-6 space-y-4 shadow-xl overflow-hidden"
-            >
-            <div className="flex flex-col space-y-4 text-sm font-semibold uppercase tracking-wider">
-              <Link
-                href="/collections"
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-[#1b1c1c] hover:text-[#5e5e5b]"
-              >
-                Collections
-              </Link>
-              <Link
-                href="/products"
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-[#1b1c1c] hover:text-[#5e5e5b]"
-              >
-                Shop
-              </Link>
-              <Link
-                href="/about"
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-[#1b1c1c] hover:text-[#5e5e5b]"
-              >
-                About
-              </Link>
-
-              <div className="border-t border-[#e3e2e2] pt-4 space-y-3">
-                {user ? (
-                  isAdmin ? (
-                    <>
-                      <div className="pb-1">
-                        <p className="text-xs font-bold text-[#1b1c1c] uppercase">{displayName}</p>
-                        <p className="text-xs font-normal text-emerald-700 lowercase">{displayEmail} (Admin)</p>
-                      </div>
-                      <Link
-                        href="/dashboard"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="text-emerald-700 hover:text-emerald-900 flex items-center gap-2"
-                      >
-                        <ShieldCheck className="h-4 w-4" />
-                        Admin Dashboard
-                      </Link>
-                      <Link
-                        href="/dashboard/products"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="text-[#1b1c1c] hover:text-[#5e5e5b] flex items-center gap-2"
-                      >
-                        <Tag className="h-4 w-4" />
-                        Manage Products
-                      </Link>
-                      <Link
-                        href="/dashboard/orders"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="text-[#1b1c1c] hover:text-[#5e5e5b] flex items-center gap-2"
-                      >
-                        <Package className="h-4 w-4" />
-                        Manage Orders
-                      </Link>
-                      <button
-                        onClick={handleSignOut}
-                        className="text-red-600 hover:text-red-800 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider cursor-pointer pt-1"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        Sign Out
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <div className="pb-1">
-                        <p className="text-xs font-bold text-[#1b1c1c] uppercase">{displayName}</p>
-                        <p className="text-xs font-normal text-[#5e5e5b] lowercase">{displayEmail}</p>
-                      </div>
-                      <Link
-                        href="/account"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="text-[#1b1c1c] hover:text-[#5e5e5b] flex items-center gap-2"
-                      >
-                        <UserIcon className="h-4 w-4" />
-                        My Profile
-                      </Link>
-                      <Link
-                        href="/account/orders"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="text-[#1b1c1c] hover:text-[#5e5e5b] flex items-center gap-2"
-                      >
-                        <Package className="h-4 w-4" />
-                        Order History
-                      </Link>
-                      <Link
-                        href="/account/addresses"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="text-[#1b1c1c] hover:text-[#5e5e5b] flex items-center gap-2"
-                      >
-                        <MapPin className="h-4 w-4" />
-                        Saved Addresses
-                      </Link>
-                      <button
-                        onClick={handleSignOut}
-                        className="text-red-600 hover:text-red-800 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider cursor-pointer pt-1"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        Sign Out
-                      </button>
-                    </>
-                  )
-                ) : (
-                  <>
-                    <Link
-                      href="/login"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="text-[#1b1c1c] hover:text-[#5e5e5b] block"
-                    >
-                      Sign In
-                    </Link>
-                    <Link
-                      href="/register"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="text-[#5e5e5b] hover:text-[#1b1c1c] block"
-                    >
-                      Create Account
-                    </Link>
-                  </>
-                )}
-              </div>
-            </div>
-          </motion.div>
-        )}
-        </AnimatePresence>
+        {/* Mobile Left Navigation Drawer */}
+        <MobileNavDrawer
+          isOpen={mobileMenuOpen}
+          onClose={() => setMobileMenuOpen(false)}
+          initialCollections={collections}
+          initialWhatsappNumber={whatsappNumber}
+        />
       </nav>
     </header>
   );
