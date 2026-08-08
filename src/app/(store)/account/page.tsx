@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { StaggerContainer, StaggerItem } from '@/components/ui/motion-wrappers';
 import { getUserOrders, getUserOrderStats } from '@/services/order-service';
+import { getUserWishlistProductIds } from '@/services/wishlist-service';
 import {
   Package,
   Clock,
@@ -39,16 +40,21 @@ export default async function AccountPage() {
   const userId = session?.user ? (session.user as { id?: string }).id : null;
   const userName = session?.user?.name || null;
 
-  const [stats, recentOrders] = userId
-    ? await Promise.all([getUserOrderStats(userId), getUserOrders(userId, 3)])
-    : [{ totalOrders: 0, processingOrders: 0, deliveredOrders: 0 }, []];
+  const [stats, recentOrders, wishlistIds] = userId
+    ? await Promise.all([
+        getUserOrderStats(userId),
+        getUserOrders(userId, 3),
+        getUserWishlistProductIds(userId),
+      ])
+    : [{ totalOrders: 0, processingOrders: 0, deliveredOrders: 0 }, [], []];
 
+  const wishlistCount = wishlistIds.length;
   const greetingMessage = getGreeting(userName);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Greeting Header */}
-      <div className="bg-white border border-[#e3e2e2] p-6 sm:p-8 space-y-2">
+      <div className="bg-white border border-[#e3e2e2] p-5 sm:p-7 space-y-1.5 shadow-xs">
         <h1 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-[#1b1c1c]">
           {greetingMessage}
         </h1>
@@ -57,51 +63,95 @@ export default async function AccountPage() {
         </p>
       </div>
 
-      {/* Metric Cards Grid */}
-      <StaggerContainer className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <StaggerItem className="bg-white border border-[#e3e2e2] p-5 space-y-1 hover:border-[#1b1c1c]/40 transition">
-          <div className="flex items-center justify-between text-[#5e5e5b]">
-            <span className="text-[11px] font-semibold uppercase tracking-wider">Total Orders</span>
-            <Package className="h-4 w-4 stroke-[1.5]" />
+      {/* Metric Cards Grid (2x2 on mobile, 4-col on desktop) */}
+      <StaggerContainer className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        {/* 1. Total Orders */}
+        <StaggerItem className="bg-white border border-[#e3e2e2] p-4 sm:p-5 space-y-3 hover:border-[#1b1c1c]/40 transition flex flex-col justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-[#5e5e5b]">
+              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
+                Total Orders
+              </span>
+              <Package className="h-4 w-4 stroke-[1.5]" />
+            </div>
+            <div className="font-display text-2xl sm:text-3xl font-bold text-[#1b1c1c]">
+              {stats.totalOrders}
+            </div>
           </div>
-          <div className="font-display text-2xl font-bold text-[#1b1c1c]">
-            {stats.totalOrders}
-          </div>
+          <Link
+            href="/account/orders"
+            className="text-[11px] font-semibold text-[#5e5e5b] hover:text-[#1b1c1c] inline-flex items-center gap-1 transition pt-1 border-t border-[#f5f3f3]"
+          >
+            <span>View orders</span>
+            <ArrowRight className="h-3 w-3" />
+          </Link>
         </StaggerItem>
 
-        <StaggerItem className="bg-white border border-[#e3e2e2] p-5 space-y-1 hover:border-[#1b1c1c]/40 transition">
-          <div className="flex items-center justify-between text-[#5e5e5b]">
-            <span className="text-[11px] font-semibold uppercase tracking-wider">Processing</span>
-            <Clock className="h-4 w-4 stroke-[1.5] text-amber-700" />
+        {/* 2. Processing */}
+        <StaggerItem className="bg-white border border-[#e3e2e2] p-4 sm:p-5 space-y-3 hover:border-[#1b1c1c]/40 transition flex flex-col justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-[#5e5e5b]">
+              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
+                Processing
+              </span>
+              <Clock className="h-4 w-4 stroke-[1.5] text-amber-600" />
+            </div>
+            <div className="font-display text-2xl sm:text-3xl font-bold text-[#1b1c1c]">
+              {stats.processingOrders}
+            </div>
           </div>
-          <div className="font-display text-2xl font-bold text-[#1b1c1c]">
-            {stats.processingOrders}
-          </div>
+          <Link
+            href="/account/orders"
+            className="text-[11px] font-semibold text-[#5e5e5b] hover:text-[#1b1c1c] inline-flex items-center gap-1 transition pt-1 border-t border-[#f5f3f3]"
+          >
+            <span>View active</span>
+            <ArrowRight className="h-3 w-3" />
+          </Link>
         </StaggerItem>
 
-        <StaggerItem className="bg-white border border-[#e3e2e2] p-5 space-y-1 hover:border-[#1b1c1c]/40 transition">
-          <div className="flex items-center justify-between text-[#5e5e5b]">
-            <span className="text-[11px] font-semibold uppercase tracking-wider">Delivered</span>
-            <CheckCircle2 className="h-4 w-4 stroke-[1.5] text-emerald-700" />
+        {/* 3. Delivered */}
+        <StaggerItem className="bg-white border border-[#e3e2e2] p-4 sm:p-5 space-y-3 hover:border-[#1b1c1c]/40 transition flex flex-col justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-[#5e5e5b]">
+              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
+                Delivered
+              </span>
+              <CheckCircle2 className="h-4 w-4 stroke-[1.5] text-emerald-600" />
+            </div>
+            <div className="font-display text-2xl sm:text-3xl font-bold text-[#1b1c1c]">
+              {stats.deliveredOrders}
+            </div>
           </div>
-          <div className="font-display text-2xl font-bold text-[#1b1c1c]">
-            {stats.deliveredOrders}
-          </div>
+          <span className="text-[11px] font-semibold text-emerald-700 inline-flex items-center gap-1 pt-1 border-t border-[#f5f3f3]">
+            <span>Completed</span>
+          </span>
         </StaggerItem>
 
-        <StaggerItem className="bg-white border border-[#e3e2e2] p-5 space-y-1 hover:border-[#1b1c1c]/40 transition">
-          <div className="flex items-center justify-between text-[#5e5e5b]">
-            <span className="text-[11px] font-semibold uppercase tracking-wider">Wishlist</span>
-            <Heart className="h-4 w-4 stroke-[1.5] text-rose-700" />
+        {/* 4. Wishlist */}
+        <StaggerItem className="bg-white border border-[#e3e2e2] p-4 sm:p-5 space-y-3 hover:border-[#1b1c1c]/40 transition flex flex-col justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-[#5e5e5b]">
+              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
+                Wishlist
+              </span>
+              <Heart className="h-4 w-4 stroke-[1.5] text-rose-600" />
+            </div>
+            <div className="font-display text-2xl sm:text-3xl font-bold text-[#1b1c1c]">
+              {wishlistCount}
+            </div>
           </div>
-          <div className="font-display text-2xl font-bold text-[#1b1c1c]">
-            3
-          </div>
+          <Link
+            href="/account/wishlist"
+            className="text-[11px] font-semibold text-[#5e5e5b] hover:text-[#1b1c1c] inline-flex items-center gap-1 transition pt-1 border-t border-[#f5f3f3]"
+          >
+            <span>View wishlist</span>
+            <ArrowRight className="h-3 w-3" />
+          </Link>
         </StaggerItem>
       </StaggerContainer>
 
       {/* Recent Orders Section */}
-      <div className="bg-white border border-[#e3e2e2] p-6 sm:p-8 space-y-6">
+      <div className="bg-white border border-[#e3e2e2] p-5 sm:p-8 space-y-5">
         <div className="flex items-center justify-between border-b border-[#e3e2e2] pb-4">
           <div>
             <h2 className="font-display text-base sm:text-lg font-semibold text-[#1b1c1c]">
@@ -116,14 +166,14 @@ export default async function AccountPage() {
               href="/account/orders"
               className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-[#1b1c1c] hover:underline"
             >
-              View All Orders
+              <span>View All</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           )}
         </div>
 
         {recentOrders.length > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {recentOrders.map((order) => {
               const itemCount = order.order_items.reduce((sum, item) => sum + item.quantity, 0);
               const orderDate = new Date(order.created_at).toLocaleDateString('en-US', {
@@ -132,10 +182,13 @@ export default async function AccountPage() {
                 year: 'numeric',
               });
 
+              const isDelivered = order.status === 'delivered';
+              const isCancelled = order.status === 'cancelled';
+
               return (
                 <div
                   key={order.id}
-                  className="border border-[#e3e2e2] p-5 bg-[#fbf9f8]/60 hover:bg-white transition flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                  className="border border-[#e3e2e2] p-4 sm:p-5 bg-[#fbf9f8]/60 hover:bg-white transition flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
@@ -153,14 +206,18 @@ export default async function AccountPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4">
-                    {order.status === 'delivered' ? (
-                      <span className="flex items-center gap-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 uppercase">
+                  <div className="flex items-center justify-between sm:justify-end gap-4 pt-2 sm:pt-0 border-t sm:border-0 border-[#e3e2e2]">
+                    {isDelivered ? (
+                      <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 border border-emerald-200 uppercase tracking-wider">
                         <CheckCircle2 className="h-3 w-3 stroke-[2]" />
                         Delivered
                       </span>
+                    ) : isCancelled ? (
+                      <span className="flex items-center gap-1 text-[11px] font-bold text-rose-700 bg-rose-50 px-2.5 py-1 border border-rose-200 uppercase tracking-wider">
+                        Cancelled
+                      </span>
                     ) : (
-                      <span className="flex items-center gap-1 text-[11px] font-medium text-blue-700 bg-blue-50 px-2 py-0.5 border border-blue-200 uppercase">
+                      <span className="flex items-center gap-1 text-[11px] font-bold text-blue-700 bg-blue-50 px-2.5 py-1 border border-blue-200 uppercase tracking-wider">
                         <Clock className="h-3 w-3 stroke-[2]" />
                         {order.status}
                       </span>
@@ -170,7 +227,7 @@ export default async function AccountPage() {
                       href={`/account/orders/${order.order_number}`}
                       className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-[#1b1c1c] hover:underline"
                     >
-                      View Order
+                      <span>View Order</span>
                       <ChevronRight className="h-3.5 w-3.5" />
                     </Link>
                   </div>
@@ -198,7 +255,7 @@ export default async function AccountPage() {
       </div>
 
       {/* Quick Actions Section */}
-      <div className="bg-white border border-[#e3e2e2] p-6 sm:p-8 space-y-4">
+      <div className="bg-white border border-[#e3e2e2] p-5 sm:p-8 space-y-4">
         <h2 className="font-display text-xs font-bold uppercase tracking-wider text-[#1b1c1c]">
           Quick Actions
         </h2>
@@ -206,9 +263,9 @@ export default async function AccountPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
           <Link
             href="/account/orders"
-            className="p-4 border border-[#e3e2e2] bg-[#fbf9f8]/60 hover:bg-white transition flex items-center justify-between font-medium text-[#1b1c1c] group"
+            className="p-4 border border-[#e3e2e2] bg-[#fbf9f8]/60 hover:bg-white transition flex items-center justify-between font-semibold text-[#1b1c1c] group"
           >
-            <span className="flex items-center gap-2">
+            <span className="flex items-center gap-2.5">
               <Package className="h-4 w-4 text-[#5e5e5b] stroke-[1.5]" />
               My Orders
             </span>
@@ -217,9 +274,9 @@ export default async function AccountPage() {
 
           <Link
             href="/account/addresses"
-            className="p-4 border border-[#e3e2e2] bg-[#fbf9f8]/60 hover:bg-white transition flex items-center justify-between font-medium text-[#1b1c1c] group"
+            className="p-4 border border-[#e3e2e2] bg-[#fbf9f8]/60 hover:bg-white transition flex items-center justify-between font-semibold text-[#1b1c1c] group"
           >
-            <span className="flex items-center gap-2">
+            <span className="flex items-center gap-2.5">
               <MapPin className="h-4 w-4 text-[#5e5e5b] stroke-[1.5]" />
               Saved Addresses
             </span>
@@ -228,9 +285,9 @@ export default async function AccountPage() {
 
           <Link
             href="/account/wishlist"
-            className="p-4 border border-[#e3e2e2] bg-[#fbf9f8]/60 hover:bg-white transition flex items-center justify-between font-medium text-[#1b1c1c] group"
+            className="p-4 border border-[#e3e2e2] bg-[#fbf9f8]/60 hover:bg-white transition flex items-center justify-between font-semibold text-[#1b1c1c] group"
           >
-            <span className="flex items-center gap-2">
+            <span className="flex items-center gap-2.5">
               <Heart className="h-4 w-4 text-[#5e5e5b] stroke-[1.5]" />
               Wishlist
             </span>
