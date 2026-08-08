@@ -22,7 +22,7 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { MobileNavDrawer } from './mobile-nav-drawer';
 import type { Collection } from '@/types';
@@ -33,20 +33,27 @@ interface HeaderProps {
   whatsappNumber?: string;
 }
 
+const emptySubscribe = () => () => { };
+
 export function Header({ variant, collections = [], whatsappNumber }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const activeVariant = variant ?? (pathname === '/' ? 'transparent' : 'light');
-  const isTransparentVariant = activeVariant === 'transparent';
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+
+  const isClient = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { openCart, cartCount } = useCart();
   const { wishlistCount } = useWishlist();
   const { user, profile, signOut } = useUser();
 
+  // Scroll position listener with passive option for mobile performance
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 20) {
@@ -56,7 +63,10 @@ export function Header({ variant, collections = [], whatsappNumber }: HeaderProp
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    // Check initial scroll position on mount
+    handleScroll();
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -80,17 +90,24 @@ export function Header({ variant, collections = [], whatsappNumber }: HeaderProp
     router.refresh();
   };
 
+  // Unified transparent vs light mode calculation
+  const isHomepage = isClient ? pathname === '/' : false;
+  const forcedVariant = variant;
+  const isTransparentMode = forcedVariant
+    ? forcedVariant === 'transparent' && !scrolled
+    : isHomepage && !scrolled;
+
+  const isDarkText = !isTransparentMode;
+
   const getHeaderStyles = () => {
-    if (isTransparentVariant) {
-      if (scrolled) {
-        return 'fixed top-0 left-0 right-0 z-50 w-full bg-[#1b1c1c]/70 backdrop-blur-md shadow-lg transition-all duration-300';
-      }
+    if (isTransparentMode) {
       return 'absolute top-0 left-0 right-0 z-50 w-full bg-transparent transition-all duration-300';
+    }
+    if (isHomepage && scrolled) {
+      return 'fixed top-0 left-0 right-0 z-50 w-full bg-white/95 backdrop-blur-md shadow transition-all duration-300';
     }
     return 'sticky top-0 z-50 w-full bg-[#fbf9f8]/95 backdrop-blur-md transition-all duration-300 shadow';
   };
-
-  const isDarkText = !isTransparentVariant;
 
   const displayName = profile?.name || user?.user_metadata?.full_name || 'User';
   const displayEmail = user?.email || '';
@@ -107,13 +124,13 @@ export function Header({ variant, collections = [], whatsappNumber }: HeaderProp
     <header className={getHeaderStyles()}>
       <nav aria-label="Main navigation">
         <Container
-          className={`flex items-center justify-between transition-all duration-300 ${scrolled ? 'py-4' : 'py-5'
+          className={`flex items-center justify-between transition-all duration-300 ${scrolled ? 'py-3.5' : 'py-5'
             }`}
         >
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className={`md:hidden p-1 focus:outline-none cursor-pointer ${isDarkText ? 'text-[#1b1c1c]' : 'text-white'
+            className={`md:hidden p-1 focus:outline-none cursor-pointer transition-colors ${isDarkText ? 'text-[#1b1c1c]' : 'text-white'
               }`}
             aria-label="Toggle mobile menu"
           >
@@ -174,7 +191,7 @@ export function Header({ variant, collections = [], whatsappNumber }: HeaderProp
 
           {/* Action Icons Section */}
           <div
-            className={`flex items-center gap-4 sm:gap-5 ${isDarkText ? 'text-[#1b1c1c]' : 'text-white'
+            className={`flex items-center gap-4 sm:gap-5 transition-colors ${isDarkText ? 'text-[#1b1c1c]' : 'text-white'
               }`}
           >
             {/* 1. Search */}
@@ -263,131 +280,131 @@ export function Header({ variant, collections = [], whatsappNumber }: HeaderProp
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -8, scale: 0.96 }}
                     transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                    className="absolute right-0 mt-3 w-60 bg-white border border-[#e3e2e2] shadow-2xl py-2 z-50 text-left"
+                    className="absolute right-0 mt-3 w-60 bg-white border border-[#e3e2e2] shadow-2xl py-2 z-50 text-left text-[#1b1c1c]"
                   >
-                  {user ? (
-                    <>
-                      {/* Header snippet */}
-                      <div className="px-4 py-3 border-b border-[#e3e2e2] bg-[#fbf9f8]">
-                        <div className="flex items-center justify-between">
-                          <p className="text-xs font-bold text-[#1b1c1c] truncate">{displayName}</p>
-                          {isAdmin && (
-                            <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 bg-emerald-100 text-emerald-800 tracking-wider">
-                              ADMIN
-                            </span>
+                    {user ? (
+                      <>
+                        {/* Header snippet */}
+                        <div className="px-4 py-3 border-b border-[#e3e2e2] bg-[#fbf9f8]">
+                          <div className="flex items-center justify-between">
+                            <p className="text-xs font-bold text-[#1b1c1c] truncate">{displayName}</p>
+                            {isAdmin && (
+                              <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 bg-emerald-100 text-emerald-800 tracking-wider">
+                                ADMIN
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-[#5e5e5b] truncate mt-0.5">{displayEmail}</p>
+                        </div>
+
+                        {/* Menu Options */}
+                        <div className="py-1">
+                          {isAdmin ? (
+                            <>
+                              <Link
+                                href="/dashboard"
+                                onClick={() => setUserDropdownOpen(false)}
+                                className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
+                              >
+                                <ShieldCheck className="h-4 w-4 text-emerald-700 stroke-[1.5]" />
+                                Admin Dashboard
+                              </Link>
+                              <Link
+                                href="/dashboard/products"
+                                onClick={() => setUserDropdownOpen(false)}
+                                className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
+                              >
+                                <Tag className="h-4 w-4 stroke-[1.5]" />
+                                Manage Products
+                              </Link>
+                              <Link
+                                href="/dashboard/orders"
+                                onClick={() => setUserDropdownOpen(false)}
+                                className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
+                              >
+                                <Package className="h-4 w-4 stroke-[1.5]" />
+                                Manage Orders
+                              </Link>
+                              <Link
+                                href="/dashboard/collections"
+                                onClick={() => setUserDropdownOpen(false)}
+                                className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
+                              >
+                                <Grid className="h-4 w-4 stroke-[1.5]" />
+                                Manage Collections
+                              </Link>
+                            </>
+                          ) : (
+                            <>
+                              <Link
+                                href="/account"
+                                onClick={() => setUserDropdownOpen(false)}
+                                className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
+                              >
+                                <UserIcon className="h-4 w-4 stroke-[1.5]" />
+                                My Profile
+                              </Link>
+                              <Link
+                                href="/account/orders"
+                                onClick={() => setUserDropdownOpen(false)}
+                                className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
+                              >
+                                <Package className="h-4 w-4 stroke-[1.5]" />
+                                Order History
+                              </Link>
+                              <Link
+                                href="/account/addresses"
+                                onClick={() => setUserDropdownOpen(false)}
+                                className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
+                              >
+                                <MapPin className="h-4 w-4 stroke-[1.5]" />
+                                Saved Addresses
+                              </Link>
+                              <Link
+                                href="/account/wishlist"
+                                onClick={() => setUserDropdownOpen(false)}
+                                className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
+                              >
+                                <Heart className="h-4 w-4 stroke-[1.5]" />
+                                My Wishlist
+                              </Link>
+                            </>
                           )}
                         </div>
-                        <p className="text-[11px] text-[#5e5e5b] truncate mt-0.5">{displayEmail}</p>
-                      </div>
 
-                      {/* Menu Options */}
+                        {/* Sign Out */}
+                        <div className="border-t border-[#e3e2e2] pt-1 mt-1">
+                          <button
+                            onClick={handleSignOut}
+                            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-red-600 hover:bg-red-50 transition text-left cursor-pointer"
+                          >
+                            <LogOut className="h-4 w-4 stroke-[1.5]" />
+                            Sign Out
+                          </button>
+                        </div>
+                      </>
+                    ) : (
                       <div className="py-1">
-                        {isAdmin ? (
-                          <>
-                            <Link
-                              href="/dashboard"
-                              onClick={() => setUserDropdownOpen(false)}
-                              className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
-                            >
-                              <ShieldCheck className="h-4 w-4 text-emerald-700 stroke-[1.5]" />
-                              Admin Dashboard
-                            </Link>
-                            <Link
-                              href="/dashboard/products"
-                              onClick={() => setUserDropdownOpen(false)}
-                              className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
-                            >
-                              <Tag className="h-4 w-4 stroke-[1.5]" />
-                              Manage Products
-                            </Link>
-                            <Link
-                              href="/dashboard/orders"
-                              onClick={() => setUserDropdownOpen(false)}
-                              className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
-                            >
-                              <Package className="h-4 w-4 stroke-[1.5]" />
-                              Manage Orders
-                            </Link>
-                            <Link
-                              href="/dashboard/collections"
-                              onClick={() => setUserDropdownOpen(false)}
-                              className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
-                            >
-                              <Grid className="h-4 w-4 stroke-[1.5]" />
-                              Manage Collections
-                            </Link>
-                          </>
-                        ) : (
-                          <>
-                            <Link
-                              href="/account"
-                              onClick={() => setUserDropdownOpen(false)}
-                              className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
-                            >
-                              <UserIcon className="h-4 w-4 stroke-[1.5]" />
-                              My Profile
-                            </Link>
-                            <Link
-                              href="/account/orders"
-                              onClick={() => setUserDropdownOpen(false)}
-                              className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
-                            >
-                              <Package className="h-4 w-4 stroke-[1.5]" />
-                              Order History
-                            </Link>
-                            <Link
-                              href="/account/addresses"
-                              onClick={() => setUserDropdownOpen(false)}
-                              className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
-                            >
-                              <MapPin className="h-4 w-4 stroke-[1.5]" />
-                              Saved Addresses
-                            </Link>
-                            <Link
-                              href="/account/wishlist"
-                              onClick={() => setUserDropdownOpen(false)}
-                              className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
-                            >
-                              <Heart className="h-4 w-4 stroke-[1.5]" />
-                              My Wishlist
-                            </Link>
-                          </>
-                        )}
-                      </div>
-
-                      {/* Sign Out */}
-                      <div className="border-t border-[#e3e2e2] pt-1 mt-1">
-                        <button
-                          onClick={handleSignOut}
-                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-red-600 hover:bg-red-50 transition text-left cursor-pointer"
+                        <Link
+                          href="/login"
+                          onClick={() => setUserDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
                         >
-                          <LogOut className="h-4 w-4 stroke-[1.5]" />
-                          Sign Out
-                        </button>
+                          <UserIcon className="h-4 w-4 stroke-[1.5]" />
+                          Sign In
+                        </Link>
+                        <Link
+                          href="/register"
+                          onClick={() => setUserDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
+                        >
+                          <Tag className="h-4 w-4 stroke-[1.5]" />
+                          Create Account
+                        </Link>
                       </div>
-                    </>
-                  ) : (
-                    <div className="py-1">
-                      <Link
-                        href="/login"
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
-                      >
-                        <UserIcon className="h-4 w-4 stroke-[1.5]" />
-                        Sign In
-                      </Link>
-                      <Link
-                        href="/register"
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
-                      >
-                        <Tag className="h-4 w-4 stroke-[1.5]" />
-                        Create Account
-                      </Link>
-                    </div>
-                  )}
-                </motion.div>
-              )}
+                    )}
+                  </motion.div>
+                )}
               </AnimatePresence>
             </div>
           </div>
