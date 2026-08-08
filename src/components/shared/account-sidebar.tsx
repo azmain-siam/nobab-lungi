@@ -44,6 +44,25 @@ export function AccountSidebar() {
     () => false
   );
 
+  const [whatsappNumber, setWhatsappNumber] = useState<string | null>(null);
+
+  useEffect(() => {
+    import('@/actions/collections').then(({ getMobileNavDataAction }) => {
+      getMobileNavDataAction()
+        .then((res) => {
+          if (res?.whatsappNumber) {
+            setWhatsappNumber(res.whatsappNumber);
+          }
+        })
+        .catch(() => {});
+    });
+  }, []);
+
+  const cleanWhatsappPhone = whatsappNumber
+    ? whatsappNumber.replace(/[^0-9]/g, '')
+    : '8801712345678';
+  const whatsappUrl = `https://wa.me/${cleanWhatsappPhone}`;
+
   const handleSignOut = async () => {
     setIsMobileMenuOpen(false);
     await signOut();
@@ -222,7 +241,7 @@ export function AccountSidebar() {
                   {/* Sheet Footer WhatsApp CTA */}
                   <div className="p-4 border-t border-[#e3e2e2] bg-white shrink-0">
                     <a
-                      href="https://wa.me/8801712345678"
+                      href={whatsappUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => setIsMobileMenuOpen(false)}
@@ -322,7 +341,7 @@ export function AccountSidebar() {
             Need assistance with your orders or delivery?
           </p>
           <a
-            href="https://wa.me/8801712345678"
+            href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 hover:underline pt-1"

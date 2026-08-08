@@ -1,11 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DELIVERY_CHARGES } from '@/constants/delivery';
 import { useToast } from '@/providers/toast-provider';
-import { MapPin, Plus, Trash2, CheckCircle2, AlertCircle } from 'lucide-react';
+import {
+  getUserAddressesAction,
+  addUserAddressAction,
+  setDefaultAddressAction,
+  deleteAddressAction,
+} from '@/actions/address';
+import { MapPin, Plus, Trash2, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 
 interface Address {
   id: string;
@@ -16,76 +22,101 @@ interface Address {
   isDefault: boolean;
 }
 
-const INITIAL_ADDRESSES: Address[] = [
-  {
-    id: '1',
-    name: 'Rafiqul Islam (Home)',
-    phone: '01712345678',
-    area: 'Inside Dhaka',
-    fullAddress: 'House 42, Road 11, Banani, Dhaka-1213',
-    isDefault: true,
-  },
-  {
-    id: '2',
-    name: 'Rafiqul Islam (Office)',
-    phone: '01812345678',
-    area: 'Outside Dhaka',
-    fullAddress: 'Holding 88, Station Road, Pabna Sadar, Pabna',
-    isDefault: false,
-  },
-];
-
 export default function AddressesPage() {
   const toast = useToast();
-  const [addresses, setAddresses] = useState<Address[]>(INITIAL_ADDRESSES);
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [newAddressName, setNewAddressName] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [newArea, setNewArea] = useState('Inside Dhaka');
   const [newFullAddress, setNewFullAddress] = useState('');
 
-  const handleAddAddress = (e: React.FormEvent) => {
+  useEffect(() => {
+    let isMounted = true;
+    getUserAddressesAction()
+      .then((res) => {
+        if (isMounted && res.success && res.addresses) {
+          setAddresses(res.addresses);
+        }
+      })
+      .catch((err) => console.error('Error loading addresses:', err))
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const handleAddAddress = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newAddressName.trim() || !newFullAddress.trim()) {
       toast.error('Please enter address label and full address.');
       return;
     }
 
-    const newEntry: Address = {
-      id: Date.now().toString(),
-      name: newAddressName.trim(),
-      phone: newPhone.trim() || '01712345678',
-      area: newArea,
-      fullAddress: newFullAddress.trim(),
-      isDefault: addresses.length === 0,
-    };
+    setIsSubmitting(true);
+    try {
+      const res = await addUserAddressAction({
+        name: newAddressName,
+        phone: newPhone,
+        area: newArea,
+        fullAddress: newFullAddress,
+      });
 
-    setAddresses([...addresses, newEntry]);
-    setShowAddForm(false);
-    setNewAddressName('');
-    setNewPhone('');
-    setNewFullAddress('');
-    toast.success('Address added successfully.');
+      if (res.success && res.addresses) {
+        setAddresses(res.addresses);
+        setShowAddForm(false);
+        setNewAddressName('');
+        setNewPhone('');
+        setNewFullAddress('');
+        toast.success('Address saved successfully.');
+      } else {
+        toast.error(res.error || 'Failed to save address.');
+      }
+    } catch (err) {
+      console.error('Error adding address:', err);
+      toast.error('An unexpected error occurred.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleSetDefault = (id: string) => {
-    setAddresses(
-      addresses.map((a) => ({
+  const handleSetDefault = async (id: string) => {
+    const previous = [...addresses];
+    setAddresses((prev) =>
+      prev.map((a) => ({
         ...a,
         isDefault: a.id === id,
       }))
     );
-    toast.success('Default shipping address updated.');
+
+    const res = await setDefaultAddressAction(id);
+    if (res.success && res.addresses) {
+      setAddresses(res.addresses);
+      toast.success('Default shipping address updated.');
+    } else {
+      setAddresses(previous);
+      toast.error(res.error || 'Failed to update default address.');
+    }
   };
 
-  const handleDelete = (id: string) => {
-    const updated = addresses.filter((a) => a.id !== id);
-    if (addresses.find((a) => a.id === id)?.isDefault && updated.length > 0) {
-      updated[0].isDefault = true;
+  const handleDelete = async (id: string) => {
+    const previous = [...addresses];
+    setAddresses((prev) => prev.filter((a) => a.id !== id));
+
+    const res = await deleteAddressAction(id);
+    if (res.success && res.addresses) {
+      setAddresses(res.addresses);
+      toast.success('Address deleted successfully.');
+    } else {
+      setAddresses(previous);
+      toast.error(res.error || 'Failed to delete address.');
     }
-    setAddresses(updated);
-    toast.success('Address deleted successfully.');
   };
 
   return (
@@ -103,7 +134,7 @@ export default function AddressesPage() {
         <Button
           variant="secondary"
           size="sm"
-          className="gap-1.5"
+          className="gap-1.5 cursor-pointer"
           onClick={() => setShowAddForm(!showAddForm)}
         >
           <Plus className="h-3.5 w-3.5" />
@@ -144,7 +175,7 @@ export default function AddressesPage() {
                 value={newPhone}
                 onChange={(e) => setNewPhone(e.target.value)}
                 placeholder="017XXXXXXXX"
-                className="w-full bg-white border border-[#e3e2e2] px-3 py-2 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
+                className="w-full bg-white border border-[#e3e2e2] px-3 py-2 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none font-mono"
               />
             </div>
 
@@ -155,7 +186,7 @@ export default function AddressesPage() {
               <select
                 value={newArea}
                 onChange={(e) => setNewArea(e.target.value)}
-                className="w-full bg-white border border-[#e3e2e2] px-3 py-2 text-xs font-medium text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
+                className="w-full bg-white border border-[#e3e2e2] px-3 py-2 text-xs font-medium text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none cursor-pointer"
               >
                 <option value="Inside Dhaka">Inside Dhaka (৳{DELIVERY_CHARGES.INSIDE_DHAKA})</option>
                 <option value="Outside Dhaka">Outside Dhaka (৳{DELIVERY_CHARGES.OUTSIDE_DHAKA})</option>
@@ -178,14 +209,28 @@ export default function AddressesPage() {
           </div>
 
           <div className="flex gap-2">
-            <Button type="submit" variant="primary" size="sm">
-              Save Address
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              disabled={isSubmitting}
+              className="cursor-pointer"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                'Save Address'
+              )}
             </Button>
             <Button
               type="button"
               variant="secondary"
               size="sm"
               onClick={() => setShowAddForm(false)}
+              className="cursor-pointer"
             >
               Cancel
             </Button>
@@ -193,7 +238,12 @@ export default function AddressesPage() {
         </form>
       )}
 
-      {addresses.length > 0 ? (
+      {loading ? (
+        <div className="py-12 flex flex-col items-center justify-center space-y-3">
+          <Loader2 className="h-6 w-6 animate-spin text-[#1b1c1c]" />
+          <p className="text-xs text-[#5e5e5b]">Loading saved addresses...</p>
+        </div>
+      ) : addresses.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {addresses.map((address) => (
             <div
@@ -208,9 +258,7 @@ export default function AddressesPage() {
                       {address.name}
                     </h3>
                   </div>
-                  {address.isDefault && (
-                    <Badge variant="pill">Default</Badge>
-                  )}
+                  {address.isDefault && <Badge variant="pill">Default</Badge>}
                 </div>
 
                 <p className="text-xs font-light leading-relaxed text-[#5e5e5b]">
@@ -261,7 +309,7 @@ export default function AddressesPage() {
             <Button
               variant="primary"
               size="sm"
-              className="gap-1.5"
+              className="gap-1.5 cursor-pointer"
               onClick={() => setShowAddForm(true)}
             >
               <Plus className="h-3.5 w-3.5" />
