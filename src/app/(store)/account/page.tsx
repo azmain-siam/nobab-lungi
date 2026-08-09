@@ -23,7 +23,12 @@ export const metadata: Metadata = {
 };
 
 function getGreeting(name?: string | null): string {
-  const hour = new Date().getHours();
+  const dhakaHourStr = new Date().toLocaleTimeString('en-US', {
+    timeZone: 'Asia/Dhaka',
+    hour12: false,
+    hour: '2-digit',
+  });
+  const hour = parseInt(dhakaHourStr, 10) || new Date().getHours();
   const firstName = name ? name.split(' ')[0] : 'Valued Customer';
 
   if (hour >= 4 && hour < 12) {

@@ -12,9 +12,13 @@ import { getCheckoutSettingsAction } from '@/actions/settings';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ShieldCheck, Truck, CreditCard, Copy, Check, Tag, AlertCircle } from 'lucide-react';
 
+import { useUser } from '@/features/auth/hooks/use-user';
+import { getUserAddressesAction } from '@/actions/address';
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, subtotal, clearCart } = useCart();
+  const { user, profile } = useUser();
 
   // Shipping Form State
   const [fullName, setFullName] = useState('');
@@ -56,6 +60,31 @@ export default function CheckoutPage() {
       }
     });
   }, []);
+
+  // Pre-fill user details & default address when authenticated
+  useEffect(() => {
+    const initialName = profile?.name || user?.user_metadata?.full_name || '';
+    const initialPhone = profile?.phone || '';
+
+    if (initialName || initialPhone) {
+      queueMicrotask(() => {
+        if (initialName) setFullName((prev) => prev || initialName);
+        if (initialPhone) setPhone((prev) => prev || initialPhone);
+      });
+    }
+
+    getUserAddressesAction().then((res) => {
+      if (res.success && res.addresses && res.addresses.length > 0) {
+        const defaultAddr = res.addresses.find((a) => a.isDefault) || res.addresses[0];
+        if (defaultAddr) {
+          setFullName((prev) => prev || defaultAddr.name);
+          setPhone((prev) => prev || defaultAddr.phone);
+          setAddress((prev) => prev || defaultAddr.fullAddress);
+          setDistrict(defaultAddr.area === 'Inside Dhaka' ? 'dhaka' : 'outside');
+        }
+      }
+    });
+  }, [user, profile]);
 
   const deliveryCharge = district === 'dhaka' ? insideDhakaCharge : outsideDhakaCharge;
   const grandTotal = Math.max(0, subtotal - couponDiscount) + deliveryCharge;

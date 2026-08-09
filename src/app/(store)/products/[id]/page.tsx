@@ -77,16 +77,14 @@ export default async function ProductDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [product, storeSettings] = await Promise.all([
-    getProductById(id),
-    getStoreSettings(),
-  ]);
+  const product = await getProductById(id);
 
   if (!product) {
     notFound();
   }
 
-  const [category, relatedDocs] = await Promise.all([
+  const [storeSettings, category, relatedDocs] = await Promise.all([
+    getStoreSettings(),
     product.category_id ? getCategoryById(product.category_id) : Promise.resolve(null),
     getRelatedProducts(product.category_id, product.id, 4),
   ]);
