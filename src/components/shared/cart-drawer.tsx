@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -19,6 +20,16 @@ export function CartDrawer() {
     subtotal,
     cartCount,
   } = useCart();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        closeCart();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, closeCart]);
 
   const freeShippingProgress = Math.min(
     100,
@@ -45,6 +56,9 @@ export function CartDrawer() {
 
       {/* Drawer Panel Container */}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Shopping Cart"
         className={`relative z-10 flex h-full w-full max-w-md flex-col justify-between bg-[#fbf9f8] shadow-2xl transition-transform duration-300 cubic-bezier(0.16, 1, 0.3, 1) ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}

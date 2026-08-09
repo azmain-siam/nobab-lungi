@@ -16,7 +16,7 @@ function mapProductToCardData(product: ProductWithImages): ProductCardData {
   const coverImage =
     product.product_images?.find((img) => img.is_cover)?.url ||
     product.product_images?.[0]?.url ||
-    'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?q=80&w=600&auto=format&fit=crop';
+    '/images/placeholder-product.svg';
 
   let badge: string | null = null;
   if (product.is_new_arrival) badge = 'New Arrival';

@@ -60,6 +60,17 @@ export function MobileNavDrawer({
     onClose();
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        setViewMode('main');
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   // Lock body scroll when drawer is open
   useEffect(() => {
     if (isOpen) {
@@ -111,6 +122,9 @@ export function MobileNavDrawer({
 
           {/* Left Drawer Panel */}
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Mobile Navigation"
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}

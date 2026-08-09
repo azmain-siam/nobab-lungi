@@ -31,7 +31,7 @@ export function HeroSection({ banners = [] }: HeroSectionProps) {
   return (
     <section
       aria-label="Hero"
-      className="relative min-h-[90vh] w-full overflow-hidden bg-stone-900 flex items-end pb-20 pt-32 lg:min-h-[95vh] lg:pb-28"
+      className="relative min-h-[100vh] w-full overflow-hidden bg-stone-900 flex items-end pb-20 pt-32 lg:min-h-[100vh] lg:pb-28"
     >
       {/* Background Image Carousel with AnimatePresence Crossfade */}
       <AnimatePresence mode="popLayout">

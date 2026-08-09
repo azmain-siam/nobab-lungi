@@ -36,7 +36,9 @@ export default function WishlistPage() {
     };
   }, []);
 
-  const handleRemove = async (product: ProductWithImages) => {
+  const handleRemove = async (e: React.MouseEvent, product: ProductWithImages) => {
+    e.preventDefault();
+    e.stopPropagation();
     setItems((prev) => prev.filter((p) => p.id !== product.id));
     await toggleWishlist({ id: product.id, name: product.name });
     await refreshWishlist();
@@ -46,7 +48,7 @@ export default function WishlistPage() {
     const coverImage =
       product.product_images?.find((img) => img.is_cover)?.url ||
       product.product_images?.[0]?.url ||
-      'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?q=80&w=600&auto=format&fit=crop';
+      '/images/placeholder-product.svg';
 
     addToCart({
       id: product.id,
@@ -115,7 +117,7 @@ export default function WishlistPage() {
                 const coverImage =
                   product.product_images?.find((img) => img.is_cover)?.url ||
                   product.product_images?.[0]?.url ||
-                  'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?q=80&w=600&auto=format&fit=crop';
+                  '/images/placeholder-product.svg';
                 const inStock = product.is_active && product.stock > 0;
                 const priceStr = `৳${(product.discount_price ?? product.price).toLocaleString('en-BD')}`;
                 const originalPriceStr = product.discount_price
@@ -163,7 +165,7 @@ export default function WishlistPage() {
                       {/* Remove Button Overlay */}
                       <button
                         type="button"
-                        onClick={() => handleRemove(product)}
+                        onClick={(e) => handleRemove(e, product)}
                         className="absolute top-3 right-3 z-10 p-2 bg-white/90 border border-[#e3e2e2] text-red-600 hover:bg-red-50 hover:text-red-700 active:scale-90 transition shadow-xs cursor-pointer"
                         title="Remove from Wishlist"
                       >

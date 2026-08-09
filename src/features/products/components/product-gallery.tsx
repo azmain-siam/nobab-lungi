@@ -20,8 +20,7 @@ interface ProductGalleryProps {
   productName: string;
 }
 
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?q=80&w=800&auto=format&fit=crop';
+const FALLBACK_IMAGE = '/images/placeholder-product.svg';
 
 export function ProductGallery({ images, productName }: ProductGalleryProps) {
   const galleryImages =
