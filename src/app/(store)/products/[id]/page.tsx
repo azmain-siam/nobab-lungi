@@ -4,7 +4,6 @@ import { Container } from '@/components/ui/container';
 import { ProductGallery } from '@/features/products/components/product-gallery';
 import { ProductInfo, type ProductInfoData } from '@/features/products/components/product-info';
 import { DeliveryInfo } from '@/features/products/components/delivery-info';
-import { ProductReviews } from '@/features/products/components/product-reviews';
 import { RelatedProducts } from '@/features/products/components/related-products';
 import { getProductById, getRelatedProducts } from '@/services/product-service';
 import { getCategoryById } from '@/services/category-service';
@@ -160,9 +159,6 @@ export default async function ProductDetailsPage({
           outsideDhakaCharge={storeSettings.delivery.outside_dhaka_charge}
           estimatedDeliveryTime={storeSettings.delivery.estimated_delivery_time}
         />
-
-        {/* Product Reviews */}
-        <ProductReviews />
 
         {/* Related Products */}
         <RelatedProducts products={relatedProducts} />
