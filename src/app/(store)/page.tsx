@@ -23,19 +23,14 @@ export default async function HomePage() {
       {/* 2. Hero Banner */}
       {isSectionVisible("hero") && <HeroSection banners={data.banners} />}
 
-      {/* 6. Why Choose Nabab Lungi */}
-      {isSectionVisible("why_choose_us") && (
-        <NababStandard items={data.config.why_choose_us} />
-      )}
-
       {/* 3. Featured Categories & 4. Premium Featured Collections */}
       {(isSectionVisible("featured_categories") ||
         isSectionVisible("featured_collections")) && (
-        <CuratedCollections
-          collections={data.collections}
-          categories={data.categories}
-        />
-      )}
+          <CuratedCollections
+            collections={data.collections}
+            categories={data.categories}
+          />
+        )}
 
       {/* 5. Best Sellers */}
       {isSectionVisible("best_sellers") && (
@@ -45,6 +40,11 @@ export default async function HomePage() {
       {/* 7. New Arrivals */}
       {isSectionVisible("new_arrivals") && (
         <NewArrivals products={data.newArrivals} />
+      )}
+
+      {/* 6. Why Choose Nabab Lungi */}
+      {isSectionVisible("why_choose_us") && (
+        <NababStandard items={data.config.why_choose_us} />
       )}
 
       {/* 8. Heritage Brand Story */}
