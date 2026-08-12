@@ -84,50 +84,79 @@ export async function Footer({ settings }: FooterProps) {
             </ul>
           </div>
 
-          {/* Customer Care (Middle Right) */}
+          {/* Customer Care */}
           <div className="md:col-span-2 space-y-4">
             <h4 className="font-display text-[11px] font-bold uppercase tracking-[0.15em] text-white/50">
-              Support
+              Customer Support
             </h4>
             <ul className="space-y-3 text-[13px] text-[#fbf9f8]/80">
               <li>
-                <Link href="#" className="transition hover:text-white hover:underline underline-offset-4">
+                <Link href="/account/orders" className="transition hover:text-white hover:underline underline-offset-4">
                   Track Order
                 </Link>
               </li>
               <li>
-                <Link href="#" className="transition hover:text-white hover:underline underline-offset-4">
+                <Link href="/shipping-info" className="transition hover:text-white hover:underline underline-offset-4">
                   Shipping Info
                 </Link>
               </li>
               <li>
-                <Link href="#" className="transition hover:text-white hover:underline underline-offset-4">
+                <Link href="/return-policy" className="transition hover:text-white hover:underline underline-offset-4">
                   Return Policy
                 </Link>
               </li>
               <li>
-                <Link href="#" className="transition hover:text-white hover:underline underline-offset-4">
+                <Link href="/faq" className="transition hover:text-white hover:underline underline-offset-4">
+                  FAQ
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="transition hover:text-white hover:underline underline-offset-4">
                   Contact Us
                 </Link>
               </li>
             </ul>
           </div>
 
+          {/* Company & Account */}
+          <div className="md:col-span-2 space-y-4">
+            <h4 className="font-display text-[11px] font-bold uppercase tracking-[0.15em] text-white/50">
+              Company
+            </h4>
+            <ul className="space-y-3 text-[13px] text-[#fbf9f8]/80">
+              <li>
+                <Link href="/about" className="transition hover:text-white hover:underline underline-offset-4">
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/account" className="transition hover:text-white hover:underline underline-offset-4">
+                  My Account
+                </Link>
+              </li>
+              <li>
+                <Link href="/account/wishlist" className="transition hover:text-white hover:underline underline-offset-4">
+                  Wishlist
+                </Link>
+              </li>
+            </ul>
+          </div>
+
           {/* Connect & Newsletter (Right) */}
-          <div className="md:col-span-4 space-y-5">
+          <div className="md:col-span-2 space-y-5">
             <h4 className="font-display text-[11px] font-bold uppercase tracking-[0.15em] text-white/50">
               Join the Family
             </h4>
-            <p className="text-[13px] text-[#fbf9f8]/80 max-w-sm">
-              Subscribe to get 10% off your first order and exclusive access to new arrivals.
+            <p className="text-[12px] text-[#fbf9f8]/80">
+              Subscribe for updates & special offers.
             </p>
-            <form className="flex gap-2 max-w-sm" action="#">
+            <form className="flex flex-col gap-2" action="#">
               <Input
                 type="email"
                 placeholder="Enter your email"
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:bg-white/10"
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:bg-white/10 text-xs"
               />
-              <Button type="button" variant="white" className="shrink-0 text-[#1b1c1c] hover:bg-[#e3e2e2]">
+              <Button type="button" variant="white" className="w-full text-[#1b1c1c] hover:bg-[#e3e2e2] text-xs">
                 Subscribe
               </Button>
             </form>
@@ -164,8 +193,8 @@ export async function Footer({ settings }: FooterProps) {
           </div>
 
           <div className="flex items-center gap-4 text-[12px] text-[#fbf9f8]/50">
-            <Link href="#" className="hover:text-white transition">Privacy Policy</Link>
-            <Link href="#" className="hover:text-white transition">Terms of Service</Link>
+            <Link href="/privacy-policy" className="hover:text-white transition">Privacy Policy</Link>
+            <Link href="/terms-of-service" className="hover:text-white transition">Terms of Service</Link>
           </div>
         </div>
       </Container>
