@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Container } from '@/components/ui/container';
 import { RevealOnScroll } from '@/components/ui/motion-wrappers';
-import { Truck, MapPin, Clock, ShieldCheck, HelpCircle } from 'lucide-react';
-import { DELIVERY_CHARGES } from '@/constants/delivery';
+import { Truck, MapPin, Clock, ShieldCheck, HelpCircle, Gift } from 'lucide-react';
+import { getStoreSettings } from '@/services/settings-service';
 
 export const metadata: Metadata = {
   title: 'Shipping & Delivery Information | Nabab Lungi',
@@ -11,9 +11,14 @@ export const metadata: Metadata = {
     'Learn about Nabab Lungi shipping rates, delivery timelines across Dhaka and Bangladesh, tracking orders, and cash-on-delivery options.',
 };
 
-export default function ShippingInfoPage() {
-  const dhakaPrice = (DELIVERY_CHARGES.INSIDE_DHAKA / 100).toFixed(0);
-  const outsideDhakaPrice = (DELIVERY_CHARGES.OUTSIDE_DHAKA / 100).toFixed(0);
+export default async function ShippingInfoPage() {
+  const settings = await getStoreSettings();
+  const delivery = settings.delivery;
+
+  const dhakaPrice = delivery.inside_dhaka_charge;
+  const outsideDhakaPrice = delivery.outside_dhaka_charge;
+  const freeDeliveryMin = delivery.free_delivery_min_amount;
+  const estimatedTime = delivery.estimated_delivery_time;
 
   return (
     <div className="bg-[#fbf9f8] text-[#1b1c1c] min-h-screen pt-28 pb-24">
@@ -29,6 +34,15 @@ export default function ShippingInfoPage() {
           <p className="font-sans text-base text-[#5e5e5b] max-w-xl mx-auto font-light leading-relaxed">
             Fast, reliable, and secure nationwide delivery across Bangladesh. We carefully hand-package every handloom item to arrive in perfect condition.
           </p>
+
+          {freeDeliveryMin && freeDeliveryMin > 0 && (
+            <div className="pt-2">
+              <span className="inline-flex items-center gap-2 bg-[#1b1c1c] text-white px-4 py-1.5 rounded-full text-xs font-sans font-medium">
+                <Gift className="w-3.5 h-3.5" />
+                <span>Free delivery on orders over ৳{freeDeliveryMin}</span>
+              </span>
+            </div>
+          )}
         </RevealOnScroll>
 
         {/* Delivery Rates Bento Grid */}
@@ -97,7 +111,7 @@ export default function ShippingInfoPage() {
               Delivery Guidelines & Order Processing
             </h3>
             <p className="font-sans text-sm text-[#5e5e5b] leading-relaxed font-light">
-              Orders placed before 2:00 PM (GMT+6) are dispatched on the same business day. Orders placed on Fridays or public holidays will be processed on the next working day.
+              Orders placed before 2:00 PM (GMT+6) are dispatched on the same business day. {estimatedTime ? `Standard delivery timeframe: ${estimatedTime}.` : ''}
             </p>
           </div>
 
@@ -146,3 +160,4 @@ export default function ShippingInfoPage() {
     </div>
   );
 }
+
