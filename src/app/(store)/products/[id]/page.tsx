@@ -117,6 +117,7 @@ export default async function ProductDetailsPage({
     name: product.name,
     collectionTag: product.fabric || category?.name || 'Heritage Collection',
     categoryTag: category?.name || 'Lungi',
+    shortDescription: product.short_description || product.description,
     description: product.description || product.short_description || '',
     price: priceStr,
     originalPrice: originalPriceStr,

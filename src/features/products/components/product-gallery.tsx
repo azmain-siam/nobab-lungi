@@ -21,7 +21,8 @@ interface ProductGalleryProps {
 }
 
 const FALLBACK_IMAGE = '/images/placeholder-product.svg';
-const LENS_SIZE = 180; // Diameter of circular magnifier lens in pixels
+const LENS_SIZE = 200; // Diameter of circular magnifier lens in pixels
+const ZOOM_FACTOR = 2.5; // Magnification scale multiplier
 
 export function ProductGallery({ images, productName }: ProductGalleryProps) {
   const galleryImages =
@@ -30,8 +31,8 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
-  const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
   const [lensPos, setLensPos] = useState({ x: 0, y: 0 });
+  const [imgDimensions, setImgDimensions] = useState({ width: 0, height: 0 });
   const [imageErrorMap, setImageErrorMap] = useState<Record<number, boolean>>({});
 
   const touchStartX = useRef<number | null>(null);
@@ -56,18 +57,15 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
     );
   };
 
-  // Desktop Circular Lens Mouse Follower
+  // Desktop Circular Lens Mouse Follower with accurate zoom math
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!mainImageRef.current) return;
     const { left, top, width, height } = mainImageRef.current.getBoundingClientRect();
     const xPx = e.clientX - left;
     const yPx = e.clientY - top;
 
-    const xPercent = Math.min(Math.max(0, (xPx / width) * 100), 100);
-    const yPercent = Math.min(Math.max(0, (yPx / height) * 100), 100);
-
     setLensPos({ x: xPx, y: yPx });
-    setZoomPos({ x: xPercent, y: yPercent });
+    setImgDimensions({ width, height });
   };
 
   // Mobile Touch Swipe Handling
@@ -144,18 +142,18 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
           </AnimatePresence>
 
           {/* Desktop Circular Magnifier Lens Glass */}
-          {isHovering && (
+          {isHovering && imgDimensions.width > 0 && (
             <div
-              className="pointer-events-none absolute hidden sm:block rounded-full border-2 border-[#1b1c1c]/40 bg-no-repeat shadow-2xl transition-opacity duration-150 z-20 overflow-hidden"
+              className="pointer-events-none absolute hidden sm:block rounded-full border-2 border-white/80 bg-no-repeat transition-opacity duration-150 z-30 overflow-hidden"
               style={{
                 width: `${LENS_SIZE}px`,
                 height: `${LENS_SIZE}px`,
                 left: `${lensPos.x - LENS_SIZE / 2}px`,
                 top: `${lensPos.y - LENS_SIZE / 2}px`,
                 backgroundImage: `url('${currentImage}')`,
-                backgroundPosition: `${zoomPos.x}% ${zoomPos.y}%`,
-                backgroundSize: '260%',
-                boxShadow: '0 12px 32px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(255,255,255,0.4)',
+                backgroundPosition: `${-(lensPos.x * ZOOM_FACTOR - LENS_SIZE / 2)}px ${-(lensPos.y * ZOOM_FACTOR - LENS_SIZE / 2)}px`,
+                backgroundSize: `${imgDimensions.width * ZOOM_FACTOR}px ${imgDimensions.height * ZOOM_FACTOR}px`,
+                boxShadow: '0 16px 40px rgba(0,0,0,0.35), inset 0 0 0 2px rgba(255,255,255,0.7)',
               }}
             />
           )}

@@ -28,6 +28,7 @@ export interface ProductInfoData {
   sku?: string | null;
   collectionTag: string;
   categoryTag: string;
+  shortDescription?: string | null;
   description: string;
   price: string;
   originalPrice?: string;
@@ -182,6 +183,13 @@ export function ProductInfo({
           </span>
         )}
       </div>
+
+      {/* Short Description Snippet */}
+      {(product.shortDescription || product.description) && (
+        <p className="font-sans text-xs sm:text-sm font-light leading-relaxed text-[#5e5e5b]">
+          {product.shortDescription || product.description}
+        </p>
+      )}
 
       {/* Quantity & Size Selection Grid (Matching Image 1 & 4 layout) */}
       <div className="grid grid-cols-2 gap-4 pt-2 border-t border-[#e3e2e2]">

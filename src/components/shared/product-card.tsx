@@ -35,7 +35,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const collectionTag = product.collectionTag ?? 'Heritage';
   const description =
     product.description ?? 'Hand-woven fine cotton with traditional Bangladeshi techniques.';
-  const productHref = `/products/${product.id}`;
+  const productHref = `/products/${product.slug || product.id}`;
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();

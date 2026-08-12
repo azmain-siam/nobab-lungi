@@ -136,7 +136,7 @@ export default function WishlistPage() {
                   >
                     {/* Image */}
                     <Link
-                      href={`/products/${product.id}`}
+                      href={`/products/${product.slug || product.id}`}
                       className="relative aspect-[3/4] w-full overflow-hidden bg-[#efeded]"
                     >
                       <Image
@@ -179,7 +179,7 @@ export default function WishlistPage() {
                         <span className="block text-[11px] font-medium text-[#5e5e5b] uppercase tracking-wider">
                           {product.fabric || 'Handloom Series'}
                         </span>
-                        <Link href={`/products/${product.id}`}>
+                        <Link href={`/products/${product.slug || product.id}`}>
                           <h2 className="font-display text-base font-semibold text-[#1b1c1c] hover:underline line-clamp-1 mt-0.5">
                             {product.name}
                           </h2>
