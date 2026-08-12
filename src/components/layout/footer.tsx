@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { Container } from '@/components/ui/container';
 import { getStoreSettings } from '@/services/settings-service';
 import type { StoreSettings } from '@/types';
-import { Phone, Mail, MapPin, CreditCard } from 'lucide-react';
+import { Phone, Mail, MapPin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
@@ -24,12 +24,12 @@ export async function Footer({ settings }: FooterProps) {
           {/* Brand Info (Left) */}
           <div className="md:col-span-4 space-y-5">
             {gen.store_logo ? (
-              <Image 
-                src={gen.store_logo} 
-                alt={gen.store_name} 
-                width={140} 
-                height={40} 
-                className="h-9 w-auto object-contain brightness-0 invert" 
+              <Image
+                src={gen.store_logo}
+                alt={gen.store_name}
+                width={140}
+                height={40}
+                className="h-9 w-auto object-contain brightness-0 invert"
               />
             ) : (
               <h3 className="font-display text-xl font-bold text-white tracking-wide">
@@ -122,30 +122,30 @@ export async function Footer({ settings }: FooterProps) {
               Subscribe to get 10% off your first order and exclusive access to new arrivals.
             </p>
             <form className="flex gap-2 max-w-sm" action="#">
-              <Input 
-                type="email" 
-                placeholder="Enter your email" 
+              <Input
+                type="email"
+                placeholder="Enter your email"
                 className="bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:bg-white/10"
               />
               <Button type="button" variant="white" className="shrink-0 text-[#1b1c1c] hover:bg-[#e3e2e2]">
                 Subscribe
               </Button>
             </form>
-            
+
             <div className="pt-2 flex items-center gap-4">
               {soc.facebook_url && (
-                <a href={soc.facebook_url} target="_blank" rel="noopener noreferrer" className="text-[11px] font-bold uppercase tracking-wider text-white/60 hover:text-white transition">
-                  FB
+                <a href={soc.facebook_url} target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></svg>
                 </a>
               )}
               {soc.instagram_url && (
-                <a href={soc.instagram_url} target="_blank" rel="noopener noreferrer" className="text-[11px] font-bold uppercase tracking-wider text-white/60 hover:text-white transition">
-                  IG
+                <a href={soc.instagram_url} target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg>
                 </a>
               )}
               {soc.youtube_url && (
-                <a href={soc.youtube_url} target="_blank" rel="noopener noreferrer" className="text-[11px] font-bold uppercase tracking-wider text-white/60 hover:text-white transition">
-                  YT
+                <a href={soc.youtube_url} target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z" /><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" /></svg>
                 </a>
               )}
             </div>
@@ -157,23 +157,15 @@ export async function Footer({ settings }: FooterProps) {
           <p className="text-[12px] text-[#fbf9f8]/50 text-center md:text-left">
             © {new Date().getFullYear()} {gen.store_name || 'Nabab Lungi'}. All rights reserved.
           </p>
-          
-          <div className="flex items-center justify-center gap-4 opacity-70 grayscale hover:grayscale-0 transition duration-300">
-             <div className="bg-white/5 px-2 py-1.5 rounded flex items-center justify-center">
-               <Image src="/images/payment/bkash.svg" alt="bKash" width={45} height={20} className="h-[18px] w-auto" />
-             </div>
-             <div className="bg-white/5 px-2 py-1.5 rounded flex items-center justify-center">
-               <Image src="/images/payment/nagad.svg" alt="Nagad" width={45} height={20} className="h-[18px] w-auto" />
-             </div>
-             <div className="bg-white/5 px-3 py-1.5 rounded flex items-center justify-center gap-1">
-                <CreditCard className="h-4 w-4 text-white" />
-                <span className="text-white text-[10px] font-semibold uppercase tracking-wider">Card</span>
-             </div>
+
+          <div className="flex items-center justify-center gap-1">
+            <Image src="/images/footer/BKash-Icon-Logo.wine.svg" alt="bKash" width={60} height={24} className="h-[38px] w-auto brightness-0 invert opacity-70 transition-all duration-300 hover:brightness-100 hover:invert-0 hover:opacity-100" />
+            <Image src="/images/footer/Nagad-Vertical-Logo.wine.svg" alt="Nagad" width={60} height={24} className="h-[38px] w-auto brightness-0 invert opacity-70 transition-all duration-300 hover:brightness-100 hover:invert-0 hover:opacity-100" />
           </div>
-          
+
           <div className="flex items-center gap-4 text-[12px] text-[#fbf9f8]/50">
-             <Link href="#" className="hover:text-white transition">Privacy Policy</Link>
-             <Link href="#" className="hover:text-white transition">Terms of Service</Link>
+            <Link href="#" className="hover:text-white transition">Privacy Policy</Link>
+            <Link href="#" className="hover:text-white transition">Terms of Service</Link>
           </div>
         </div>
       </Container>
