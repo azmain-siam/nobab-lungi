@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard,
   Package,
@@ -98,7 +99,8 @@ export function AdminSidebar({
               {onMobileClose && (
                 <button
                   onClick={onMobileClose}
-                  className="lg:hidden p-1 text-white/60 hover:text-white"
+                  className="lg:hidden p-1 text-white/60 hover:text-white hover:bg-white/10 transition"
+                  aria-label="Close navigation menu"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -122,10 +124,11 @@ export function AdminSidebar({
                   key={item.href}
                   href={item.href}
                   title={item.label}
-                  className={`h-10 w-10 mx-auto flex items-center justify-center transition ${isActive
-                    ? 'bg-white text-[#1b1c1c]'
-                    : 'text-white/70 hover:text-white hover:bg-white/10'
-                    }`}
+                  className={`h-10 w-10 mx-auto flex items-center justify-center transition ${
+                    isActive
+                      ? 'bg-white text-[#1b1c1c]'
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                  }`}
                 >
                   <Icon className="h-5 w-5 stroke-[1.5] shrink-0" />
                 </Link>
@@ -137,10 +140,11 @@ export function AdminSidebar({
                 key={item.href}
                 href={item.href}
                 onClick={onMobileClose}
-                className={`flex items-center gap-3 px-3.5 py-2.5 text-xs font-semibold uppercase tracking-wider transition ${isActive
-                  ? 'bg-white text-[#1b1c1c]'
-                  : 'text-white/70 hover:text-white hover:bg-white/10'
-                  }`}
+                className={`flex items-center gap-3 px-3.5 py-2.5 text-xs font-semibold uppercase tracking-wider transition ${
+                  isActive
+                    ? 'bg-white text-[#1b1c1c]'
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                }`}
               >
                 <Icon className="h-4 w-4 stroke-[1.5] shrink-0" />
                 <span className="truncate">{item.label}</span>
@@ -178,24 +182,40 @@ export function AdminSidebar({
     <>
       {/* Desktop Sidebar */}
       <aside
-        className={`hidden lg:flex flex-col bg-[#1b1c1c] text-white shrink-0 sticky top-0 h-screen transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'
-          }`}
+        className={`hidden lg:flex flex-col bg-[#1b1c1c] text-white shrink-0 sticky top-0 h-screen transition-all duration-300 ${
+          isCollapsed ? 'w-16' : 'w-64'
+        }`}
       >
         {sidebarContent}
       </aside>
 
-      {/* Mobile Drawer Backdrop */}
-      {isMobileOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 flex">
-          <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
-            onClick={onMobileClose}
-          />
-          <aside className="relative z-10 w-72 max-w-[80vw] bg-[#1b1c1c] text-white h-full shadow-2xl animate-in slide-in-from-left duration-200">
-            {sidebarContent}
-          </aside>
-        </div>
-      )}
+      {/* Mobile Drawer with Simple Animation */}
+      <AnimatePresence>
+        {isMobileOpen && (
+          <div className="lg:hidden fixed inset-0 z-50 flex">
+            {/* Simple Backdrop Fade */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              className="fixed inset-0 bg-black/50"
+              onClick={onMobileClose}
+            />
+
+            {/* Simple Slide-in Sidebar */}
+            <motion.aside
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              className="relative z-10 w-72 max-w-[80vw] bg-[#1b1c1c] text-white h-full shadow-lg"
+            >
+              {sidebarContent}
+            </motion.aside>
+          </div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
