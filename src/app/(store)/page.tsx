@@ -5,6 +5,7 @@ import { CuratedCollections } from "@/features/landing/components/curated-collec
 import { HeroSection } from "@/features/landing/components/hero-section";
 import { NababStandard } from "@/features/landing/components/nabab-standard";
 import { NewArrivals } from "@/features/landing/components/new-arrivals";
+// import { CustomerReviews } from "@/features/landing/components/customer-reviews";
 import { getPublicHomepageData } from "@/services/homepage-service";
 
 export const revalidate = 60; // Revalidate public homepage cache every 60 seconds
@@ -46,6 +47,9 @@ export default async function HomePage() {
       {isSectionVisible("why_choose_us") && (
         <NababStandard items={data.config.why_choose_us} />
       )}
+
+      {/* Customer Reviews & Social Proof */}
+      {/* <CustomerReviews /> */}
 
       {/* 8. Heritage Brand Story */}
       {isSectionVisible("brand_story") && (

@@ -24,6 +24,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+// import { AnnouncementBar } from './announcement-bar';
 import { MobileNavDrawer } from './mobile-nav-drawer';
 import type { Collection } from '@/types';
 
@@ -122,6 +123,7 @@ export function Header({ variant, collections = [], whatsappNumber }: HeaderProp
 
   return (
     <header className={getHeaderStyles()}>
+      {/* <AnnouncementBar /> */}
       <nav aria-label="Main navigation">
         <Container
           className={`flex items-center justify-between transition-all duration-300 ${scrolled ? 'py-3.5' : 'py-5'
@@ -213,9 +215,9 @@ export function Header({ variant, collections = [], whatsappNumber }: HeaderProp
               {wishlistCount > 0 && (
                 <motion.span
                   key={`wishlist-badge-${wishlistCount}`}
-                  initial={{ scale: 0.5, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.25, ease: [0.34, 1.56, 0.64, 1] }}
+                  initial={{ scale: 0.3, opacity: 0 }}
+                  animate={{ scale: [1.35, 1], opacity: 1 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 15 }}
                   className="absolute -top-1.5 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-rose-600 text-[9px] font-bold text-white ring-2 ring-[#fbf9f8]"
                 >
                   {wishlistCount}
@@ -233,9 +235,9 @@ export function Header({ variant, collections = [], whatsappNumber }: HeaderProp
               {cartCount > 0 && (
                 <motion.span
                   key={`cart-badge-${cartCount}`}
-                  initial={{ scale: 0.5, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.25, ease: [0.34, 1.56, 0.64, 1] }}
+                  initial={{ scale: 0.3, opacity: 0 }}
+                  animate={{ scale: [1.35, 1], opacity: 1 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 15 }}
                   className="absolute -top-1.5 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[9px] font-bold text-white ring-2 ring-[#fbf9f8]"
                 >
                   {cartCount}

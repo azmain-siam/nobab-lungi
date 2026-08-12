@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { Container } from '@/components/ui/container';
 import { getStoreSettings } from '@/services/settings-service';
 import type { StoreSettings } from '@/types';
-import { Phone, Mail, MapPin } from 'lucide-react';
+import { Phone, Mail, MapPin, Banknote, ShieldCheck, Truck, RefreshCw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
@@ -18,8 +18,51 @@ export async function Footer({ settings }: FooterProps) {
   const soc = storeSettings.social;
 
   return (
-    <footer id="about" className="bg-[#1b1c1c] text-[#fbf9f8] pt-20 pb-12">
+    <footer id="about" className="bg-[#1b1c1c] text-[#fbf9f8] pt-16 pb-12">
       <Container>
+        {/* Top Trust Banner inside Footer */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pb-14 border-b border-white/10 mb-14 text-center sm:text-left">
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+              <Banknote className="w-5 h-5 text-amber-400" />
+            </div>
+            <div>
+              <h5 className="font-display text-xs font-semibold text-white">Cash on Delivery</h5>
+              <p className="text-[11px] text-[#fbf9f8]/60 font-light">Pay when you receive</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+              <Truck className="w-5 h-5 text-emerald-400" />
+            </div>
+            <div>
+              <h5 className="font-display text-xs font-semibold text-white">Nationwide Express</h5>
+              <p className="text-[11px] text-[#fbf9f8]/60 font-light">Fast home delivery</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+              <RefreshCw className="w-5 h-5 text-blue-400" />
+            </div>
+            <div>
+              <h5 className="font-display text-xs font-semibold text-white">7-Day Exchange</h5>
+              <p className="text-[11px] text-[#fbf9f8]/60 font-light">Hassle-free replacement</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-5 h-5 text-purple-400" />
+            </div>
+            <div>
+              <h5 className="font-display text-xs font-semibold text-white">100% Organic Handloom</h5>
+              <p className="text-[11px] text-[#fbf9f8]/60 font-light">Authentic Bengal weave</p>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 gap-y-12 md:gap-8 md:grid-cols-12">
           {/* Brand Info (Left) */}
           <div className="md:col-span-4 space-y-5">
@@ -182,14 +225,18 @@ export async function Footer({ settings }: FooterProps) {
         </div>
 
         {/* Bottom Bar: Payments & Copyright */}
-        <div className="mt-20 border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="mt-16 border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <p className="text-[12px] text-[#fbf9f8]/50 text-center md:text-left">
             © {new Date().getFullYear()} {gen.store_name || 'Nabab Lungi'}. All rights reserved.
           </p>
 
-          <div className="flex items-center justify-center gap-1">
-            <Image src="/images/footer/BKash-Icon-Logo.wine.svg" alt="bKash" width={60} height={24} className="h-[38px] w-auto brightness-0 invert opacity-70 transition-all duration-300 hover:brightness-100 hover:invert-0 hover:opacity-100" />
-            <Image src="/images/footer/Nagad-Vertical-Logo.wine.svg" alt="Nagad" width={60} height={24} className="h-[38px] w-auto brightness-0 invert opacity-70 transition-all duration-300 hover:brightness-100 hover:invert-0 hover:opacity-100" />
+          <div className="flex items-center justify-center gap-3">
+            {/* <span className="inline-flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded text-[11px] font-semibold text-white/90 border border-white/10">
+              <Banknote className="w-3.5 h-3.5 text-amber-400" />
+              <span>Cash on Delivery</span>
+            </span> */}
+            <Image src="/images/footer/BKash-Icon-Logo.wine.svg" alt="bKash" width={60} height={24} className="h-[34px] w-auto brightness-0 invert opacity-70 transition-all duration-300 hover:brightness-100 hover:invert-0 hover:opacity-100" />
+            <Image src="/images/footer/Nagad-Vertical-Logo.wine.svg" alt="Nagad" width={60} height={24} className="h-[34px] w-auto brightness-0 invert opacity-70 transition-all duration-300 hover:brightness-100 hover:invert-0 hover:opacity-100" />
           </div>
 
           <div className="flex items-center gap-4 text-[12px] text-[#fbf9f8]/50">

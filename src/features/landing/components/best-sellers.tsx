@@ -56,10 +56,10 @@ export function BestSellers({ products = [] }: BestSellersProps) {
           />
         </RevealOnScroll>
 
-        {/* Product Grid */}
-        <StaggerContainer className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Product Grid / Mobile Horizontal Scroll */}
+        <StaggerContainer className="flex overflow-x-auto snap-x snap-mandatory gap-5 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 no-scrollbar sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-8 sm:pb-0">
           {displayProducts.map((product) => (
-            <StaggerItem key={product.id}>
+            <StaggerItem key={product.id} className="w-[260px] shrink-0 snap-start sm:w-auto sm:shrink">
               <ProductCard product={product} />
             </StaggerItem>
           ))}
