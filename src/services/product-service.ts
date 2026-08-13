@@ -8,26 +8,34 @@ export interface AdminProductListItem extends ProductWithImages {
   category_name?: string | null;
 }
 
-function mapProductToProductWithImages(doc: Record<string, unknown>): ProductWithImages {
+function mapProductToProductWithImages(doc: Record<string, unknown>, locale?: string): ProductWithImages {
   const images = (doc.product_images as Record<string, unknown>[]) || [];
   const rawCollectionIds = doc.collection_ids || doc.collections;
   const collection_ids = Array.isArray(rawCollectionIds)
     ? (rawCollectionIds as unknown[]).map((id) => Number(id)).filter((id) => !isNaN(id))
     : [];
 
+  const translations = (doc.translations as Record<string, Record<string, string>>) || {};
+  const bn = translations.bn || {};
+
+  const name = (locale === 'bn' && bn.name) ? bn.name : (doc.name as string);
+  const shortDesc = (locale === 'bn' && bn.short_description) ? bn.short_description : ((doc.short_description as string) ?? (doc.summary as string) ?? null);
+  const description = (locale === 'bn' && bn.description) ? bn.description : ((doc.description as string) ?? null);
+  const fabric = (locale === 'bn' && bn.fabric) ? bn.fabric : ((doc.fabric as string) ?? null);
+
   return {
     id: String(doc._id),
-    name: doc.name as string,
+    name,
     slug: doc.slug as string,
     sku: (doc.sku as string) ?? null,
-    short_description: (doc.short_description as string) ?? (doc.summary as string) ?? null,
-    description: (doc.description as string) ?? null,
+    short_description: shortDesc,
+    description,
     price: doc.price as number,
     discount_price: (doc.discount_price as number) ?? null,
     stock: doc.stock as number,
     category_id: (doc.category_id as number) ?? null,
     collection_ids,
-    fabric: (doc.fabric as string) ?? null,
+    fabric,
     pattern: (doc.pattern as string) ?? null,
     color: (doc.color as string) ?? null,
     weight: (doc.weight as string) ?? null,
@@ -39,6 +47,7 @@ function mapProductToProductWithImages(doc: Record<string, unknown>): ProductWit
     is_active: (doc.is_active as boolean) ?? true,
     seo_title: (doc.seo_title as string) ?? null,
     seo_description: (doc.seo_description as string) ?? null,
+    translations: doc.translations as ProductWithImages['translations'],
     created_at: doc.created_at ? (doc.created_at as Date).toISOString() : new Date().toISOString(),
     updated_at: doc.updated_at ? (doc.updated_at as Date).toISOString() : new Date().toISOString(),
     product_images: images.map((img) => ({
@@ -52,7 +61,7 @@ function mapProductToProductWithImages(doc: Record<string, unknown>): ProductWit
   };
 }
 
-export async function getNewArrivals(limit = 8): Promise<ProductWithImages[]> {
+export async function getNewArrivals(limit = 8, locale?: string): Promise<ProductWithImages[]> {
   try {
     await connectToDatabase();
     const products = await Product.find({ is_active: true, is_new_arrival: true })
@@ -60,14 +69,14 @@ export async function getNewArrivals(limit = 8): Promise<ProductWithImages[]> {
       .limit(limit)
       .lean();
 
-    return products.map((p) => mapProductToProductWithImages(p as unknown as Record<string, unknown>));
+    return products.map((p) => mapProductToProductWithImages(p as unknown as Record<string, unknown>, locale));
   } catch (error) {
     console.error('Error fetching new arrivals:', error);
     return [];
   }
 }
 
-export async function getBestSellers(limit = 8): Promise<ProductWithImages[]> {
+export async function getBestSellers(limit = 8, locale?: string): Promise<ProductWithImages[]> {
   try {
     await connectToDatabase();
     const products = await Product.find({ is_active: true, is_best_seller: true })
@@ -75,14 +84,14 @@ export async function getBestSellers(limit = 8): Promise<ProductWithImages[]> {
       .limit(limit)
       .lean();
 
-    return products.map((p) => mapProductToProductWithImages(p as unknown as Record<string, unknown>));
+    return products.map((p) => mapProductToProductWithImages(p as unknown as Record<string, unknown>, locale));
   } catch (error) {
     console.error('Error fetching best sellers:', error);
     return [];
   }
 }
 
-export async function getFeaturedProducts(limit = 8): Promise<ProductWithImages[]> {
+export async function getFeaturedProducts(limit = 8, locale?: string): Promise<ProductWithImages[]> {
   try {
     await connectToDatabase();
     const products = await Product.find({ is_active: true, is_featured: true })
@@ -90,7 +99,7 @@ export async function getFeaturedProducts(limit = 8): Promise<ProductWithImages[
       .limit(limit)
       .lean();
 
-    return products.map((p) => mapProductToProductWithImages(p as unknown as Record<string, unknown>));
+    return products.map((p) => mapProductToProductWithImages(p as unknown as Record<string, unknown>, locale));
   } catch (error) {
     console.error('Error fetching featured products:', error);
     return [];
@@ -217,20 +226,20 @@ export async function getAdminProducts(options?: {
   }
 }
 
-export async function getProductBySlug(slug: string): Promise<ProductWithImages | null> {
+export async function getProductBySlug(slug: string, locale?: string): Promise<ProductWithImages | null> {
   try {
     await connectToDatabase();
     const product = await Product.findOne({ slug, is_active: { $ne: false }, status: 'published' }).lean();
 
     if (!product) return null;
-    return mapProductToProductWithImages(product as unknown as Record<string, unknown>);
+    return mapProductToProductWithImages(product as unknown as Record<string, unknown>, locale);
   } catch (error) {
     console.error('Error fetching product by slug:', error);
     return null;
   }
 }
 
-export async function getProductById(id: string): Promise<ProductWithImages | null> {
+export async function getProductById(id: string, locale?: string): Promise<ProductWithImages | null> {
   try {
     await connectToDatabase();
     let product = null;
@@ -246,7 +255,7 @@ export async function getProductById(id: string): Promise<ProductWithImages | nu
     }
 
     if (!product) return null;
-    return mapProductToProductWithImages(product as unknown as Record<string, unknown>);
+    return mapProductToProductWithImages(product as unknown as Record<string, unknown>, locale);
   } catch (error) {
     console.error('Error fetching product by id:', error);
     return null;
@@ -256,7 +265,8 @@ export async function getProductById(id: string): Promise<ProductWithImages | nu
 export async function getRelatedProducts(
   categoryId?: number | null,
   currentProductId?: string,
-  limit = 4
+  limit = 4,
+  locale?: string
 ): Promise<ProductWithImages[]> {
   try {
     await connectToDatabase();
@@ -294,7 +304,7 @@ export async function getRelatedProducts(
       products = [...products, ...additional];
     }
 
-    return products.map((p) => mapProductToProductWithImages(p));
+    return products.map((p) => mapProductToProductWithImages(p, locale));
   } catch (error) {
     console.error('Error fetching related products:', error);
     return [];
@@ -316,6 +326,7 @@ export interface PublicProductsQueryOptions {
   sort?: string;
   page?: number;
   limit?: number;
+  locale?: string;
 }
 
 export async function getPublicProducts(options?: PublicProductsQueryOptions): Promise<{
@@ -442,7 +453,7 @@ export async function getPublicProducts(options?: PublicProductsQueryOptions): P
       .lean();
 
     const products = docs.map((doc) =>
-      mapProductToProductWithImages(doc as unknown as Record<string, unknown>)
+      mapProductToProductWithImages(doc as unknown as Record<string, unknown>, options?.locale)
     );
 
     return { products, total, pages, currentPage: page };

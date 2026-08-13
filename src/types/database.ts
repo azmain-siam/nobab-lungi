@@ -54,6 +54,23 @@ export interface Address {
   created_at:  string;
 }
 
+export interface ProductTranslation {
+  name?: string;
+  short_description?: string;
+  description?: string;
+  fabric?: string;
+}
+
+export interface CategoryTranslation {
+  name?: string;
+  description?: string;
+}
+
+export interface CollectionTranslation {
+  name?: string;
+  description?: string;
+}
+
 export interface Category {
   id:            number;
   name:          string;
@@ -64,6 +81,7 @@ export interface Category {
   sort_order:    number;
   is_active?:    boolean;
   product_count?: number;
+  translations?: { bn?: CategoryTranslation };
   created_at:    string;
 }
 
@@ -80,6 +98,7 @@ export interface Collection {
   seo_title?:      string | null;
   seo_description?: string | null;
   product_count?:  number;
+  translations?:   { bn?: CollectionTranslation };
   created_at:      string;
   updated_at:      string;
 }
@@ -108,6 +127,7 @@ export interface Product {
   is_active:         boolean;
   seo_title:         string | null;
   seo_description:   string | null;
+  translations?:     { bn?: ProductTranslation };
   created_at:        string;
   updated_at:        string;
 }
