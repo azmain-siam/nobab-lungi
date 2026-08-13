@@ -43,10 +43,10 @@ function mapProductToCardData(product: ProductWithImages): ProductCardData {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; locale: string }>;
 }): Promise<Metadata> {
-  const { id } = await params;
-  const product = await getProductById(id);
+  const { id, locale } = await params;
+  const product = await getProductById(id, locale);
 
   if (!product) {
     return {
@@ -73,10 +73,10 @@ export async function generateMetadata({
 export default async function ProductDetailsPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; locale: string }>;
 }) {
-  const { id } = await params;
-  const product = await getProductById(id);
+  const { id, locale } = await params;
+  const product = await getProductById(id, locale);
 
   if (!product) {
     notFound();
@@ -84,8 +84,8 @@ export default async function ProductDetailsPage({
 
   const [storeSettings, category, relatedDocs] = await Promise.all([
     getStoreSettings(),
-    product.category_id ? getCategoryById(product.category_id) : Promise.resolve(null),
-    getRelatedProducts(product.category_id, product.id, 4),
+    product.category_id ? getCategoryById(product.category_id, locale) : Promise.resolve(null),
+    getRelatedProducts(product.category_id, product.id, 4, locale),
   ]);
 
   const images =

@@ -44,10 +44,10 @@ function mapProductToCardData(product: ProductWithImages): ProductCardData {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const collection = await getCollectionBySlug(slug);
+  const { slug, locale } = await params;
+  const collection = await getCollectionBySlug(slug, locale);
 
   if (!collection) {
     return {
@@ -68,10 +68,10 @@ export async function generateMetadata({
 export default async function CollectionDetailsPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }) {
-  const { slug } = await params;
-  const collection = await getCollectionBySlug(slug);
+  const { slug, locale } = await params;
+  const collection = await getCollectionBySlug(slug, locale);
 
   // Fallback for default predefined lungi collections if DB collection doc is missing
   const fallbackTitle = slug.replace(/-/g, ' ').toUpperCase();
@@ -86,6 +86,7 @@ export default async function CollectionDetailsPage({
   const productsRes = await getPublicProducts({
     collections: [slug],
     limit: 24,
+    locale,
   });
 
   const cardProducts = productsRes.products.map(mapProductToCardData);

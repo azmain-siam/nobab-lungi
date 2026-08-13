@@ -10,8 +10,13 @@ import { getPublicHomepageData } from "@/services/homepage-service";
 
 export const revalidate = 60; // Revalidate public homepage cache every 60 seconds
 
-export default async function HomePage() {
-  const data = await getPublicHomepageData();
+interface HomePageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export default async function HomePage({ params }: HomePageProps) {
+  const { locale } = await params;
+  const data = await getPublicHomepageData(locale);
 
   // Section order map driven by CMS visibility config or fallback order
   const isSectionVisible = (key: string) => {

@@ -9,6 +9,7 @@ export interface ICategory extends Document {
   parent_type: 'lungi' | 'saree';
   sort_order: number;
   is_active: boolean;
+  translations?: Record<string, unknown>;
   created_at: Date;
   updated_at: Date;
 }
@@ -23,6 +24,7 @@ const CategorySchema = new Schema<ICategory>(
     parent_type: { type: String, enum: ['lungi', 'saree'], required: true },
     sort_order: { type: Number, default: 0 },
     is_active: { type: Boolean, default: true },
+    translations: { type: Schema.Types.Mixed, default: {} },
   },
   {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },

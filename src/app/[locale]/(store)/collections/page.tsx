@@ -62,8 +62,8 @@ const FALLBACK_LUNGI_COLLECTIONS = [
 const DEFAULT_LUNGI_IMAGE =
   'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?q=80&w=1200&auto=format&fit=crop';
 
-async function DynamicCollectionsGrid() {
-  let collections = await getPublicCollections();
+async function DynamicCollectionsGrid({ locale }: { locale: string }) {
+  let collections = await getPublicCollections(locale);
 
   // If no DB collections found, use curated lungi fallbacks (ensuring NO saree content)
   if (!collections || collections.length === 0) {
@@ -176,7 +176,13 @@ function CollectionsSkeleton() {
   );
 }
 
-export default function CollectionsPage() {
+export default async function CollectionsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+
   return (
     <Section variant="default" className="py-12 lg:py-20">
       <Container>
@@ -191,7 +197,7 @@ export default function CollectionsPage() {
 
         {/* Dynamic Collections Grid */}
         <Suspense fallback={<CollectionsSkeleton />}>
-          <DynamicCollectionsGrid />
+          <DynamicCollectionsGrid locale={locale} />
         </Suspense>
       </Container>
     </Section>
