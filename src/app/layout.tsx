@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Hanken_Grotesk, Cormorant_Garamond } from 'next/font/google';
+import { Inter, Hanken_Grotesk, Cormorant_Garamond, Hind_Siliguri } from 'next/font/google';
 import { CartProvider } from '@/context/cart-context';
 import { ToastProvider } from '@/providers/toast-provider';
 import { WishlistProvider } from '@/providers/wishlist-provider';
@@ -27,6 +27,13 @@ const cormorant = Cormorant_Garamond({
   display: 'swap',
 });
 
+const hindSiliguri = Hind_Siliguri({
+  subsets: ['bengali'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-hind-siliguri',
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
   title: 'Nabab Lungi — Traditional Bangladeshi Lungi & Saree Store',
   description:
@@ -41,7 +48,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${hankenGrotesk.variable} ${cormorant.variable} h-full scroll-smooth`}
+      className={`${inter.variable} ${hankenGrotesk.variable} ${cormorant.variable} ${hindSiliguri.variable} h-full scroll-smooth`}
     >
       <body className="min-h-full bg-[#fbf9f8] text-[#1b1c1c] font-sans antialiased">
         <SessionProvider>

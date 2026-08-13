@@ -1,0 +1,34 @@
+{
+  "common": {
+    "store_name": "Nabab Lungi",
+    "tagline": "Traditional Bangladeshi Lungi & Saree Store"
+  },
+  "nav": {
+    "home": "Home",
+    "shop": "Shop",
+    "collections": "Collections",
+    "about_us": "About Us",
+    "contact": "Contact",
+    "faq": "FAQ",
+    "cart": "Cart",
+    "wishlist": "Wishlist",
+    "account": "Account",
+    "login": "Login"
+  },
+  "hero": {
+    "badge": "ROYAL HERITAGE HANDLOOM",
+    "title_part1": "Wear Tradition",
+    "title_part2": "With Distinction",
+    "subtitle": "Discover Bengal's finest handwoven lungis & sarees, crafted with heritage weaves, breathable long-staple cotton, and timeless elegance.",
+    "cta_shop": "Explore Collection",
+    "cta_story": "Our Craft Story"
+  },
+  "standard": {
+    "title": "The Nabab Standard",
+    "subtitle": "Uncompromising Quality & Pure Craftsmanship"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "tagline": "Crafting premium traditional Bangladeshi apparel with pride."
+  }
+}

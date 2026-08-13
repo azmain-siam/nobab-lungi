@@ -16,6 +16,12 @@
   --color-accent-muted: #4a4a47;
 }
 
+html[lang="bn"],
+.locale-bn {
+  --font-inter: var(--font-hind-siliguri), sans-serif;
+  --font-hanken: var(--font-hind-siliguri), sans-serif;
+}
+
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
