@@ -136,7 +136,7 @@ export interface PublicHomepageData {
   newArrivals: ProductWithImages[];
 }
 
-export async function getPublicHomepageData(): Promise<PublicHomepageData> {
+export async function getPublicHomepageData(locale?: string): Promise<PublicHomepageData> {
   try {
     await connectToDatabase();
 
@@ -154,18 +154,22 @@ export async function getPublicHomepageData(): Promise<PublicHomepageData> {
         catQuery.id = { $in: config.featured_category_ids };
       }
       const catDocs = await CategoryModel.find(catQuery).sort({ parent_type: 1, sort_order: 1 }).lean();
-      categories = catDocs.map((c) => ({
-        id: Number(c.id || c._id),
-        name: c.name as string,
-        slug: c.slug as string,
-        description: (c.description as string) ?? null,
-        image_url: (c.image_url as string) ?? null,
-        parent_type: c.parent_type as 'lungi' | 'saree',
-        sort_order: (c.sort_order as number) ?? 0,
-        is_active: (c.is_active as boolean) ?? true,
-        product_count: 0,
-        created_at: c.created_at ? (c.created_at as Date).toISOString() : new Date().toISOString(),
-      }));
+      categories = catDocs.map((c) => {
+        const tr = (c.translations as Record<string, Record<string, string>>) || {};
+        const bn = tr.bn || {};
+        return {
+          id: Number(c.id || c._id),
+          name: (locale === 'bn' && bn.name) ? bn.name : (c.name as string),
+          slug: c.slug as string,
+          description: (locale === 'bn' && bn.description) ? bn.description : ((c.description as string) ?? null),
+          image_url: (c.image_url as string) ?? null,
+          parent_type: c.parent_type as 'lungi' | 'saree',
+          sort_order: (c.sort_order as number) ?? 0,
+          is_active: (c.is_active as boolean) ?? true,
+          product_count: 0,
+          created_at: c.created_at ? (c.created_at as Date).toISOString() : new Date().toISOString(),
+        };
+      });
     } catch (e) {
       console.error('Error fetching homepage categories:', e);
     }
@@ -178,21 +182,25 @@ export async function getPublicHomepageData(): Promise<PublicHomepageData> {
         collQuery.id = { $in: config.featured_collection_ids };
       }
       const collDocs = await CollectionModel.find(collQuery).sort({ is_featured: -1, sort_order: 1 }).lean();
-      collections = collDocs.map((c) => ({
-        id: Number(c.id || c._id),
-        name: c.name as string,
-        slug: c.slug as string,
-        description: (c.description as string) ?? null,
-        cover_image: (c.cover_image as string) ?? null,
-        banner_url: (c.banner_url as string) ?? null,
-        is_featured: (c.is_featured as boolean) ?? false,
-        sort_order: (c.sort_order as number) ?? 0,
-        is_active: (c.is_active as boolean) ?? true,
-        seo_title: (c.seo_title as string) ?? null,
-        seo_description: (c.seo_description as string) ?? null,
-        created_at: c.created_at ? (c.created_at as Date).toISOString() : new Date().toISOString(),
-        updated_at: c.updated_at ? (c.updated_at as Date).toISOString() : new Date().toISOString(),
-      }));
+      collections = collDocs.map((c) => {
+        const tr = (c.translations as Record<string, Record<string, string>>) || {};
+        const bn = tr.bn || {};
+        return {
+          id: Number(c.id || c._id),
+          name: (locale === 'bn' && bn.name) ? bn.name : (c.name as string),
+          slug: c.slug as string,
+          description: (locale === 'bn' && bn.description) ? bn.description : ((c.description as string) ?? null),
+          cover_image: (c.cover_image as string) ?? null,
+          banner_url: (c.banner_url as string) ?? null,
+          is_featured: (c.is_featured as boolean) ?? false,
+          sort_order: (c.sort_order as number) ?? 0,
+          is_active: (c.is_active as boolean) ?? true,
+          seo_title: (c.seo_title as string) ?? null,
+          seo_description: (c.seo_description as string) ?? null,
+          created_at: c.created_at ? (c.created_at as Date).toISOString() : new Date().toISOString(),
+          updated_at: c.updated_at ? (c.updated_at as Date).toISOString() : new Date().toISOString(),
+        };
+      });
     } catch (e) {
       console.error('Error fetching homepage collections:', e);
     }
@@ -205,19 +213,27 @@ export async function getPublicHomepageData(): Promise<PublicHomepageData> {
         ? (rawCollectionIds as unknown[]).map((id) => Number(id)).filter((id) => !isNaN(id))
         : [];
 
+      const tr = (doc.translations as Record<string, Record<string, string>>) || {};
+      const bn = tr.bn || {};
+
+      const name = (locale === 'bn' && bn.name) ? bn.name : (doc.name as string);
+      const shortDesc = (locale === 'bn' && bn.short_description) ? bn.short_description : ((doc.short_description as string) ?? null);
+      const description = (locale === 'bn' && bn.description) ? bn.description : ((doc.description as string) ?? null);
+      const fabric = (locale === 'bn' && bn.fabric) ? bn.fabric : ((doc.fabric as string) ?? null);
+
       return {
         id: String(doc._id),
-        name: doc.name as string,
+        name,
         slug: doc.slug as string,
         sku: (doc.sku as string) ?? null,
-        short_description: (doc.short_description as string) ?? null,
-        description: (doc.description as string) ?? null,
+        short_description: shortDesc,
+        description,
         price: doc.price as number,
         discount_price: (doc.discount_price as number) ?? null,
         stock: doc.stock as number,
         category_id: (doc.category_id as number) ?? null,
         collection_ids,
-        fabric: (doc.fabric as string) ?? null,
+        fabric,
         pattern: (doc.pattern as string) ?? null,
         color: (doc.color as string) ?? null,
         weight: (doc.weight as string) ?? null,
@@ -229,6 +245,7 @@ export async function getPublicHomepageData(): Promise<PublicHomepageData> {
         is_active: (doc.is_active as boolean) ?? true,
         seo_title: (doc.seo_title as string) ?? null,
         seo_description: (doc.seo_description as string) ?? null,
+        translations: doc.translations as ProductWithImages['translations'],
         created_at: doc.created_at ? (doc.created_at as Date).toISOString() : new Date().toISOString(),
         updated_at: doc.updated_at ? (doc.updated_at as Date).toISOString() : new Date().toISOString(),
         product_images: images.map((img) => ({

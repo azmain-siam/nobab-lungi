@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Heart } from 'lucide-react';
+import { Heart, Plus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/cart-context';
@@ -35,7 +35,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const collectionTag = product.collectionTag ?? 'Heritage';
   const description =
     product.description ?? 'Hand-woven fine cotton with traditional Bangladeshi techniques.';
-  const productHref = `/products/${product.id}`;
+  const productHref = `/products/${product.slug || product.id}`;
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -90,8 +90,8 @@ export function ProductCard({ product }: ProductCardProps) {
           />
         </button>
 
-        {/* Animated Quick Add Button */}
-        <div className="absolute bottom-0 inset-x-0 z-20 w-full transition-all duration-300 transform translate-y-full opacity-0 group-hover/card:translate-y-0 group-hover/card:opacity-100">
+        {/* Animated Desktop Quick Add Button */}
+        <div className="hidden sm:block absolute bottom-0 inset-x-0 z-20 w-full transition-all duration-300 transform translate-y-full opacity-0 group-hover/card:translate-y-0 group-hover/card:opacity-100">
           <Button
             variant="primary"
             size="md"
@@ -122,16 +122,29 @@ export function ProductCard({ product }: ProductCardProps) {
           {description}
         </p>
 
-        {/* Price Row */}
-        <div className="mt-2 flex items-center gap-2">
-          <span className="font-display text-base font-semibold text-[#1b1c1c]">
-            {product.price}
-          </span>
-          {product.originalPrice && (
-            <span className="text-xs text-[#5e5e5b] line-through font-normal">
-              {product.originalPrice}
+        {/* Price & Mobile Quick Add Row */}
+        <div className="mt-2 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="font-display text-base font-semibold text-[#1b1c1c]">
+              {product.price}
             </span>
-          )}
+            {product.originalPrice && (
+              <span className="text-xs text-[#5e5e5b] line-through font-normal">
+                {product.originalPrice}
+              </span>
+            )}
+          </div>
+
+          {/* Mobile Direct Add Button */}
+          <button
+            type="button"
+            onClick={handleQuickAdd}
+            className="sm:hidden flex items-center gap-1 bg-[#1b1c1c] text-white text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1.5 rounded-sm active:scale-95 transition cursor-pointer"
+            aria-label={`Add ${product.name} to cart`}
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Add</span>
+          </button>
         </div>
 
         {/* Sub-Tag */}

@@ -1,0 +1,329 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { StaggerContainer, StaggerItem } from '@/components/ui/motion-wrappers';
+import { getUserOrders, getUserOrderStats } from '@/services/order-service';
+import { getUserWishlistProductIds } from '@/services/wishlist-service';
+import {
+  Package,
+  Clock,
+  CheckCircle2,
+  Heart,
+  ChevronRight,
+  ArrowRight,
+  MapPin,
+  ShoppingBag,
+  Sparkles,
+} from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Account Overview — Nabab Lungi',
+  description: 'Manage your orders, saved addresses, wishlist, and profile details.',
+};
+
+function getGreeting(name?: string | null): string {
+  const dhakaHourStr = new Date().toLocaleTimeString('en-US', {
+    timeZone: 'Asia/Dhaka',
+    hour12: false,
+    hour: '2-digit',
+  });
+  const hour = parseInt(dhakaHourStr, 10) || new Date().getHours();
+  const firstName = name ? name.split(' ')[0] : 'Valued Customer';
+
+  if (hour >= 4 && hour < 12) {
+    return `Good morning, ${firstName}!`;
+  }
+  if (hour >= 12 && hour < 17) {
+    return `Good afternoon, ${firstName}!`;
+  }
+  return `Good evening, ${firstName}!`;
+}
+
+export default async function AccountPage() {
+  const session = await getServerSession(authOptions);
+  const userId = session?.user ? (session.user as { id?: string }).id : null;
+  const userName = session?.user?.name || null;
+
+  const [stats, recentOrders, wishlistIds] = userId
+    ? await Promise.all([
+        getUserOrderStats(userId),
+        getUserOrders(userId, 3),
+        getUserWishlistProductIds(userId),
+      ])
+    : [{ totalOrders: 0, processingOrders: 0, deliveredOrders: 0 }, [], []];
+
+  const wishlistCount = wishlistIds.length;
+  const greetingMessage = getGreeting(userName);
+
+  return (
+    <div className="space-y-6 sm:space-y-8">
+      {/* Greeting Header */}
+      <div className="bg-white border border-[#e3e2e2] p-5 sm:p-7 space-y-1.5 shadow-xs">
+        <h1 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-[#1b1c1c]">
+          {greetingMessage}
+        </h1>
+        <p className="text-xs font-light text-[#5e5e5b]">
+          Manage your orders, saved addresses, wishlist, and account details.
+        </p>
+      </div>
+
+      {/* Metric Cards Grid (2x2 on mobile, 4-col on desktop) */}
+      <StaggerContainer className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        {/* 1. Total Orders */}
+        <StaggerItem className="bg-white border border-[#e3e2e2] p-4 sm:p-5 space-y-3 hover:border-[#1b1c1c]/40 transition flex flex-col justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-[#5e5e5b]">
+              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
+                Total Orders
+              </span>
+              <Package className="h-4 w-4 stroke-[1.5]" />
+            </div>
+            <div className="font-display text-2xl sm:text-3xl font-bold text-[#1b1c1c]">
+              {stats.totalOrders}
+            </div>
+          </div>
+          <Link
+            href="/account/orders"
+            className="text-[11px] font-semibold text-[#5e5e5b] hover:text-[#1b1c1c] inline-flex items-center gap-1 transition pt-1 border-t border-[#f5f3f3]"
+          >
+            <span>View orders</span>
+            <ArrowRight className="h-3 w-3" />
+          </Link>
+        </StaggerItem>
+
+        {/* 2. Processing */}
+        <StaggerItem className="bg-white border border-[#e3e2e2] p-4 sm:p-5 space-y-3 hover:border-[#1b1c1c]/40 transition flex flex-col justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-[#5e5e5b]">
+              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
+                Processing
+              </span>
+              <Clock className="h-4 w-4 stroke-[1.5] text-amber-600" />
+            </div>
+            <div className="font-display text-2xl sm:text-3xl font-bold text-[#1b1c1c]">
+              {stats.processingOrders}
+            </div>
+          </div>
+          <Link
+            href="/account/orders"
+            className="text-[11px] font-semibold text-[#5e5e5b] hover:text-[#1b1c1c] inline-flex items-center gap-1 transition pt-1 border-t border-[#f5f3f3]"
+          >
+            <span>View active</span>
+            <ArrowRight className="h-3 w-3" />
+          </Link>
+        </StaggerItem>
+
+        {/* 3. Delivered */}
+        <StaggerItem className="bg-white border border-[#e3e2e2] p-4 sm:p-5 space-y-3 hover:border-[#1b1c1c]/40 transition flex flex-col justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-[#5e5e5b]">
+              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
+                Delivered
+              </span>
+              <CheckCircle2 className="h-4 w-4 stroke-[1.5] text-emerald-600" />
+            </div>
+            <div className="font-display text-2xl sm:text-3xl font-bold text-[#1b1c1c]">
+              {stats.deliveredOrders}
+            </div>
+          </div>
+          <span className="text-[11px] font-semibold text-emerald-700 inline-flex items-center gap-1 pt-1 border-t border-[#f5f3f3]">
+            <span>Completed</span>
+          </span>
+        </StaggerItem>
+
+        {/* 4. Wishlist */}
+        <StaggerItem className="bg-white border border-[#e3e2e2] p-4 sm:p-5 space-y-3 hover:border-[#1b1c1c]/40 transition flex flex-col justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-[#5e5e5b]">
+              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
+                Wishlist
+              </span>
+              <Heart className="h-4 w-4 stroke-[1.5] text-rose-600" />
+            </div>
+            <div className="font-display text-2xl sm:text-3xl font-bold text-[#1b1c1c]">
+              {wishlistCount}
+            </div>
+          </div>
+          <Link
+            href="/account/wishlist"
+            className="text-[11px] font-semibold text-[#5e5e5b] hover:text-[#1b1c1c] inline-flex items-center gap-1 transition pt-1 border-t border-[#f5f3f3]"
+          >
+            <span>View wishlist</span>
+            <ArrowRight className="h-3 w-3" />
+          </Link>
+        </StaggerItem>
+      </StaggerContainer>
+
+      {/* Recent Orders Section */}
+      <div className="bg-white border border-[#e3e2e2] p-5 sm:p-8 space-y-5">
+        <div className="flex items-center justify-between border-b border-[#e3e2e2] pb-4">
+          <div>
+            <h2 className="font-display text-base sm:text-lg font-semibold text-[#1b1c1c]">
+              Recent Orders
+            </h2>
+            <p className="text-xs font-light text-[#5e5e5b] mt-0.5">
+              Your latest purchases and current fulfillment status.
+            </p>
+          </div>
+          {recentOrders.length > 0 && (
+            <Link
+              href="/account/orders"
+              className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-[#1b1c1c] hover:underline"
+            >
+              <span>View All</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          )}
+        </div>
+
+        {recentOrders.length > 0 ? (
+          <div className="space-y-3">
+            {recentOrders.map((order) => {
+              const itemCount = order.order_items.reduce((sum, item) => sum + item.quantity, 0);
+              const orderDate = new Date(order.created_at).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              });
+
+              const isDelivered = order.status === 'delivered';
+              const isCancelled = order.status === 'cancelled';
+
+              return (
+                <div
+                  key={order.id}
+                  className="border border-[#e3e2e2] p-4 sm:p-5 bg-[#fbf9f8]/60 hover:bg-white transition flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-display text-sm font-bold text-[#1b1c1c]">
+                        Order #{order.order_number}
+                      </span>
+                      <span className="text-xs text-[#5e5e5b]">• {orderDate}</span>
+                    </div>
+
+                    <div className="text-xs text-[#5e5e5b]">
+                      {itemCount} {itemCount === 1 ? 'item' : 'items'} ·{' '}
+                      <span className="font-semibold text-[#1b1c1c]">
+                        ৳{order.total.toLocaleString('en-BD')}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between sm:justify-end gap-4 pt-2 sm:pt-0 border-t sm:border-0 border-[#e3e2e2]">
+                    {isDelivered ? (
+                      <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 border border-emerald-200 uppercase tracking-wider">
+                        <CheckCircle2 className="h-3 w-3 stroke-[2]" />
+                        Delivered
+                      </span>
+                    ) : isCancelled ? (
+                      <span className="flex items-center gap-1 text-[11px] font-bold text-rose-700 bg-rose-50 px-2.5 py-1 border border-rose-200 uppercase tracking-wider">
+                        Cancelled
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-[11px] font-bold text-blue-700 bg-blue-50 px-2.5 py-1 border border-blue-200 uppercase tracking-wider">
+                        <Clock className="h-3 w-3 stroke-[2]" />
+                        {order.status}
+                      </span>
+                    )}
+
+                    <Link
+                      href={`/account/orders/${order.order_number}`}
+                      className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-[#1b1c1c] hover:underline"
+                    >
+                      <span>View Order</span>
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="p-8 text-center space-y-3 bg-[#fbf9f8]/40 border border-dashed border-[#e3e2e2]">
+            <Package className="h-6 w-6 stroke-[1.5] text-[#5e5e5b] mx-auto" />
+            <h3 className="font-display text-sm font-semibold text-[#1b1c1c]">No Orders Placed Yet</h3>
+            <p className="text-xs text-[#5e5e5b] max-w-sm mx-auto">
+              You haven&apos;t placed any orders yet. Explore our handcrafted Lungi collection to find something you love.
+            </p>
+            <div className="pt-2">
+              <Link
+                href="/products"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1b1c1c] text-white text-xs font-semibold uppercase tracking-wider hover:bg-black transition"
+              >
+                Start Shopping
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Quick Actions Section */}
+      <div className="bg-white border border-[#e3e2e2] p-5 sm:p-8 space-y-4">
+        <h2 className="font-display text-xs font-bold uppercase tracking-wider text-[#1b1c1c]">
+          Quick Actions
+        </h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <Link
+            href="/account/orders"
+            className="p-4 border border-[#e3e2e2] bg-[#fbf9f8]/60 hover:bg-white transition flex items-center justify-between font-semibold text-[#1b1c1c] group"
+          >
+            <span className="flex items-center gap-2.5">
+              <Package className="h-4 w-4 text-[#5e5e5b] stroke-[1.5]" />
+              My Orders
+            </span>
+            <ChevronRight className="h-4 w-4 text-[#5e5e5b] group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+
+          <Link
+            href="/account/addresses"
+            className="p-4 border border-[#e3e2e2] bg-[#fbf9f8]/60 hover:bg-white transition flex items-center justify-between font-semibold text-[#1b1c1c] group"
+          >
+            <span className="flex items-center gap-2.5">
+              <MapPin className="h-4 w-4 text-[#5e5e5b] stroke-[1.5]" />
+              Saved Addresses
+            </span>
+            <ChevronRight className="h-4 w-4 text-[#5e5e5b] group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+
+          <Link
+            href="/account/wishlist"
+            className="p-4 border border-[#e3e2e2] bg-[#fbf9f8]/60 hover:bg-white transition flex items-center justify-between font-semibold text-[#1b1c1c] group"
+          >
+            <span className="flex items-center gap-2.5">
+              <Heart className="h-4 w-4 text-[#5e5e5b] stroke-[1.5]" />
+              Wishlist
+            </span>
+            <ChevronRight className="h-4 w-4 text-[#5e5e5b] group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+        </div>
+      </div>
+
+      {/* Continue Shopping Banner */}
+      <div className="bg-[#1b1c1c] text-white p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div className="space-y-1">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-[#e3e2e2] flex items-center gap-1.5">
+            <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+            Artisanal Handloom Craftsmanship
+          </span>
+          <h3 className="font-display text-lg font-semibold text-white">
+            Continue Shopping
+          </h3>
+          <p className="text-xs text-[#c5c4c2]">
+            Discover our latest handcrafted Lungi collection woven from fine natural cotton.
+          </p>
+        </div>
+
+        <Link
+          href="/products"
+          className="shrink-0 inline-flex items-center gap-2 px-6 py-3 bg-white text-[#1b1c1c] text-xs font-semibold uppercase tracking-wider hover:bg-[#f5f3f3] transition"
+        >
+          <ShoppingBag className="h-4 w-4 stroke-[1.5]" />
+          Explore Collection →
+        </Link>
+      </div>
+    </div>
+  );
+}

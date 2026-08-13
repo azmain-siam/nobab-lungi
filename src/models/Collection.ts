@@ -12,6 +12,7 @@ export interface ICollection extends Document {
   is_active: boolean;
   seo_title?: string | null;
   seo_description?: string | null;
+  translations?: Record<string, unknown>;
   created_at: Date;
   updated_at: Date;
 }
@@ -29,6 +30,7 @@ const CollectionSchema = new Schema<ICollection>(
     is_active: { type: Boolean, default: true },
     seo_title: { type: String, default: null },
     seo_description: { type: String, default: null },
+    translations: { type: Schema.Types.Mixed, default: {} },
   },
   {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },

@@ -2,12 +2,18 @@ import { connectToDatabase } from '@/lib/db';
 import { Collection as CollectionModel } from '@/models/Collection';
 import type { Collection } from '@/types';
 
-function mapDocToCollection(doc: Record<string, unknown>, productCount = 0): Collection {
+function mapDocToCollection(doc: Record<string, unknown>, productCount = 0, locale?: string): Collection {
+  const translations = (doc.translations as Record<string, Record<string, string>>) || {};
+  const bn = translations.bn || {};
+
+  const name = (locale === 'bn' && bn.name) ? bn.name : (doc.name as string);
+  const description = (locale === 'bn' && bn.description) ? bn.description : ((doc.description as string) ?? null);
+
   return {
     id: Number(doc.id || doc._id),
-    name: doc.name as string,
+    name,
     slug: doc.slug as string,
-    description: (doc.description as string) ?? null,
+    description,
     cover_image: (doc.cover_image as string) ?? null,
     banner_url: (doc.banner_url as string) ?? null,
     is_featured: (doc.is_featured as boolean) ?? false,
@@ -16,12 +22,13 @@ function mapDocToCollection(doc: Record<string, unknown>, productCount = 0): Col
     seo_title: (doc.seo_title as string) ?? null,
     seo_description: (doc.seo_description as string) ?? null,
     product_count: productCount,
+    translations: doc.translations as Collection['translations'],
     created_at: doc.created_at ? (doc.created_at as Date).toISOString() : new Date().toISOString(),
     updated_at: doc.updated_at ? (doc.updated_at as Date).toISOString() : new Date().toISOString(),
   };
 }
 
-export async function getPublicCollections(): Promise<Collection[]> {
+export async function getPublicCollections(locale?: string): Promise<Collection[]> {
   try {
     await connectToDatabase();
     const { Product } = await import('@/models/Product');
@@ -46,7 +53,7 @@ export async function getPublicCollections(): Promise<Collection[]> {
       .map((doc) => {
         const idNum = Number(doc.id);
         const productCount = countMap.get(idNum) || 0;
-        return mapDocToCollection(doc as unknown as Record<string, unknown>, productCount);
+        return mapDocToCollection(doc as unknown as Record<string, unknown>, productCount, locale);
       })
       // Filter out any saree-related collections (Brand Requirement: LUNGI focused)
       .filter((c) => {
@@ -62,7 +69,7 @@ export async function getPublicCollections(): Promise<Collection[]> {
   }
 }
 
-export async function getFeaturedCollections(): Promise<Collection[]> {
+export async function getFeaturedCollections(locale?: string): Promise<Collection[]> {
   try {
     await connectToDatabase();
     const collections = await CollectionModel.find({ is_featured: true, is_active: true })
@@ -70,7 +77,7 @@ export async function getFeaturedCollections(): Promise<Collection[]> {
       .lean();
 
     return collections
-      .map((c) => mapDocToCollection(c as unknown as Record<string, unknown>))
+      .map((c) => mapDocToCollection(c as unknown as Record<string, unknown>, 0, locale))
       .filter((c) => {
         const nameLower = c.name.toLowerCase();
         const descLower = (c.description || '').toLowerCase();
@@ -141,26 +148,26 @@ export async function getAdminCollections(options?: {
   }
 }
 
-export async function getCollectionBySlug(slug: string): Promise<Collection | null> {
+export async function getCollectionBySlug(slug: string, locale?: string): Promise<Collection | null> {
   try {
     await connectToDatabase();
     const collection = await CollectionModel.findOne({ slug, is_active: true }).lean();
 
     if (!collection) return null;
-    return mapDocToCollection(collection as unknown as Record<string, unknown>);
+    return mapDocToCollection(collection as unknown as Record<string, unknown>, 0, locale);
   } catch (error) {
     console.error('Error fetching collection by slug:', error);
     return null;
   }
 }
 
-export async function getCollectionById(id: number): Promise<Collection | null> {
+export async function getCollectionById(id: number, locale?: string): Promise<Collection | null> {
   try {
     await connectToDatabase();
     const collection = await CollectionModel.findOne({ id }).lean();
 
     if (!collection) return null;
-    return mapDocToCollection(collection as unknown as Record<string, unknown>);
+    return mapDocToCollection(collection as unknown as Record<string, unknown>, 0, locale);
   } catch (error) {
     console.error('Error fetching collection by id:', error);
     return null;

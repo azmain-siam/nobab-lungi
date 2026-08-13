@@ -54,6 +54,30 @@ export interface Address {
   created_at:  string;
 }
 
+export interface ProductTranslation {
+  name?: string;
+  short_description?: string;
+  description?: string;
+  fabric?: string;
+  pattern?: string;
+  color?: string;
+  country_of_origin?: string;
+  seo_title?: string;
+  seo_description?: string;
+}
+
+export interface CategoryTranslation {
+  name?: string;
+  description?: string;
+}
+
+export interface CollectionTranslation {
+  name?: string;
+  description?: string;
+  seo_title?: string;
+  seo_description?: string;
+}
+
 export interface Category {
   id:            number;
   name:          string;
@@ -64,6 +88,7 @@ export interface Category {
   sort_order:    number;
   is_active?:    boolean;
   product_count?: number;
+  translations?: Record<string, any> | null;
   created_at:    string;
 }
 
@@ -80,6 +105,7 @@ export interface Collection {
   seo_title?:      string | null;
   seo_description?: string | null;
   product_count?:  number;
+  translations?:   Record<string, any> | null;
   created_at:      string;
   updated_at:      string;
 }
@@ -108,6 +134,7 @@ export interface Product {
   is_active:         boolean;
   seo_title:         string | null;
   seo_description:   string | null;
+  translations?:     Record<string, any> | null;
   created_at:        string;
   updated_at:        string;
 }
@@ -227,6 +254,7 @@ export interface Banner {
   sort_order:         number;
   start_date:         string | null;
   end_date:           string | null;
+  translations?:      Record<string, any> | null;
   created_at:         string;
   updated_at:         string;
 }
@@ -244,6 +272,7 @@ export interface WhyChooseUsCard {
   title:       string;
   description: string;
   sort_order:  number;
+  translations?: Record<string, any> | null;
 }
 
 export interface BrandStoryConfig {
@@ -253,12 +282,14 @@ export interface BrandStoryConfig {
   button_text:  string | null;
   button_url:   string | null;
   is_active:    boolean;
+  translations?: Record<string, any> | null;
 }
 
 export interface NewsletterConfig {
   heading:     string;
   description: string;
   is_enabled:  boolean;
+  translations?: Record<string, any> | null;
 }
 
 export interface HomepageConfig {

@@ -63,6 +63,12 @@ export default function AdminCollectionsPage() {
   const [seoTitle, setSeoTitle] = useState('');
   const [seoDescription, setSeoDescription] = useState('');
 
+  // Bengali Translation State
+  const [nameBn, setNameBn] = useState('');
+  const [descriptionBn, setDescriptionBn] = useState('');
+  const [seoTitleBn, setSeoTitleBn] = useState('');
+  const [seoDescriptionBn, setSeoDescriptionBn] = useState('');
+
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [isUploadingBanner, setIsUploadingBanner] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -129,6 +135,10 @@ export default function AdminCollectionsPage() {
     setIsActive(true);
     setSeoTitle('');
     setSeoDescription('');
+    setNameBn('');
+    setDescriptionBn('');
+    setSeoTitleBn('');
+    setSeoDescriptionBn('');
     setIsDrawerOpen(true);
   };
 
@@ -145,6 +155,13 @@ export default function AdminCollectionsPage() {
     setIsActive(collection.is_active ?? true);
     setSeoTitle(collection.seo_title || '');
     setSeoDescription(collection.seo_description || '');
+
+    const bn = (collection.translations as Record<string, Record<string, string>> | undefined)?.bn;
+    setNameBn(bn?.name || '');
+    setDescriptionBn(bn?.description || '');
+    setSeoTitleBn(bn?.seo_title || '');
+    setSeoDescriptionBn(bn?.seo_description || '');
+
     setIsDrawerOpen(true);
   };
 
@@ -209,6 +226,14 @@ export default function AdminCollectionsPage() {
       is_active: isActive,
       seo_title: seoTitle || null,
       seo_description: seoDescription || null,
+      translations: {
+        bn: {
+          name: nameBn || undefined,
+          description: descriptionBn || undefined,
+          seo_title: seoTitleBn || undefined,
+          seo_description: seoDescriptionBn || undefined,
+        },
+      },
     };
 
     try {
@@ -749,6 +774,54 @@ export default function AdminCollectionsPage() {
                     onChange={(e) => setSeoDescription(e.target.value)}
                     placeholder="Custom description snippet for Google..."
                     className="w-full bg-[#fbf9f8] border border-[#e3e2e2] py-1.5 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Bengali Translation Section */}
+              <div className="space-y-3 p-4 bg-[#fbf9f8] border border-[#e3e2e2]">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#1b1c1c] flex items-center gap-2">
+                  <span className="bg-[#1b1c1c] text-white px-1.5 py-0.5 text-[10px]">বাংলা</span>
+                  Bengali Translations (Optional)
+                </h3>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#1b1c1c]">Collection Name (বাংলা নাম)</label>
+                  <input
+                    type="text"
+                    value={nameBn}
+                    onChange={(e) => setNameBn(e.target.value)}
+                    placeholder="যেমন: ঈদ স্পেশাল রয়েল কালেকশন ২০২৬"
+                    className="w-full bg-white border border-[#e3e2e2] py-2 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none transition"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#1b1c1c]">Description (বাংলা বিবরণ)</label>
+                  <textarea
+                    rows={2}
+                    value={descriptionBn}
+                    onChange={(e) => setDescriptionBn(e.target.value)}
+                    placeholder="কালেকশন সম্পর্কিত আকর্ষণীয় বিবরণ..."
+                    className="w-full bg-white border border-[#e3e2e2] py-2 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none transition"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#1b1c1c]">SEO Title (বাংলা মেটা শিরোনাম)</label>
+                  <input
+                    type="text"
+                    value={seoTitleBn}
+                    onChange={(e) => setSeoTitleBn(e.target.value)}
+                    placeholder="যেমন: নোবাব ঈদ কালেকশন ২০২৬"
+                    className="w-full bg-white border border-[#e3e2e2] py-1.5 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#1b1c1c]">SEO Description (বাংলা মেটা বিবরণ)</label>
+                  <textarea
+                    rows={2}
+                    value={seoDescriptionBn}
+                    onChange={(e) => setSeoDescriptionBn(e.target.value)}
+                    placeholder="গুগল সার্চে প্রদর্শনের জন্য বিবরণ..."
+                    className="w-full bg-white border border-[#e3e2e2] py-1.5 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
                   />
                 </div>
               </div>

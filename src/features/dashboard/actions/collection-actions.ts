@@ -52,6 +52,7 @@ export async function createCollectionAction(input: CollectionInput): Promise<Co
       is_active,
       seo_title,
       seo_description,
+      translations,
     } = parsed.data;
 
     await connectToDatabase();
@@ -87,6 +88,7 @@ export async function createCollectionAction(input: CollectionInput): Promise<Co
       is_active: is_active ?? true,
       seo_title: seo_title?.trim() || null,
       seo_description: seo_description?.trim() || null,
+      translations: translations || {},
     });
 
     revalidatePath('/dashboard/collections');
@@ -121,6 +123,7 @@ export async function updateCollectionAction(
       is_active,
       seo_title,
       seo_description,
+      translations,
     } = parsed.data;
 
     await connectToDatabase();
@@ -160,6 +163,7 @@ export async function updateCollectionAction(
           is_active: is_active ?? true,
           seo_title: seo_title?.trim() || null,
           seo_description: seo_description?.trim() || null,
+          translations: translations || {},
         },
       }
     );

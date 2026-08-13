@@ -90,6 +90,7 @@ export async function createProductAction(input: ProductInput): Promise<ProductA
       is_new_arrival: data.is_new_arrival ?? false,
       seo_title: data.seo_title?.trim() || null,
       seo_description: data.seo_description?.trim() || null,
+      translations: data.translations || {},
       product_images: data.product_images.map((img, idx) => ({
         url: img.url,
         alt_text: img.alt_text || data.name,
@@ -178,6 +179,7 @@ export async function updateProductAction(
         is_new_arrival: data.is_new_arrival ?? false,
         seo_title: data.seo_title?.trim() || null,
         seo_description: data.seo_description?.trim() || null,
+        translations: data.translations || {},
         product_images: data.product_images.map((img, idx) => ({
           url: img.url,
           alt_text: img.alt_text || data.name,

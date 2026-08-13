@@ -3,7 +3,8 @@
 @theme inline {
   --font-sans: var(--font-inter);
   --font-display: var(--font-hanken);
-
+  --font-serif: var(--font-cormorant);
+  --font-hind-siliguri: var(--font-hind-siliguri);
   --color-background: #fbf9f8;
   --color-foreground: #1b1c1c;
   --color-card: #ffffff;
@@ -12,7 +13,27 @@
   --color-surface-low: #f5f3f3;
   --color-border-subtle: #e3e2e2;
   --color-primary-dark: #000000;
-  --color-accent-muted: #5e5e5b;
+  --color-accent-muted: #4a4a47;
+}
+
+html[lang="bn"],
+.locale-bn,
+.locale-bn body,
+.locale-bn .font-display,
+.locale-bn .font-sans,
+.locale-bn h1,
+.locale-bn h2,
+.locale-bn h3,
+.locale-bn h4,
+.locale-bn h5,
+.locale-bn h6,
+.locale-bn p,
+.locale-bn span,
+.locale-bn a,
+.locale-bn button,
+.locale-bn input,
+.locale-bn textarea {
+  font-family: var(--font-hind-siliguri), sans-serif !important;
 }
 
 body {
@@ -54,4 +75,13 @@ body {
 
 .animation-delay-300 {
   animation-delay: 300ms;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

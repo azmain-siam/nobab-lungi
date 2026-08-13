@@ -16,6 +16,7 @@ export interface IBanner extends Document {
   sort_order: number;
   start_date?: Date | null;
   end_date?: Date | null;
+  translations?: Record<string, any> | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -37,6 +38,7 @@ const BannerSchema = new Schema<IBanner>(
     sort_order: { type: Number, default: 0 },
     start_date: { type: Date, default: null },
     end_date: { type: Date, default: null },
+    translations: { type: Schema.Types.Mixed, default: {} },
   },
   {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },

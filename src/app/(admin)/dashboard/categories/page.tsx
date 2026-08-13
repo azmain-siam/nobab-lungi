@@ -59,6 +59,10 @@ export default function AdminCategoriesPage() {
   const [sortOrder, setSortOrder] = useState(0);
   const [isActive, setIsActive] = useState(true);
 
+  // Bengali Translation State
+  const [nameBn, setNameBn] = useState('');
+  const [descriptionBn, setDescriptionBn] = useState('');
+
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -123,6 +127,8 @@ export default function AdminCategoriesPage() {
     setImageUrl('');
     setSortOrder(0);
     setIsActive(true);
+    setNameBn('');
+    setDescriptionBn('');
     setIsDrawerOpen(true);
   };
 
@@ -137,6 +143,11 @@ export default function AdminCategoriesPage() {
     setImageUrl(category.image_url || '');
     setSortOrder(category.sort_order || 0);
     setIsActive(category.is_active ?? true);
+
+    const bn = (category.translations as Record<string, Record<string, string>> | undefined)?.bn;
+    setNameBn(bn?.name || '');
+    setDescriptionBn(bn?.description || '');
+
     setIsDrawerOpen(true);
   };
 
@@ -177,6 +188,12 @@ export default function AdminCategoriesPage() {
       parent_type: parentType,
       sort_order: Number(sortOrder),
       is_active: isActive,
+      translations: {
+        bn: {
+          name: nameBn || undefined,
+          description: descriptionBn || undefined,
+        },
+      },
     };
 
     try {
@@ -633,6 +650,34 @@ export default function AdminCategoriesPage() {
                   placeholder="Optional details about this category..."
                   className="w-full bg-[#fbf9f8] border border-[#e3e2e2] py-2 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none transition"
                 />
+              </div>
+
+              {/* Bengali Translation Section */}
+              <div className="space-y-3 p-4 bg-[#fbf9f8] border border-[#e3e2e2]">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#1b1c1c] flex items-center gap-2">
+                  <span className="bg-[#1b1c1c] text-white px-1.5 py-0.5 text-[10px]">বাংলা</span>
+                  Bengali Translations (Optional)
+                </h3>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#1b1c1c]">Category Name (বাংলা নাম)</label>
+                  <input
+                    type="text"
+                    value={nameBn}
+                    onChange={(e) => setNameBn(e.target.value)}
+                    placeholder="যেমন: সিল্ক জামদানি শাড়ি"
+                    className="w-full bg-white border border-[#e3e2e2] py-2 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none transition"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#1b1c1c]">Description (বাংলা বিবরণ)</label>
+                  <textarea
+                    rows={2}
+                    value={descriptionBn}
+                    onChange={(e) => setDescriptionBn(e.target.value)}
+                    placeholder="ক্যাটাগরি সম্পর্কে বিস্তারিত তথ্য..."
+                    className="w-full bg-white border border-[#e3e2e2] py-2 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none transition"
+                  />
+                </div>
               </div>
 
               {/* Sort Order & Active Switch */}

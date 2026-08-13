@@ -20,8 +20,9 @@ interface ProductGalleryProps {
   productName: string;
 }
 
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?q=80&w=800&auto=format&fit=crop';
+const FALLBACK_IMAGE = '/images/placeholder-product.svg';
+const LENS_SIZE = 200; // Diameter of circular magnifier lens in pixels
+const ZOOM_FACTOR = 2.5; // Magnification scale multiplier
 
 export function ProductGallery({ images, productName }: ProductGalleryProps) {
   const galleryImages =
@@ -30,7 +31,8 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
-  const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
+  const [lensPos, setLensPos] = useState({ x: 0, y: 0 });
+  const [imgDimensions, setImgDimensions] = useState({ width: 0, height: 0 });
   const [imageErrorMap, setImageErrorMap] = useState<Record<number, boolean>>({});
 
   const touchStartX = useRef<number | null>(null);
@@ -55,13 +57,15 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
     );
   };
 
-  // Desktop Mouse Zoom Follower
+  // Desktop Circular Lens Mouse Follower with accurate zoom math
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!mainImageRef.current) return;
     const { left, top, width, height } = mainImageRef.current.getBoundingClientRect();
-    const x = Math.min(Math.max(0, ((e.clientX - left) / width) * 100), 100);
-    const y = Math.min(Math.max(0, ((e.clientY - top) / height) * 100), 100);
-    setZoomPos({ x, y });
+    const xPx = e.clientX - left;
+    const yPx = e.clientY - top;
+
+    setLensPos({ x: xPx, y: yPx });
+    setImgDimensions({ width, height });
   };
 
   // Mobile Touch Swipe Handling
@@ -82,43 +86,24 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
     touchStartX.current = null;
   };
 
+  const hasMultipleImages = galleryImages.length > 1;
+
   return (
     <>
-      <div className="flex flex-col-reverse gap-4 sm:flex-row">
-        {/* Thumbnail Navigation Strip */}
-        {galleryImages.length > 1 && (
-          <div className="flex flex-row gap-3 sm:flex-col sm:w-24 shrink-0 overflow-x-auto sm:overflow-y-auto no-scrollbar">
-            {galleryImages.map((img, index) => {
-              const isSelected = index === selectedImageIndex;
-              const imgSrc = imageErrorMap[index] ? FALLBACK_IMAGE : img;
-
-              return (
-                <button
-                  key={index}
-                  onClick={() => setSelectedImageIndex(index)}
-                  aria-label={`View image ${index + 1} of ${galleryImages.length}`}
-                  className={`relative aspect-[3/4] w-20 sm:w-full overflow-hidden bg-[#efeded] border-2 transition-all cursor-pointer shrink-0 ${isSelected
-                      ? 'border-[#1b1c1c] opacity-100 ring-1 ring-[#1b1c1c]'
-                      : 'border-transparent opacity-65 hover:opacity-100'
-                    }`}
-                >
-                  <Image
-                    src={imgSrc}
-                    alt={`${productName} thumbnail ${index + 1}`}
-                    fill
-                    className="object-cover"
-                    sizes="100px"
-                    onError={() =>
-                      setImageErrorMap((prev) => ({ ...prev, [index]: true }))
-                    }
-                  />
-                </button>
-              );
-            })}
-          </div>
+      <div className="relative w-full flex items-center justify-center">
+        {/* Navigation Arrow Left (Desktop Side Positioned) */}
+        {hasMultipleImages && (
+          <button
+            type="button"
+            onClick={handlePrevImage}
+            aria-label="Previous product image"
+            className="hidden lg:flex absolute -left-12 z-20 h-10 w-10 items-center justify-center rounded-full bg-white/90 text-[#1b1c1c] border border-[#e3e2e2] shadow-md transition-transform duration-200 hover:scale-110 active:scale-95 cursor-pointer"
+          >
+            <ChevronLeft className="h-5 w-5 stroke-[1.8]" />
+          </button>
         )}
 
-        {/* Main Image Stage */}
+        {/* Main Single Image Container Stage */}
         <div
           ref={mainImageRef}
           onMouseEnter={() => setIsHovering(true)}
@@ -127,7 +112,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
           onClick={() => setIsLightboxOpen(true)}
-          className="relative aspect-[3/4] w-full flex-1 overflow-hidden bg-[#efeded] group cursor-zoom-in border border-[#e3e2e2]"
+          className="relative aspect-[3/4] w-full max-w-lg overflow-hidden bg-[#efeded] group cursor-zoom-in border border-[#e3e2e2] shadow-xs"
         >
           {/* Base Image with Framer Motion Crossfade */}
           <AnimatePresence mode="popLayout">
@@ -136,7 +121,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
               className="absolute inset-0"
             >
               <Image
@@ -144,9 +129,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                 alt={productName}
                 fill
                 priority
-                className={`object-cover transition-opacity duration-300 ${
-                  isHovering ? 'opacity-0 sm:opacity-100' : 'opacity-100'
-                }`}
+                className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 onError={() =>
                   setImageErrorMap((prev) => ({
@@ -158,61 +141,102 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             </motion.div>
           </AnimatePresence>
 
-          {/* Desktop Lens Zoom Effect */}
-          {isHovering && (
+          {/* Desktop Circular Magnifier Lens Glass */}
+          {isHovering && imgDimensions.width > 0 && (
             <div
-              className="absolute inset-0 pointer-events-none hidden sm:block bg-no-repeat transition-all duration-75"
+              className="pointer-events-none absolute hidden sm:block rounded-full border-2 border-white/80 bg-no-repeat transition-opacity duration-150 z-30 overflow-hidden"
               style={{
+                width: `${LENS_SIZE}px`,
+                height: `${LENS_SIZE}px`,
+                left: `${lensPos.x - LENS_SIZE / 2}px`,
+                top: `${lensPos.y - LENS_SIZE / 2}px`,
                 backgroundImage: `url('${currentImage}')`,
-                backgroundPosition: `${zoomPos.x}% ${zoomPos.y}%`,
-                backgroundSize: '220%',
+                backgroundPosition: `${-(lensPos.x * ZOOM_FACTOR - LENS_SIZE / 2)}px ${-(lensPos.y * ZOOM_FACTOR - LENS_SIZE / 2)}px`,
+                backgroundSize: `${imgDimensions.width * ZOOM_FACTOR}px ${imgDimensions.height * ZOOM_FACTOR}px`,
+                boxShadow: '0 16px 40px rgba(0,0,0,0.35), inset 0 0 0 2px rgba(255,255,255,0.7)',
               }}
             />
           )}
 
           {/* Image Counter Badge */}
-          {galleryImages.length > 1 && (
+          {hasMultipleImages && (
             <div className="absolute top-3 right-3 z-10 bg-black/75 backdrop-blur-sm px-2.5 py-1 text-[11px] font-semibold text-white tracking-wider rounded-none">
               {selectedImageIndex + 1} / {galleryImages.length}
             </div>
           )}
 
           {/* Expand Fullscreen / Zoom Hint Overlay */}
-          <div className="absolute bottom-3 right-3 z-10 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-2.5 py-1.5 text-[11px] font-medium text-[#1b1c1c] shadow-sm transition group-hover:bg-black group-hover:text-white">
+          <div className="absolute bottom-3 right-3 z-10 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-2.5 py-1.5 text-[11px] font-medium text-[#1b1c1c] shadow-sm transition group-hover:bg-[#1b1c1c] group-hover:text-white">
             <ZoomIn className="h-3.5 w-3.5 stroke-[1.8]" />
-            <span className="hidden sm:inline">Hover to Zoom / Click Fullscreen</span>
-            <span className="sm:hidden">Tap Fullscreen</span>
+            <span className="hidden sm:inline">Hover Magnifier / Click Fullscreen</span>
+            <span className="sm:hidden">Tap Lightbox</span>
           </div>
 
-          {/* Mobile Swipe Hints (Arrows on Hover) */}
-          {galleryImages.length > 1 && (
+          {/* Mobile Overlay Arrows */}
+          {hasMultipleImages && (
             <>
               <button
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   handlePrevImage();
                 }}
                 aria-label="Previous image"
-                className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 text-[#1b1c1c] shadow-sm opacity-0 group-hover:opacity-100 transition hover:bg-white"
+                className="lg:hidden absolute left-2 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#1b1c1c] shadow-sm hover:bg-white"
               >
                 <ChevronLeft className="h-4 w-4 stroke-[2]" />
               </button>
               <button
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleNextImage();
                 }}
                 aria-label="Next image"
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 text-[#1b1c1c] shadow-sm opacity-0 group-hover:opacity-100 transition hover:bg-white"
+                className="lg:hidden absolute right-2 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#1b1c1c] shadow-sm hover:bg-white"
               >
                 <ChevronRight className="h-4 w-4 stroke-[2]" />
               </button>
             </>
           )}
+
+          {/* Bottom Indicator Dots */}
+          {hasMultipleImages && (
+            <div className="absolute bottom-3 left-4 z-10 flex items-center gap-1.5">
+              {galleryImages.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedImageIndex(idx);
+                  }}
+                  aria-label={`Go to slide ${idx + 1}`}
+                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                    idx === selectedImageIndex
+                      ? 'w-5 bg-[#e05638]'
+                      : 'w-2 bg-white/80 hover:bg-white'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </div>
+
+        {/* Navigation Arrow Right (Desktop Side Positioned) */}
+        {hasMultipleImages && (
+          <button
+            type="button"
+            onClick={handleNextImage}
+            aria-label="Next product image"
+            className="hidden lg:flex absolute -right-12 z-20 h-10 w-10 items-center justify-center rounded-full bg-white/90 text-[#1b1c1c] border border-[#e3e2e2] shadow-md transition-transform duration-200 hover:scale-110 active:scale-95 cursor-pointer"
+          >
+            <ChevronRight className="h-5 w-5 stroke-[1.8]" />
+          </button>
+        )}
       </div>
 
-      {/* Yet Another React Lightbox Modal */}
+      {/* Lightbox Modal */}
       <Lightbox
         open={isLightboxOpen}
         close={() => setIsLightboxOpen(false)}

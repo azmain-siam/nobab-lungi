@@ -52,8 +52,8 @@ export function CuratedCollections({ collections = [] }: CuratedCollectionsProps
           <SectionHeading title="Curated Collections" actionHref="/collections" actionLabel="VIEW ALL" />
         </RevealOnScroll>
 
-        {/* Bento Grid */}
-        <StaggerContainer className="grid grid-cols-12 gap-6">
+        {/* Bento Grid on Desktop (sm+) / Horizontal Scroll on Mobile (< sm) */}
+        <StaggerContainer className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-4 px-4 no-scrollbar sm:grid sm:grid-cols-12 sm:gap-6 sm:pb-0 sm:mx-0 sm:px-0">
           {activeCollections.length > 0 ? (
             activeCollections.map((col, idx) => {
               const isLarge = idx % 3 === 0;
@@ -67,10 +67,10 @@ export function CuratedCollections({ collections = [] }: CuratedCollectionsProps
                   : 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=1000&auto=format&fit=crop');
 
               return (
-                <StaggerItem key={col.id} className={`col-span-12 ${spanClass}`}>
+                <StaggerItem key={col.id} className={`w-[82vw] max-w-[320px] shrink-0 snap-start sm:w-full sm:max-w-none col-span-12 ${spanClass}`}>
                   <Link
                     href={`/collections/${col.slug}`}
-                    className="group relative block h-[360px] w-full overflow-hidden rounded-2xl sm:h-[400px] cursor-pointer"
+                    className="group relative block h-[280px] w-full overflow-hidden rounded-2xl sm:h-[360px] lg:h-[400px] cursor-pointer"
                   >
                     <Image
                       src={coverImg}
@@ -80,8 +80,8 @@ export function CuratedCollections({ collections = [] }: CuratedCollectionsProps
                       sizes="(max-width: 1024px) 100vw, 60vw"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent transition-opacity duration-300 group-hover:opacity-90" />
-                    <div className="absolute bottom-0 left-0 p-8 text-white transition-transform duration-300 group-hover:-translate-y-1">
-                      <h3 className="font-display text-2xl font-semibold text-white sm:text-3xl">
+                    <div className="absolute bottom-0 left-0 p-6 sm:p-8 text-white transition-transform duration-300 group-hover:-translate-y-1">
+                      <h3 className="font-display text-xl font-semibold text-white sm:text-3xl">
                         {col.name}
                       </h3>
                       {col.description && (
@@ -97,10 +97,10 @@ export function CuratedCollections({ collections = [] }: CuratedCollectionsProps
           ) : (
             /* Approved Fallback Bento Grid */
             FALLBACK_COLLECTIONS.map((item) => (
-              <StaggerItem key={item.id} className={`col-span-12 ${item.span}`}>
+              <StaggerItem key={item.id} className={`w-[82vw] max-w-[320px] shrink-0 snap-start sm:w-full sm:max-w-none col-span-12 ${item.span}`}>
                 <Link
                   href={`/collections/${item.slug}`}
-                  className="group relative block h-[360px] w-full overflow-hidden rounded-2xl sm:h-[400px] cursor-pointer"
+                  className="group relative block h-[280px] w-full overflow-hidden rounded-2xl sm:h-[360px] lg:h-[400px] cursor-pointer"
                 >
                   <Image
                     src={item.image}
@@ -110,11 +110,11 @@ export function CuratedCollections({ collections = [] }: CuratedCollectionsProps
                     sizes="(max-width: 1024px) 100vw, 60vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent transition-opacity duration-300 group-hover:opacity-90" />
-                  <div className="absolute bottom-0 left-0 p-8 text-white transition-transform duration-300 group-hover:-translate-y-1">
+                  <div className="absolute bottom-0 left-0 p-6 sm:p-8 text-white transition-transform duration-300 group-hover:-translate-y-1">
                     <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-white/80 mb-1">
                       {item.tag}
                     </span>
-                    <h3 className="font-display text-2xl font-semibold text-white sm:text-3xl">
+                    <h3 className="font-display text-xl font-semibold text-white sm:text-3xl">
                       {item.name}
                     </h3>
                     {item.description && (

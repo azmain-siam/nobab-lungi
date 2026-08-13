@@ -11,6 +11,7 @@ export interface CreateOrderParams {
   fullAddress: string;
   paymentMethod: 'cod' | 'bkash' | 'nagad';
   transactionId?: string;
+  couponCode?: string;
   subtotal: number;
   deliveryCharge: number;
   grandTotal: number;
@@ -94,26 +95,7 @@ function mapOrderToOrderWithItems(doc: Record<string, unknown>): OrderWithItems 
   };
 }
 
-export interface CreateOrderParams {
-  userId?: string;
-  fullName: string;
-  phone: string;
-  deliveryArea: 'dhaka' | 'outside';
-  fullAddress: string;
-  paymentMethod: 'cod' | 'bkash' | 'nagad';
-  transactionId?: string;
-  couponCode?: string;
-  subtotal: number;
-  deliveryCharge: number;
-  grandTotal: number;
-  items: {
-    productId: string;
-    productName: string;
-    productPrice: number;
-    quantity: number;
-    image: string;
-  }[];
-}
+
 
 export async function createOrder(
   params: CreateOrderParams

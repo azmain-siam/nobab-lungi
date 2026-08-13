@@ -13,6 +13,7 @@ export interface IWhyChooseUsCard {
   title: string;
   description: string;
   sort_order: number;
+  translations?: Record<string, any> | null;
 }
 
 export interface IHomepageConfig extends Document {
@@ -32,12 +33,14 @@ export interface IHomepageConfig extends Document {
     button_text?: string | null;
     button_url?: string | null;
     is_active: boolean;
+    translations?: Record<string, any> | null;
   };
   why_choose_us: IWhyChooseUsCard[];
   newsletter: {
     heading: string;
     description: string;
     is_enabled: boolean;
+    translations?: Record<string, any> | null;
   };
   created_at: Date;
   updated_at: Date;
@@ -60,6 +63,7 @@ const WhyChooseUsCardSchema = new Schema<IWhyChooseUsCard>(
     title: { type: String, required: true },
     description: { type: String, required: true },
     sort_order: { type: Number, default: 0 },
+    translations: { type: Schema.Types.Mixed, default: {} },
   },
   { _id: false }
 );
@@ -100,6 +104,7 @@ const HomepageConfigSchema = new Schema<IHomepageConfig>(
       button_text: { type: String, default: 'Explore Craftsmanship' },
       button_url: { type: String, default: '/about' },
       is_active: { type: Boolean, default: true },
+      translations: { type: Schema.Types.Mixed, default: {} },
     },
     why_choose_us: {
       type: [WhyChooseUsCardSchema],
@@ -138,6 +143,7 @@ const HomepageConfigSchema = new Schema<IHomepageConfig>(
       heading: { type: String, default: 'Join Nobab Heritage Circle' },
       description: { type: String, default: 'Subscribe to receive exclusive drops, Eid special collections, and VIP offers.' },
       is_enabled: { type: Boolean, default: true },
+      translations: { type: Schema.Types.Mixed, default: {} },
     },
   },
   {

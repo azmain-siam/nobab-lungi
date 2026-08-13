@@ -1,16 +1,17 @@
-'use client';
+"use client";
 
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle } from "lucide-react";
 
 interface WhatsAppCTAProps {
   whatsappNumber?: string | null;
 }
 
 export function WhatsAppCTA({ whatsappNumber }: WhatsAppCTAProps) {
-  const phone = whatsappNumber || '+8801712345678';
-  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  const phone = whatsappNumber || "+8801712345678";
+  const cleanPhone = phone.replace(/[^0-9]/g, "");
+
   const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-    'Hello Nobab Lungi! I would like to inquire about your premium handloom lungi collection.'
+    "Hello Nobab Lungi! I would like to inquire about your premium handloom lungi collection."
   )}`;
 
   return (
@@ -18,11 +19,40 @@ export function WhatsAppCTA({ whatsappNumber }: WhatsAppCTAProps) {
       href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Contact us on WhatsApp"
-      className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 group"
+      aria-label="Order via WhatsApp"
+      className="
+        group fixed bottom-6 right-6 z-50
+        flex h-12 w-12 items-center
+        overflow-hidden rounded-full
+        bg-[#00a884] text-white
+        shadow-lg
+        transition-[width,background-color,box-shadow,transform]
+        duration-200 ease-out
+        hover:w-[178px]
+        hover:bg-[#008f70]
+        hover:shadow-xl
+        active:scale-95
+      "
     >
-      <MessageCircle className="h-5 w-5 fill-white stroke-emerald-600 group-hover:rotate-12 transition-transform duration-300" />
-      <span className="text-xs font-semibold tracking-wide hidden sm:inline">Order via WhatsApp</span>
+      <span className="flex h-12 w-12 shrink-0 items-center justify-center">
+        <MessageCircle size={22} />
+      </span>
+
+      <span
+        className="
+          whitespace-nowrap
+          pr-9
+          text-xs font-semibold tracking-wide
+          opacity-0
+          -translate-x-1
+          transition-[opacity,transform]
+          duration-150
+          group-hover:translate-x-0
+          group-hover:opacity-100
+        "
+      >
+        Order via WhatsApp
+      </span>
     </a>
   );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -19,6 +20,16 @@ export function CartDrawer() {
     subtotal,
     cartCount,
   } = useCart();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        closeCart();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, closeCart]);
 
   const freeShippingProgress = Math.min(
     100,
@@ -45,6 +56,9 @@ export function CartDrawer() {
 
       {/* Drawer Panel Container */}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Shopping Cart"
         className={`relative z-10 flex h-full w-full max-w-md flex-col justify-between bg-[#fbf9f8] shadow-2xl transition-transform duration-300 cubic-bezier(0.16, 1, 0.3, 1) ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
@@ -89,74 +103,81 @@ export function CartDrawer() {
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 divider-y divide-[#e3e2e2]">
           {items.length > 0 ? (
             <AnimatePresence initial={false}>
-              {items.map(({ product, quantity }) => (
-                <motion.div
-                  key={product.id}
-                  layout
-                  initial={{ opacity: 0, height: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, height: 'auto', scale: 1 }}
-                  exit={{ opacity: 0, height: 0, scale: 0.95 }}
-                  transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                  className="pt-4 first:pt-0 flex gap-4 overflow-hidden"
-                >
-                  {/* Product Image */}
-                  <div className="relative aspect-[3/4] w-20 shrink-0 overflow-hidden bg-[#efeded]">
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      fill
-                      className="object-cover"
-                      sizes="80px"
-                    />
-                  </div>
+              {items.map((cartItem) => {
+                const { product, quantity, maxStock } = cartItem;
+                const isMaxReached = Boolean(maxStock && maxStock > 0 && quantity >= maxStock);
 
-                  {/* Info & Quantity */}
-                  <div className="flex flex-1 flex-col justify-between py-0.5">
-                    <div>
-                      <div className="flex items-start justify-between gap-2">
-                        <h3 className="font-display text-xs font-semibold text-[#1b1c1c]">
-                          {product.name}
-                        </h3>
-                        <button
-                          onClick={() => removeFromCart(product.id)}
-                          aria-label="Remove item"
-                          className="text-[#5e5e5b] hover:text-red-600 active:scale-90 transition cursor-pointer"
-                        >
-                          <Trash2 className="h-3.5 w-3.5 stroke-[1.5]" />
-                        </button>
-                      </div>
-                      <span className="block text-[10px] text-[#5e5e5b] mt-0.5">
-                        {product.collectionTag ?? 'Heritage'}
-                      </span>
+                return (
+                  <motion.div
+                    key={product.id}
+                    layout
+                    initial={{ opacity: 0, height: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, height: 'auto', scale: 1 }}
+                    exit={{ opacity: 0, height: 0, scale: 0.95 }}
+                    transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                    className="pt-4 first:pt-0 flex gap-4 overflow-hidden"
+                  >
+                    {/* Product Image */}
+                    <div className="relative aspect-[3/4] w-20 shrink-0 overflow-hidden bg-[#efeded]">
+                      <Image
+                        src={product.image}
+                        alt={product.name}
+                        fill
+                        className="object-cover"
+                        sizes="80px"
+                      />
                     </div>
 
-                    {/* Quantity & Price Row */}
-                    <div className="mt-3 flex items-center justify-between">
-                      <div className="flex items-center border border-[#e3e2e2] bg-white">
-                        <button
-                          onClick={() => updateQuantity(product.id, quantity - 1)}
-                          className="p-1 text-[#1b1c1c] hover:bg-[#efeded] active:scale-90 transition cursor-pointer"
-                        >
-                          <Minus className="h-3 w-3" />
-                        </button>
-                        <span className="w-7 text-center font-display text-xs font-semibold text-[#1b1c1c]">
-                          {quantity}
+                    {/* Info & Quantity */}
+                    <div className="flex flex-1 flex-col justify-between py-0.5">
+                      <div>
+                        <div className="flex items-start justify-between gap-2">
+                          <h3 className="font-display text-xs font-semibold text-[#1b1c1c]">
+                            {product.name}
+                          </h3>
+                          <button
+                            onClick={() => removeFromCart(product.id)}
+                            aria-label="Remove item"
+                            className="text-[#5e5e5b] hover:text-red-600 active:scale-90 transition cursor-pointer"
+                          >
+                            <Trash2 className="h-3.5 w-3.5 stroke-[1.5]" />
+                          </button>
+                        </div>
+                        <span className="block text-[10px] text-[#5e5e5b] mt-0.5">
+                          {product.collectionTag ?? 'Heritage'}
                         </span>
-                        <button
-                          onClick={() => updateQuantity(product.id, quantity + 1)}
-                          className="p-1 text-[#1b1c1c] hover:bg-[#efeded] active:scale-90 transition cursor-pointer"
-                        >
-                          <Plus className="h-3 w-3" />
-                        </button>
                       </div>
 
-                      <span className="font-display text-xs font-semibold text-[#1b1c1c]">
-                        {product.price}
-                      </span>
+                      {/* Quantity & Price Row */}
+                      <div className="mt-3 flex items-center justify-between">
+                        <div className="flex items-center border border-[#e3e2e2] bg-white">
+                          <button
+                            onClick={() => updateQuantity(product.id, quantity - 1)}
+                            className="p-1 text-[#1b1c1c] hover:bg-[#efeded] active:scale-90 transition cursor-pointer"
+                          >
+                            <Minus className="h-3 w-3" />
+                          </button>
+                          <span className="w-7 text-center font-display text-xs font-semibold text-[#1b1c1c]">
+                            {quantity}
+                          </span>
+                          <button
+                            onClick={() => updateQuantity(product.id, quantity + 1, maxStock)}
+                            disabled={isMaxReached}
+                            title={isMaxReached ? `Only ${maxStock} in stock` : undefined}
+                            className="p-1 text-[#1b1c1c] hover:bg-[#efeded] active:scale-90 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                          >
+                            <Plus className="h-3 w-3" />
+                          </button>
+                        </div>
+
+                        <span className="font-display text-xs font-semibold text-[#1b1c1c]">
+                          {product.price}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </AnimatePresence>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">

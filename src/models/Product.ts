@@ -31,6 +31,7 @@ export interface IProduct extends Document {
   is_active: boolean;
   seo_title?: string | null;
   seo_description?: string | null;
+  translations?: Record<string, any> | null;
   product_images: IProductImage[];
   created_at: Date;
   updated_at: Date;
@@ -70,6 +71,7 @@ const ProductSchema = new Schema<IProduct>(
     is_active: { type: Boolean, default: true },
     seo_title: { type: String, default: null },
     seo_description: { type: String, default: null },
+    translations: { type: Schema.Types.Mixed, default: {} },
     product_images: [ProductImageSchema],
   },
   {
