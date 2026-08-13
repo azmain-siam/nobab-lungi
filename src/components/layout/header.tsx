@@ -147,10 +147,10 @@ export function Header({ variant, collections = [], whatsappNumber }: HeaderProp
           {/* Brand Logo */}
           <Link
             href="/"
-            className={`font-display text-xl font-bold tracking-tight transition hover:opacity-85 ${isDarkText ? 'text-[#1b1c1c]' : 'text-white'
+            className={`font-display text-2xl font-bold tracking-tight transition hover:opacity-85 ${isDarkText ? 'text-[#1b1c1c]' : 'text-white'
               }`}
           >
-            Nabab Lungi
+            Nobab
           </Link>
 
           {/* Center Navigation Links (Desktop) */}

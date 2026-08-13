@@ -37,7 +37,7 @@ export function NewArrivals({ products = [] }: NewArrivalsProps) {
   if (displayProducts.length === 0) return null;
 
   return (
-    <Section id="new-arrivals" variant="default" className="py-20 lg:py-28 bg-[#f5f3f3]/50">
+    <Section id="new-arrivals" variant="default" className="py-12 lg:py-16 bg-[#f5f3f3]/50">
       <Container>
         {/* Section Header */}
         <RevealOnScroll>

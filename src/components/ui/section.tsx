@@ -20,7 +20,7 @@ export function Section({
 
   return (
     <section
-      className={`py-16 lg:py-24 ${variantStyles[variant]} ${className}`}
+      className={`py-12 lg:py-16 ${variantStyles[variant]} ${className}`}
       {...props}
     >
       {children}

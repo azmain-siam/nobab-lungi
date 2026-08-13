@@ -19,7 +19,7 @@ export function SectionHeading({
 }: SectionHeadingProps) {
   if (align === 'center') {
     return (
-      <div className={`text-center max-w-lg mx-auto mb-12 sm:mb-14 ${className}`}>
+      <div className={`text-center max-w-lg mx-auto mb-8 sm:mb-10 ${className}`}>
         <h2 className="font-display text-2xl font-semibold tracking-tight text-[#1b1c1c] sm:text-3xl">
           {title}
         </h2>
@@ -33,7 +33,7 @@ export function SectionHeading({
   }
 
   return (
-    <div className={`flex items-end justify-between gap-4 mb-8 sm:mb-10 ${className}`}>
+    <div className={`flex items-end justify-between gap-4 mb-6 sm:mb-8 ${className}`}>
       <div>
         <h2 className="font-display text-2xl font-semibold tracking-tight text-[#1b1c1c] sm:text-3xl">
           {title}

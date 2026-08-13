@@ -45,7 +45,7 @@ export function CuratedCollections({ collections = [] }: CuratedCollectionsProps
   const activeCollections = collections.filter((c) => c.is_active);
 
   return (
-    <Section id="collections" variant="default" className="py-16 lg:py-24">
+    <Section id="collections" variant="default" className="py-12 lg:py-16">
       <Container>
         {/* Section Header */}
         <RevealOnScroll>

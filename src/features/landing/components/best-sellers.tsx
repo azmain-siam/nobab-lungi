@@ -43,7 +43,7 @@ export function BestSellers({ products = [] }: BestSellersProps) {
   if (displayProducts.length === 0) return null;
 
   return (
-    <Section id="shop" variant="default" className="py-20 lg:py-28">
+    <Section id="shop" variant="default" className="py-12 lg:py-16">
       <Container>
         {/* Section Header */}
         <RevealOnScroll>

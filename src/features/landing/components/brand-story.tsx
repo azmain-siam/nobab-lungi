@@ -22,7 +22,7 @@ export function HeritageBrandStory({ story }: BrandStoryProps) {
   const btnUrl = story.button_url || '/about';
 
   return (
-    <section id="brand-story" className="relative w-full min-h-[500px] md:min-h-[650px] flex items-center overflow-hidden">
+    <section id="brand-story" className="relative w-full min-h-[400px] md:min-h-[520px] flex items-center overflow-hidden">
       {/* Background Image */}
       <Image
         src={imageUrl}
@@ -37,7 +37,7 @@ export function HeritageBrandStory({ story }: BrandStoryProps) {
       <div className="absolute inset-0 bg-gradient-to-r from-[#1b1c1c]/90 via-[#1b1c1c]/60 to-transparent sm:via-[#1b1c1c]/70 md:via-[#1b1c1c]/40" />
 
       {/* Content Container */}
-      <Container className="relative z-10 w-full py-20">
+      <Container className="relative z-10 w-full py-12 md:py-16">
         <RevealOnScroll className="max-w-xl space-y-6 md:space-y-8">
           <span className="inline-block font-sans text-[10px] md:text-xs font-bold uppercase tracking-[0.25em] text-white/80">
             Our Heritage & Craft
