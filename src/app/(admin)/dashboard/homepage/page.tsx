@@ -95,6 +95,13 @@ export default function AdminHomepageCMSPage() {
   const [bannerStartDate, setBannerStartDate] = useState('');
   const [bannerEndDate, setBannerEndDate] = useState('');
 
+  // Hero Banner Bengali Translation State
+  const [bannerTitleBn, setBannerTitleBn] = useState('');
+  const [bannerSubtitleBn, setBannerSubtitleBn] = useState('');
+  const [bannerDescriptionBn, setBannerDescriptionBn] = useState('');
+  const [bannerPrimaryBtnTextBn, setBannerPrimaryBtnTextBn] = useState('');
+  const [bannerSecondaryBtnTextBn, setBannerSecondaryBtnTextBn] = useState('');
+
   const [isUploadingDesktop, setIsUploadingDesktop] = useState(false);
   const [isUploadingMobile, setIsUploadingMobile] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -106,6 +113,8 @@ export default function AdminHomepageCMSPage() {
   const [cardTitle, setCardTitle] = useState('');
   const [cardDescription, setCardDescription] = useState('');
   const [cardSortOrder, setCardSortOrder] = useState(0);
+  const [cardTitleBn, setCardTitleBn] = useState('');
+  const [cardDescriptionBn, setCardDescriptionBn] = useState('');
 
   // Delete Modals State
   const [deleteBannerTarget, setDeleteBannerTarget] = useState<Banner | null>(null);
@@ -118,6 +127,7 @@ export default function AdminHomepageCMSPage() {
     setRefreshKey((k) => k + 1);
   }, []);
 
+  // Fetch Homepage Banners, Section Config, Categories & Collections
   useEffect(() => {
     let isMounted = true;
 
@@ -133,7 +143,7 @@ export default function AdminHomepageCMSPage() {
         }
       })
       .catch((error) => {
-        console.error('Error fetching homepage CMS data:', error);
+        console.error('Error fetching homepage data:', error);
         if (isMounted) setIsLoading(false);
       });
 
@@ -159,6 +169,11 @@ export default function AdminHomepageCMSPage() {
     setBannerSortOrder(0);
     setBannerStartDate('');
     setBannerEndDate('');
+    setBannerTitleBn('');
+    setBannerSubtitleBn('');
+    setBannerDescriptionBn('');
+    setBannerPrimaryBtnTextBn('');
+    setBannerSecondaryBtnTextBn('');
     setIsBannerDrawerOpen(true);
   };
 
@@ -179,6 +194,14 @@ export default function AdminHomepageCMSPage() {
     setBannerSortOrder(banner.sort_order || 0);
     setBannerStartDate(banner.start_date ? banner.start_date.split('T')[0] : '');
     setBannerEndDate(banner.end_date ? banner.end_date.split('T')[0] : '');
+
+    const bn = (banner.translations as Record<string, Record<string, string>> | undefined)?.bn;
+    setBannerTitleBn(bn?.title || '');
+    setBannerSubtitleBn(bn?.subtitle || '');
+    setBannerDescriptionBn(bn?.description || '');
+    setBannerPrimaryBtnTextBn(bn?.primary_btn_text || '');
+    setBannerSecondaryBtnTextBn(bn?.secondary_btn_text || '');
+
     setIsBannerDrawerOpen(true);
   };
 
@@ -256,6 +279,15 @@ export default function AdminHomepageCMSPage() {
       sort_order: Number(bannerSortOrder),
       start_date: bannerStartDate || null,
       end_date: bannerEndDate || null,
+      translations: {
+        bn: {
+          title: bannerTitleBn || undefined,
+          subtitle: bannerSubtitleBn || undefined,
+          description: bannerDescriptionBn || undefined,
+          primary_btn_text: bannerPrimaryBtnTextBn || undefined,
+          secondary_btn_text: bannerSecondaryBtnTextBn || undefined,
+        },
+      },
     };
 
     try {
@@ -494,6 +526,12 @@ export default function AdminHomepageCMSPage() {
       title: cardTitle,
       description: cardDescription,
       sort_order: Number(cardSortOrder),
+      translations: {
+        bn: {
+          title: cardTitleBn || undefined,
+          description: cardDescriptionBn || undefined,
+        },
+      },
     };
 
     try {
@@ -603,6 +641,8 @@ export default function AdminHomepageCMSPage() {
                 setCardTitle('');
                 setCardDescription('');
                 setCardSortOrder(0);
+                setCardTitleBn('');
+                setCardDescriptionBn('');
                 setIsWhyUsDrawerOpen(true);
               }}
               className="gap-2"
@@ -1188,6 +1228,77 @@ export default function AdminHomepageCMSPage() {
                       />
                     </div>
                   </div>
+
+                  {/* Bengali Translations Section */}
+                  <div className="space-y-3 p-4 bg-[#fbf9f8] border border-[#e3e2e2]">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#1b1c1c] flex items-center gap-2">
+                      <span className="bg-[#1b1c1c] text-white px-1.5 py-0.5 text-[10px]">বাংলা</span>
+                      Bengali Brand Story Translations (Optional)
+                    </h4>
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-[#1b1c1c]">Story Title (বাংলা শিরোনাম)</label>
+                      <input
+                        type="text"
+                        value={config.brand_story.translations?.bn?.title || ''}
+                        onChange={(e) =>
+                          setConfig({
+                            ...config,
+                            brand_story: {
+                              ...config.brand_story,
+                              translations: {
+                                ...config.brand_story.translations,
+                                bn: { ...config.brand_story.translations?.bn, title: e.target.value },
+                              },
+                            },
+                          })
+                        }
+                        placeholder="যেমন: নোবাব হেরিটেজ লুঙ্গির ইতিহাস"
+                        className="w-full bg-white border border-[#e3e2e2] py-2 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-[#1b1c1c]">Narrative (বাংলা বিবরণ)</label>
+                      <textarea
+                        rows={3}
+                        value={config.brand_story.translations?.bn?.description || ''}
+                        onChange={(e) =>
+                          setConfig({
+                            ...config,
+                            brand_story: {
+                              ...config.brand_story,
+                              translations: {
+                                ...config.brand_story.translations,
+                                bn: { ...config.brand_story.translations?.bn, description: e.target.value },
+                              },
+                            },
+                          })
+                        }
+                        placeholder="কারিগরদের বুনন ও ঐতিহ্য সম্পর্কিত বাংলা বিবরণ..."
+                        className="w-full bg-white border border-[#e3e2e2] py-2 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-[#1b1c1c]">Button Label (বাংলা বাটন টেক্সট)</label>
+                      <input
+                        type="text"
+                        value={config.brand_story.translations?.bn?.button_text || ''}
+                        onChange={(e) =>
+                          setConfig({
+                            ...config,
+                            brand_story: {
+                              ...config.brand_story,
+                              translations: {
+                                ...config.brand_story.translations,
+                                bn: { ...config.brand_story.translations?.bn, button_text: e.target.value },
+                              },
+                            },
+                          })
+                        }
+                        placeholder="যেমন: কারুশিল্প বিস্তারিত দেখুন"
+                        className="w-full bg-white border border-[#e3e2e2] py-2 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="pt-3 border-t border-[#e3e2e2] flex justify-end">
@@ -1221,6 +1332,8 @@ export default function AdminHomepageCMSPage() {
                       setCardTitle('');
                       setCardDescription('');
                       setCardSortOrder(0);
+                      setCardTitleBn('');
+                      setCardDescriptionBn('');
                       setIsWhyUsDrawerOpen(true);
                     }}
                     className="gap-2"
@@ -1253,6 +1366,11 @@ export default function AdminHomepageCMSPage() {
                             setCardTitle(card.title);
                             setCardDescription(card.description);
                             setCardSortOrder(card.sort_order);
+
+                            const cardBn = (card.translations as Record<string, Record<string, string>> | undefined)?.bn;
+                            setCardTitleBn(cardBn?.title || '');
+                            setCardDescriptionBn(cardBn?.description || '');
+
                             setIsWhyUsDrawerOpen(true);
                           }}
                           className="p-1.5 text-[#5e5e5b] hover:text-[#1b1c1c]"
@@ -1316,6 +1434,56 @@ export default function AdminHomepageCMSPage() {
                       }
                       className="w-full bg-[#fbf9f8] border border-[#e3e2e2] py-2 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
                     />
+                  </div>
+
+                  {/* Bengali Translations Section */}
+                  <div className="space-y-3 p-4 bg-[#fbf9f8] border border-[#e3e2e2]">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#1b1c1c] flex items-center gap-2">
+                      <span className="bg-[#1b1c1c] text-white px-1.5 py-0.5 text-[10px]">বাংলা</span>
+                      Bengali Newsletter Translations (Optional)
+                    </h4>
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-[#1b1c1c]">Heading (বাংলা শিরোনাম)</label>
+                      <input
+                        type="text"
+                        value={config.newsletter.translations?.bn?.heading || ''}
+                        onChange={(e) =>
+                          setConfig({
+                            ...config,
+                            newsletter: {
+                              ...config.newsletter,
+                              translations: {
+                                ...config.newsletter.translations,
+                                bn: { ...config.newsletter.translations?.bn, heading: e.target.value },
+                              },
+                            },
+                          })
+                        }
+                        placeholder="যেমন: নোবাব হেরিটেজ সার্কেলে যোগ দিন"
+                        className="w-full bg-white border border-[#e3e2e2] py-2 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-[#1b1c1c]">Description (বাংলা বিবরণ)</label>
+                      <textarea
+                        rows={2}
+                        value={config.newsletter.translations?.bn?.description || ''}
+                        onChange={(e) =>
+                          setConfig({
+                            ...config,
+                            newsletter: {
+                              ...config.newsletter,
+                              translations: {
+                                ...config.newsletter.translations,
+                                bn: { ...config.newsletter.translations?.bn, description: e.target.value },
+                              },
+                            },
+                          })
+                        }
+                        placeholder="অফার ও নতুন কালেকশন আপডেট পাওয়ার আহ্বান..."
+                        className="w-full bg-white border border-[#e3e2e2] py-2 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
+                      />
+                    </div>
                   </div>
 
                   <div className="flex items-center justify-between border-t border-[#e3e2e2] pt-3">
@@ -1483,6 +1651,54 @@ export default function AdminHomepageCMSPage() {
                 </div>
               </div>
 
+              {/* Bengali Translation Section */}
+              <div className="space-y-3 p-4 bg-[#fbf9f8] border border-[#e3e2e2]">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#1b1c1c] flex items-center gap-2">
+                  <span className="bg-[#1b1c1c] text-white px-1.5 py-0.5 text-[10px]">বাংলা</span>
+                  Bengali Translations (Optional)
+                </h3>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#1b1c1c]">Banner Title (বাংলা শিরোনাম)</label>
+                  <input
+                    type="text"
+                    value={bannerTitleBn}
+                    onChange={(e) => setBannerTitleBn(e.target.value)}
+                    placeholder="যেমন: রয়্যাল হেরিটেজ হ্যান্ডলুম কালেকশন"
+                    className="w-full bg-white border border-[#e3e2e2] py-2 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#1b1c1c]">Subtitle (বাংলা সাবটাইটেল)</label>
+                  <input
+                    type="text"
+                    value={bannerSubtitleBn}
+                    onChange={(e) => setBannerSubtitleBn(e.target.value)}
+                    placeholder="যেমন: ১০০% অর্গানিক কটন সুতার বুনন"
+                    className="w-full bg-white border border-[#e3e2e2] py-2 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#1b1c1c]">Description (বাংলা বিবরণ)</label>
+                  <textarea
+                    rows={2}
+                    value={bannerDescriptionBn}
+                    onChange={(e) => setBannerDescriptionBn(e.target.value)}
+                    placeholder="ব্যানারের আকর্ষণীয় বিবরণ..."
+                    className="w-full bg-white border border-[#e3e2e2] py-2 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#1b1c1c]">Primary Button Text (বাংলা বাটন টেক্সট)</label>
+                  <input
+                    type="text"
+                    value={bannerPrimaryBtnTextBn}
+                    onChange={(e) => setBannerPrimaryBtnTextBn(e.target.value)}
+                    placeholder="যেমন: এখনই কেনাকাটা করুন"
+                    className="w-full bg-white border border-[#e3e2e2] py-2 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
+                  />
+                </div>
+              </div>
+
               <div className="grid grid-cols-3 gap-3 pt-2 border-t border-[#e3e2e2]">
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-[#1b1c1c]">Display Order</label>
@@ -1613,6 +1829,34 @@ export default function AdminHomepageCMSPage() {
                   placeholder="Short description snippet..."
                   className="w-full bg-[#fbf9f8] border border-[#e3e2e2] py-2 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
                 />
+              </div>
+
+              {/* Bengali Translations Section */}
+              <div className="space-y-3 p-4 bg-[#fbf9f8] border border-[#e3e2e2]">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#1b1c1c] flex items-center gap-2">
+                  <span className="bg-[#1b1c1c] text-white px-1.5 py-0.5 text-[10px]">বাংলা</span>
+                  Bengali Translations (Optional)
+                </h4>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#1b1c1c]">Card Title (বাংলা শিরোনাম)</label>
+                  <input
+                    type="text"
+                    value={cardTitleBn}
+                    onChange={(e) => setCardTitleBn(e.target.value)}
+                    placeholder="যেমন: ১০০% হস্তচালিত তাঁতের সুতি"
+                    className="w-full bg-white border border-[#e3e2e2] py-2 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#1b1c1c]">Description (বাংলা বিবরণ)</label>
+                  <textarea
+                    rows={2}
+                    value={cardDescriptionBn}
+                    onChange={(e) => setCardDescriptionBn(e.target.value)}
+                    placeholder="সংক্ষিপ্ত বাংলা বিবরণ..."
+                    className="w-full bg-white border border-[#e3e2e2] py-2 px-3 text-xs text-[#1b1c1c] rounded-none focus:border-[#1b1c1c] focus:outline-none"
+                  />
+                </div>
               </div>
 
               <div className="space-y-1">

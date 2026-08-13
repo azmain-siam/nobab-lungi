@@ -31,14 +31,7 @@ export interface IProduct extends Document {
   is_active: boolean;
   seo_title?: string | null;
   seo_description?: string | null;
-  translations?: {
-    bn?: {
-      name?: string;
-      short_description?: string;
-      description?: string;
-      fabric?: string;
-    };
-  };
+  translations?: Record<string, any> | null;
   product_images: IProductImage[];
   created_at: Date;
   updated_at: Date;

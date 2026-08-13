@@ -44,6 +44,25 @@ export const productSchema = z
     is_new_arrival: z.boolean().default(false),
     seo_title: z.string().optional().nullable(),
     seo_description: z.string().optional().nullable(),
+    translations: z
+      .object({
+        bn: z
+          .object({
+            name: z.string().optional().nullable(),
+            short_description: z.string().optional().nullable(),
+            description: z.string().optional().nullable(),
+            fabric: z.string().optional().nullable(),
+            pattern: z.string().optional().nullable(),
+            color: z.string().optional().nullable(),
+            country_of_origin: z.string().optional().nullable(),
+            seo_title: z.string().optional().nullable(),
+            seo_description: z.string().optional().nullable(),
+          })
+          .optional()
+          .nullable(),
+      })
+      .optional()
+      .nullable(),
   })
   .refine(
     (data) => {

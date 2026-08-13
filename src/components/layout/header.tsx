@@ -20,6 +20,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import Image from 'next/image';
+import NextLink from 'next/link';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/routing';
@@ -309,38 +310,38 @@ export function Header({ variant, collections = [], whatsappNumber }: HeaderProp
                         <div className="py-1">
                           {isAdmin ? (
                             <>
-                              <Link
+                              <NextLink
                                 href="/dashboard"
                                 onClick={() => setUserDropdownOpen(false)}
                                 className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
                               >
                                 <ShieldCheck className="h-4 w-4 text-emerald-700 stroke-[1.5]" />
                                 Admin Dashboard
-                              </Link>
-                              <Link
+                              </NextLink>
+                              <NextLink
                                 href="/dashboard/products"
                                 onClick={() => setUserDropdownOpen(false)}
                                 className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
                               >
                                 <Tag className="h-4 w-4 stroke-[1.5]" />
                                 Manage Products
-                              </Link>
-                              <Link
+                              </NextLink>
+                              <NextLink
                                 href="/dashboard/orders"
                                 onClick={() => setUserDropdownOpen(false)}
                                 className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
                               >
                                 <Package className="h-4 w-4 stroke-[1.5]" />
                                 Manage Orders
-                              </Link>
-                              <Link
+                              </NextLink>
+                              <NextLink
                                 href="/dashboard/collections"
                                 onClick={() => setUserDropdownOpen(false)}
                                 className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-[#5e5e5b] hover:text-[#1b1c1c] hover:bg-[#f5f3f3] transition"
                               >
                                 <Grid className="h-4 w-4 stroke-[1.5]" />
                                 Manage Collections
-                              </Link>
+                              </NextLink>
                             </>
                           ) : (
                             <>

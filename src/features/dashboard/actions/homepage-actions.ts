@@ -82,6 +82,7 @@ export async function createBannerAction(input: BannerInput): Promise<HomepageAc
       sort_order: data.sort_order ?? 0,
       start_date: data.start_date ? new Date(data.start_date) : null,
       end_date: data.end_date ? new Date(data.end_date) : null,
+      translations: data.translations || {},
     });
 
     revalidatePath('/dashboard/homepage');
@@ -127,6 +128,7 @@ export async function updateBannerAction(id: number, input: BannerInput): Promis
           sort_order: data.sort_order ?? 0,
           start_date: data.start_date ? new Date(data.start_date) : null,
           end_date: data.end_date ? new Date(data.end_date) : null,
+          translations: data.translations || {},
         },
       }
     );
@@ -291,6 +293,7 @@ export async function updateBrandStoryAction(data: {
   button_text?: string | null;
   button_url?: string | null;
   is_active: boolean;
+  translations?: Record<string, any> | null;
 }): Promise<HomepageActionResult> {
   try {
     await verifyAdminSession();
@@ -314,6 +317,7 @@ export async function saveWhyChooseUsCardAction(card: {
   title: string;
   description: string;
   sort_order: number;
+  translations?: Record<string, any> | null;
 }): Promise<HomepageActionResult> {
   try {
     await verifyAdminSession();
@@ -374,6 +378,7 @@ export async function updateNewsletterConfigAction(data: {
   heading: string;
   description: string;
   is_enabled: boolean;
+  translations?: Record<string, any> | null;
 }): Promise<HomepageActionResult> {
   try {
     await verifyAdminSession();

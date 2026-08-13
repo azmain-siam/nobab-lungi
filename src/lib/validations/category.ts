@@ -17,6 +17,18 @@ export const categorySchema = z.object({
   }),
   sort_order: z.coerce.number().int().min(0, 'Sort order must be a non-negative integer.').default(0),
   is_active: z.boolean().default(true),
+  translations: z
+    .object({
+      bn: z
+        .object({
+          name: z.string().optional().nullable(),
+          description: z.string().optional().nullable(),
+        })
+        .optional()
+        .nullable(),
+    })
+    .optional()
+    .nullable(),
 });
 
 export type CategoryInput = z.infer<typeof categorySchema>;

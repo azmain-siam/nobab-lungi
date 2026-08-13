@@ -75,6 +75,17 @@ export default function AdminProductsPage() {
   const [seoTitle, setSeoTitle] = useState('');
   const [seoDescription, setSeoDescription] = useState('');
 
+  // Bengali Translation State
+  const [nameBn, setNameBn] = useState('');
+  const [shortDescriptionBn, setShortDescriptionBn] = useState('');
+  const [descriptionBn, setDescriptionBn] = useState('');
+  const [fabricBn, setFabricBn] = useState('');
+  const [patternBn, setPatternBn] = useState('');
+  const [colorBn, setColorBn] = useState('');
+  const [countryOfOriginBn, setCountryOfOriginBn] = useState('');
+  const [seoTitleBn, setSeoTitleBn] = useState('');
+  const [seoDescriptionBn, setSeoDescriptionBn] = useState('');
+
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -165,6 +176,15 @@ export default function AdminProductsPage() {
     setIsNewArrival(true);
     setSeoTitle('');
     setSeoDescription('');
+    setNameBn('');
+    setShortDescriptionBn('');
+    setDescriptionBn('');
+    setFabricBn('');
+    setPatternBn('');
+    setColorBn('');
+    setCountryOfOriginBn('');
+    setSeoTitleBn('');
+    setSeoDescriptionBn('');
     setIsDrawerOpen(true);
   };
 
@@ -209,6 +229,18 @@ export default function AdminProductsPage() {
     setIsNewArrival(product.is_new_arrival ?? false);
     setSeoTitle(product.seo_title || '');
     setSeoDescription(product.seo_description || '');
+
+    const bn = (product.translations as Record<string, Record<string, string>> | undefined)?.bn;
+    setNameBn(bn?.name || '');
+    setShortDescriptionBn(bn?.short_description || '');
+    setDescriptionBn(bn?.description || '');
+    setFabricBn(bn?.fabric || '');
+    setPatternBn(bn?.pattern || '');
+    setColorBn(bn?.color || '');
+    setCountryOfOriginBn(bn?.country_of_origin || '');
+    setSeoTitleBn(bn?.seo_title || '');
+    setSeoDescriptionBn(bn?.seo_description || '');
+
     setIsDrawerOpen(true);
   };
 
@@ -294,6 +326,19 @@ export default function AdminProductsPage() {
       is_new_arrival: isNewArrival,
       seo_title: seoTitle || null,
       seo_description: seoDescription || null,
+      translations: {
+        bn: {
+          name: nameBn || undefined,
+          short_description: shortDescriptionBn || undefined,
+          description: descriptionBn || undefined,
+          fabric: fabricBn || undefined,
+          pattern: patternBn || undefined,
+          color: colorBn || undefined,
+          country_of_origin: countryOfOriginBn || undefined,
+          seo_title: seoTitleBn || undefined,
+          seo_description: seoDescriptionBn || undefined,
+        },
+      },
     };
 
     try {
@@ -471,6 +516,24 @@ export default function AdminProductsPage() {
         setSeoTitle={setSeoTitle}
         seoDescription={seoDescription}
         setSeoDescription={setSeoDescription}
+        nameBn={nameBn}
+        setNameBn={setNameBn}
+        shortDescriptionBn={shortDescriptionBn}
+        setShortDescriptionBn={setShortDescriptionBn}
+        descriptionBn={descriptionBn}
+        setDescriptionBn={setDescriptionBn}
+        fabricBn={fabricBn}
+        setFabricBn={setFabricBn}
+        patternBn={patternBn}
+        setPatternBn={setPatternBn}
+        colorBn={colorBn}
+        setColorBn={setColorBn}
+        countryOfOriginBn={countryOfOriginBn}
+        setCountryOfOriginBn={setCountryOfOriginBn}
+        seoTitleBn={seoTitleBn}
+        setSeoTitleBn={setSeoTitleBn}
+        seoDescriptionBn={seoDescriptionBn}
+        setSeoDescriptionBn={setSeoDescriptionBn}
         isUploadingImage={isUploadingImage}
         isSubmitting={isSubmitting}
         onImageUpload={handleImageUpload}

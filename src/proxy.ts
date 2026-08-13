@@ -8,19 +8,19 @@ const handleIntl = createMiddleware(routing);
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // Run next-intl middleware first to obtain locale response & headers
-  const response = handleIntl(request);
+  // 1. Redirect localized dashboard URLs (/en/dashboard, /bn/dashboard) to unlocalized /dashboard
+  if (pathname.match(/^\/(?:en|bn)\/dashboard/)) {
+    const cleanDashboardPath = pathname.replace(/^\/(?:en|bn)/, '');
+    return NextResponse.redirect(new URL(cleanDashboardPath, request.url));
+  }
 
-  // Normalize pathname by stripping locale prefix (/en or /bn)
-  const cleanPathname = pathname.replace(/^\/(?:en|bn)/, '') || '/';
+  // 2. Handle /dashboard routes directly (Bypassing next-intl to avoid locale rewriting/404s)
+  if (pathname.startsWith('/dashboard')) {
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
 
-  const token = await getToken({
-    req: request,
-    secret: process.env.NEXTAUTH_SECRET,
-  });
-
-  // Protect /dashboard routes — admin only
-  if (cleanPathname.startsWith('/dashboard')) {
     if (!token) {
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('next', pathname);
@@ -30,7 +30,20 @@ export async function proxy(request: NextRequest) {
     if (token.role !== 'admin') {
       return NextResponse.redirect(new URL('/', request.url));
     }
+
+    return NextResponse.next();
   }
+
+  // 3. For non-dashboard routes, run next-intl middleware first
+  const response = handleIntl(request);
+
+  // Normalize pathname by stripping locale prefix (/en or /bn)
+  const cleanPathname = pathname.replace(/^\/(?:en|bn)/, '') || '/';
+
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
 
   // Protect /account routes — must be logged in; Admin redirected to /dashboard
   if (cleanPathname.startsWith('/account')) {

@@ -71,6 +71,25 @@ interface ProductFormDrawerProps {
   setSeoTitle: (val: string) => void;
   seoDescription: string;
   setSeoDescription: (val: string) => void;
+  // Bengali Translations
+  nameBn: string;
+  setNameBn: (val: string) => void;
+  shortDescriptionBn: string;
+  setShortDescriptionBn: (val: string) => void;
+  descriptionBn: string;
+  setDescriptionBn: (val: string) => void;
+  fabricBn: string;
+  setFabricBn: (val: string) => void;
+  patternBn: string;
+  setPatternBn: (val: string) => void;
+  colorBn: string;
+  setColorBn: (val: string) => void;
+  countryOfOriginBn: string;
+  setCountryOfOriginBn: (val: string) => void;
+  seoTitleBn: string;
+  setSeoTitleBn: (val: string) => void;
+  seoDescriptionBn: string;
+  setSeoDescriptionBn: (val: string) => void;
   isUploadingImage: boolean;
   isSubmitting: boolean;
   onImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -133,6 +152,24 @@ export function ProductFormDrawer({
   setSeoTitle,
   seoDescription,
   setSeoDescription,
+  nameBn,
+  setNameBn,
+  shortDescriptionBn,
+  setShortDescriptionBn,
+  descriptionBn,
+  setDescriptionBn,
+  fabricBn,
+  setFabricBn,
+  patternBn,
+  setPatternBn,
+  colorBn,
+  setColorBn,
+  countryOfOriginBn,
+  setCountryOfOriginBn,
+  seoTitleBn,
+  setSeoTitleBn,
+  seoDescriptionBn,
+  setSeoDescriptionBn,
   isUploadingImage,
   isSubmitting,
   onImageUpload,
@@ -539,7 +576,7 @@ export function ProductFormDrawer({
           </div>
 
           {/* SECTION 7: SEO META INFORMATION */}
-          <div className="space-y-4 pb-4">
+          <div className="space-y-4 border-b border-[#e3e2e2] pb-6">
             <h3 className="text-xs font-bold uppercase tracking-wider text-[#5e5e5b]">
               7. Search Engine Optimization (SEO)
             </h3>
@@ -556,6 +593,84 @@ export function ProductFormDrawer({
               placeholder="Custom description for Google search results..."
               value={seoDescription}
               onChange={(e) => setSeoDescription(e.target.value)}
+              rows={2}
+            />
+          </div>
+
+          {/* SECTION 8: BENGALI TRANSLATIONS (বাংলা সংস্করণ) */}
+          <div className="space-y-4 pb-4 bg-[#fbf9f8] p-4 border border-[#e3e2e2]">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#1b1c1c] flex items-center gap-2">
+                <span className="bg-[#1b1c1c] text-white px-1.5 py-0.5 text-[10px]">বাংলা</span>
+                8. Bengali Translations (Optional Overrides)
+              </h3>
+            </div>
+
+            <Input
+              label="Product Name (বাংলা নাম)"
+              placeholder="যেমন: রয়্যাল হ্যান্ডলুম কটন লুঙ্গি"
+              value={nameBn}
+              onChange={(e) => setNameBn(e.target.value)}
+            />
+
+            <Textarea
+              label="Short Summary (সংক্ষিপ্ত বিবরণ)"
+              placeholder="প্রোডাক্ট কার্ডে দেখানোর জন্য সংক্ষেপে লিখুন..."
+              value={shortDescriptionBn}
+              onChange={(e) => setShortDescriptionBn(e.target.value)}
+              rows={2}
+            />
+
+            <Textarea
+              label="Detailed Description (বিস্তারিত বিবরণ)"
+              placeholder="বুনন পদ্ধতি, বিবরণ ও যত্ন সম্পর্কিত তথ্য..."
+              value={descriptionBn}
+              onChange={(e) => setDescriptionBn(e.target.value)}
+              rows={4}
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="Fabric (ফেব্রিক)"
+                placeholder="১০০% অর্গানিক কটন"
+                value={fabricBn}
+                onChange={(e) => setFabricBn(e.target.value)}
+              />
+              <Input
+                label="Pattern (প্যাটার্ন)"
+                placeholder="ঐতিহ্যবাহী চেক"
+                value={patternBn}
+                onChange={(e) => setPatternBn(e.target.value)}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="Color (রং)"
+                placeholder="নেভি ব্লু"
+                value={colorBn}
+                onChange={(e) => setColorBn(e.target.value)}
+              />
+              <Input
+                label="Country of Origin (উৎপাদনকারী দেশ)"
+                placeholder="বাংলাদেশ"
+                value={countryOfOriginBn}
+                onChange={(e) => setCountryOfOriginBn(e.target.value)}
+              />
+            </div>
+
+            <Input
+              label="SEO Title (বাংলা মেটা শিরোনাম)"
+              placeholder="যেমন: রয়্যাল হ্যান্ডলুম লুঙ্গি | নোবাব ঐতিহ্য"
+              value={seoTitleBn}
+              onChange={(e) => setSeoTitleBn(e.target.value)}
+            />
+
+            <Textarea
+              label="SEO Meta Description (বাংলা মেটা বিবরণ)"
+              placeholder="গুগল সার্চ ফলাফলের জন্য বিস্তারিত বাংলা বিবরণ..."
+              value={seoDescriptionBn}
+              onChange={(e) => setSeoDescriptionBn(e.target.value)}
               rows={2}
             />
           </div>

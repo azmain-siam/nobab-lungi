@@ -18,6 +18,20 @@ export const collectionSchema = z.object({
   is_active: z.boolean().default(true),
   seo_title: z.string().optional().nullable(),
   seo_description: z.string().optional().nullable(),
+  translations: z
+    .object({
+      bn: z
+        .object({
+          name: z.string().optional().nullable(),
+          description: z.string().optional().nullable(),
+          seo_title: z.string().optional().nullable(),
+          seo_description: z.string().optional().nullable(),
+        })
+        .optional()
+        .nullable(),
+    })
+    .optional()
+    .nullable(),
 });
 
 export type CollectionInput = z.infer<typeof collectionSchema>;

@@ -4,7 +4,7 @@
   --font-sans: var(--font-inter);
   --font-display: var(--font-hanken);
   --font-serif: var(--font-cormorant);
-
+  --font-hind-siliguri: var(--font-hind-siliguri);
   --color-background: #fbf9f8;
   --color-foreground: #1b1c1c;
   --color-card: #ffffff;
@@ -85,4 +85,3 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-

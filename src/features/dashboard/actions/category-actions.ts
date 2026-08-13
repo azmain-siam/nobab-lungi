@@ -43,7 +43,7 @@ export async function createCategoryAction(input: CategoryInput): Promise<Catego
       return { error: parsed.error.issues[0].message };
     }
 
-    const { name, slug, description, image_url, parent_type, sort_order, is_active } = parsed.data;
+    const { name, slug, description, image_url, parent_type, sort_order, is_active, translations } = parsed.data;
 
     await connectToDatabase();
 
@@ -75,6 +75,7 @@ export async function createCategoryAction(input: CategoryInput): Promise<Catego
       parent_type,
       sort_order: sort_order ?? 0,
       is_active: is_active ?? true,
+      translations: translations || {},
     });
 
     revalidatePath('/dashboard/categories');
@@ -98,7 +99,7 @@ export async function updateCategoryAction(
       return { error: parsed.error.issues[0].message };
     }
 
-    const { name, slug, description, image_url, parent_type, sort_order, is_active } = parsed.data;
+    const { name, slug, description, image_url, parent_type, sort_order, is_active, translations } = parsed.data;
 
     await connectToDatabase();
 
@@ -134,6 +135,7 @@ export async function updateCategoryAction(
           parent_type,
           sort_order: sort_order ?? 0,
           is_active: is_active ?? true,
+          translations: translations || {},
         },
       }
     );
