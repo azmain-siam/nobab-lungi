@@ -1,16 +1,19 @@
-import type { Metadata } from 'next';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Container } from '@/components/ui/container';
-import { Section } from '@/components/ui/section';
-import { ProductCard, type ProductCardData } from '@/components/shared/product-card';
-import { getCollectionBySlug } from '@/services/collection-service';
-import { getPublicProducts } from '@/services/product-service';
-import type { ProductWithImages } from '@/types';
-import { ArrowLeft, ShoppingBag } from 'lucide-react';
+import {
+  ProductCard,
+  type ProductCardData,
+} from "@/components/shared/product-card";
+import { Container } from "@/components/ui/container";
+import { Section } from "@/components/ui/section";
+import { getCollectionBySlug } from "@/services/collection-service";
+import { getPublicProducts } from "@/services/product-service";
+import type { ProductWithImages } from "@/types";
+import { ArrowLeft, ShoppingBag } from "lucide-react";
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 
 const DEFAULT_BANNER =
-  'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?q=80&w=1600&auto=format&fit=crop';
+  "https://images.unsplash.com/photo-1607344645866-009c320c5ab8?q=80&w=1600&auto=format&fit=crop";
 
 function mapProductToCardData(product: ProductWithImages): ProductCardData {
   const coverImage =
@@ -19,20 +22,20 @@ function mapProductToCardData(product: ProductWithImages): ProductCardData {
     DEFAULT_BANNER;
 
   let badge: string | null = null;
-  if (product.is_new_arrival) badge = 'New Arrival';
-  else if (product.is_best_seller) badge = 'Best Seller';
-  else if (product.is_featured) badge = 'Featured';
+  if (product.is_new_arrival) badge = "New Arrival";
+  else if (product.is_best_seller) badge = "Best Seller";
+  else if (product.is_featured) badge = "Featured";
 
-  const priceStr = `৳${(product.discount_price ?? product.price).toLocaleString('en-BD')}`;
+  const priceStr = `৳${(product.discount_price ?? product.price).toLocaleString("en-BD")}`;
   const originalPriceStr = product.discount_price
-    ? `৳${product.price.toLocaleString('en-BD')}`
+    ? `৳${product.price.toLocaleString("en-BD")}`
     : undefined;
 
   return {
     id: product.id,
     slug: product.slug,
     name: product.name,
-    collectionTag: product.fabric || 'Handloom',
+    collectionTag: product.fabric || "Handloom",
     description: product.short_description || product.description || undefined,
     image: coverImage,
     price: priceStr,
@@ -51,8 +54,8 @@ export async function generateMetadata({
 
   if (!collection) {
     return {
-      title: 'Collection — Nabab Lungi',
-      description: 'Explore our handcrafted lungi collection.',
+      title: "Collection — Nabab Lungi",
+      description: "Explore our handcrafted lungi collection.",
     };
   }
 
@@ -74,13 +77,14 @@ export default async function CollectionDetailsPage({
   const collection = await getCollectionBySlug(slug, locale);
 
   // Fallback for default predefined lungi collections if DB collection doc is missing
-  const fallbackTitle = slug.replace(/-/g, ' ').toUpperCase();
+  const fallbackTitle = slug.replace(/-/g, " ").toUpperCase();
 
   const title = collection?.name || `${fallbackTitle} COLLECTION`;
   const description =
     collection?.description ||
-    'Timeless traditional check and pattern lungis hand-woven with fine organic cotton yarn by master Bengali artisans.';
-  const bannerImage = collection?.banner_url || collection?.cover_image || DEFAULT_BANNER;
+    "Timeless traditional check and pattern lungis hand-woven with fine organic cotton yarn by master Bengali artisans.";
+  const bannerImage =
+    collection?.banner_url || collection?.cover_image || DEFAULT_BANNER;
 
   // Fetch dynamic products matching this collection from MongoDB
   const productsRes = await getPublicProducts({
@@ -94,7 +98,10 @@ export default async function CollectionDetailsPage({
   return (
     <>
       {/* Editorial Hero Banner */}
-      <section aria-label="Hero" className="relative min-h-[55vh] w-full overflow-hidden bg-stone-900 flex items-end pb-16 pt-32 lg:min-h-[60vh]">
+      <section
+        aria-label="Hero"
+        className="relative min-h-[60vh] w-full overflow-hidden bg-stone-900 flex items-end pb-16 pt-32 lg:min-h-[70vh]"
+      >
         <Image
           src={bannerImage}
           alt={`${title} banner`}
@@ -137,7 +144,9 @@ export default async function CollectionDetailsPage({
         <Container>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#e3e2e2] pb-6 mb-10 gap-4">
             <span className="text-xs font-semibold uppercase tracking-wider text-[#5e5e5b]">
-              Showing <strong className="text-[#1b1c1c]">{cardProducts.length}</strong> Handcrafted Lungi Items
+              Showing{" "}
+              <strong className="text-[#1b1c1c]">{cardProducts.length}</strong>{" "}
+              Handcrafted Lungi Items
             </span>
             <Link
               href={`/shop?collection=${slug}`}
@@ -161,7 +170,8 @@ export default async function CollectionDetailsPage({
                 No Items Found in this Collection
               </h2>
               <p className="text-xs text-[#5e5e5b] max-w-xs mx-auto">
-                Explore our full catalog to discover our full selection of handcrafted lungis.
+                Explore our full catalog to discover our full selection of
+                handcrafted lungis.
               </p>
               <div className="pt-2">
                 <Link

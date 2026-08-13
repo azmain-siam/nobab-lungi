@@ -97,10 +97,11 @@ export function Header({ variant, collections = [], whatsappNumber }: HeaderProp
 
   // Unified transparent vs light mode calculation
   const isHomepage = isClient ? pathname === '/' : false;
+  const isSingleCollection = isClient ? pathname.startsWith('/collections/') : false;
   const forcedVariant = variant;
   const isTransparentMode = forcedVariant
     ? forcedVariant === 'transparent' && !scrolled
-    : isHomepage && !scrolled;
+    : (isHomepage || isSingleCollection) && !scrolled;
 
   const isDarkText = !isTransparentMode;
 
