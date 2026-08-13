@@ -17,9 +17,23 @@
 }
 
 html[lang="bn"],
-.locale-bn {
-  --font-inter: var(--font-hind-siliguri), sans-serif;
-  --font-hanken: var(--font-hind-siliguri), sans-serif;
+.locale-bn,
+.locale-bn body,
+.locale-bn .font-display,
+.locale-bn .font-sans,
+.locale-bn h1,
+.locale-bn h2,
+.locale-bn h3,
+.locale-bn h4,
+.locale-bn h5,
+.locale-bn h6,
+.locale-bn p,
+.locale-bn span,
+.locale-bn a,
+.locale-bn button,
+.locale-bn input,
+.locale-bn textarea {
+  font-family: var(--font-hind-siliguri), sans-serif !important;
 }
 
 body {

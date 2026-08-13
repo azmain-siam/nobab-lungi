@@ -20,12 +20,14 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { Link } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
+import { usePathname, useRouter } from '@/i18n/routing';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 // import { AnnouncementBar } from './announcement-bar';
 import { MobileNavDrawer } from './mobile-nav-drawer';
+import { LanguageToggle } from './language-toggle';
 import type { Collection } from '@/types';
 
 interface HeaderProps {
@@ -37,6 +39,7 @@ interface HeaderProps {
 const emptySubscribe = () => () => { };
 
 export function Header({ variant, collections = [], whatsappNumber }: HeaderProps) {
+  const tNav = useTranslations('nav');
   const pathname = usePathname();
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
@@ -161,7 +164,7 @@ export function Header({ variant, collections = [], whatsappNumber }: HeaderProp
                   : 'text-white/80 hover:text-white'
                 }`}
             >
-              COLLECTIONS
+              {tNav('collections')}
             </Link>
             <Link
               href="/products"
@@ -174,7 +177,7 @@ export function Header({ variant, collections = [], whatsappNumber }: HeaderProp
                   : 'text-white/80 hover:text-white'
                 }`}
             >
-              SHOP
+              {tNav('shop')}
             </Link>
             <Link
               href="/about"
@@ -187,15 +190,18 @@ export function Header({ variant, collections = [], whatsappNumber }: HeaderProp
                   : 'text-white/80 hover:text-white'
                 }`}
             >
-              ABOUT
+              {tNav('about_us')}
             </Link>
           </div>
 
           {/* Action Icons Section */}
           <div
-            className={`flex items-center gap-4 sm:gap-5 transition-colors ${isDarkText ? 'text-[#1b1c1c]' : 'text-white'
+            className={`flex items-center gap-3 sm:gap-4 transition-colors ${isDarkText ? 'text-[#1b1c1c]' : 'text-white'
               }`}
           >
+            {/* Language Switcher Toggle */}
+            <LanguageToggle isTransparent={isTransparentMode} />
+
             {/* 1. Search */}
             <Link
               href="/products"

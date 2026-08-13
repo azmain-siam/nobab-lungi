@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
+import { useTranslations } from 'next-intl';
 import type { Banner } from '@/types';
 import bannerImg from '../../../../public/images/banner/banner.jpeg';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -14,6 +15,7 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ banners = [] }: HeroSectionProps) {
+  const tHero = useTranslations('hero');
   const activeBanners = banners.filter((b) => b.is_active && b.desktop_image);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -102,7 +104,7 @@ export function HeroSection({ banners = [] }: HeroSectionProps) {
                     variant="white"
                     size="lg"
                   >
-                    {currentBanner.primary_btn_text || 'SHOP COLLECTION'}
+                    {currentBanner.primary_btn_text || tHero('cta_shop')}
                   </Button>
                   {currentBanner.secondary_btn_text && (
                     <Button
@@ -118,21 +120,24 @@ export function HeroSection({ banners = [] }: HeroSectionProps) {
             ) : (
               /* Approved Static Hero Content Fallback */
               <>
+                <span className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-white/80 bg-white/10 px-3 py-1 backdrop-blur-xs animate-fade-in-up">
+                  {tHero('badge')}
+                </span>
                 <h1 className="font-display text-5xl font-semibold leading-[1.1] tracking-tight sm:text-6xl lg:text-7xl animate-fade-in-up animation-delay-100">
-                  Wear Tradition <br />
-                  with Pride.
+                  {tHero('title_part1')} <br />
+                  {tHero('title_part2')}
                 </h1>
 
                 <p className="max-w-md text-sm font-light leading-relaxed text-white/90 sm:text-base animate-fade-in-up animation-delay-200">
-                  Premium handcrafted lungis made with exceptional fabrics, timeless craftsmanship, and modern comfort.
+                  {tHero('subtitle')}
                 </p>
 
                 <div className="pt-2 flex flex-wrap items-center gap-4 animate-fade-in-up animation-delay-300">
                   <Button href="/products" variant="white" size="lg">
-                    SHOP COLLECTION
+                    {tHero('cta_shop')}
                   </Button>
                   <Button href="/collections" variant="ghost-white" size="lg">
-                    EXPLORE PREMIUM SERIES
+                    {tHero('cta_story')}
                   </Button>
                 </div>
               </>

@@ -2,6 +2,7 @@ import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { RevealOnScroll, StaggerContainer, StaggerItem } from "@/components/ui/motion-wrappers";
+import { useTranslations } from "next-intl";
 import type { HomepageConfig } from "@/types";
 import {
   Award,
@@ -71,13 +72,14 @@ interface NababStandardProps {
 }
 
 export function NababStandard({ items = [] }: NababStandardProps) {
+  const tStandard = useTranslations('standard');
   const cards = items.length > 0 ? items : DEFAULT_STANDARDS;
 
   return (
     <Section variant="default" className="py-10 sm:py-16 lg:py-24">
       <Container>
         <RevealOnScroll>
-          <SectionHeading title="The Nabab Standard" align="center" className="mb-6 sm:mb-12" />
+          <SectionHeading title={tStandard('title')} align="center" className="mb-6 sm:mb-12" />
         </RevealOnScroll>
 
         <StaggerContainer className="mt-6 sm:mt-12 grid grid-cols-2 gap-x-4 gap-y-6 sm:gap-8 lg:grid-cols-4">

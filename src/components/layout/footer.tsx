@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import Image from 'next/image';
 import { Container } from '@/components/ui/container';
 import { getStoreSettings } from '@/services/settings-service';

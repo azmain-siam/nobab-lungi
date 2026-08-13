@@ -28,7 +28,7 @@ const cormorant = Cormorant_Garamond({
 });
 
 const hindSiliguri = Hind_Siliguri({
-  subsets: ['bengali'],
+  subsets: ['bengali', 'latin'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-hind-siliguri',
   display: 'swap',
